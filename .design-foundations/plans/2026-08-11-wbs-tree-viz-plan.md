@@ -1,8 +1,5 @@
 # Plan: WBS 계층 트리 다이어그램
 
-**Status:** in-progress
-**Started:** 2026-08-11 15:35
-**Current Phase:** 1
 **Track:** Quick (1 phase)
 **Entry stage:** Design (DESIGN.md 파일 자체는 없지만, render.js의 색상/서페이스 토큰 — `--bg/--panel/--ink/--muted/--border/--accent/--code-bg/--grid-line` 등 — 은 이미 확정되어 있어 그 범위에 한해 locked로 간주. 단 타입 스케일(`--text-xs`…`--text-4xl`)과 기능색 램프(`--error/--success/--warning/--info-*`)는 토큰화돼 있지 않으므로 "DESIGN.md 전체가 locked"는 아님 — 이번 phase가 필요로 하는 색/서페이스 토큰만 재사용.
 **JOURNEY.md 부재 확인:** JOURNEY.md도 없음 — workflow-conventions.md §2에 따라 wireframe mode로 진행, 이 갭을 명시적으로 플래그함. 트리 진입점(사이드바 탭 vs 기존 탭 내 토글) 배치는 정식 페이지 스펙 없이 mock 단계에서 wireframe로 결정.)

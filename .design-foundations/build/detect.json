@@ -4,48 +4,289 @@
   "attribution": "Rule subset ported from Impeccable (pbakaus/impeccable), Apache-2.0, with modifications — see file header. Catalog: references/visual/ai-tells.md.",
   "status": "ran",
   "sources": [
-    "C:\\Pruden_KH\\CodeSearch\\.claude\\worktrees\\wbs-tree-viz\\index.html"
+    "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html"
   ],
   "rules": 16,
   "findings": [
     {
-      "source": "C:\\Pruden_KH\\CodeSearch\\.claude\\worktrees\\wbs-tree-viz\\index.html",
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
       "rule": "hero-eyebrow-chip",
       "category": "layout",
       "severity": "high",
-      "evidence": "eyebrow \"K-water\" above <h1> \"BIM 코드&middot;기준 검색\"",
-      "line": 391
+      "evidence": "eyebrow \"K-water\" above <h1> \"WBS 계층 트리 다이어그램\"",
+      "line": 147
     },
     {
-      "source": "C:\\Pruden_KH\\CodeSearch\\.claude\\worktrees\\wbs-tree-viz\\index.html",
-      "rule": "hero-eyebrow-chip",
-      "category": "layout",
-      "severity": "high",
-      "evidence": "eyebrow \"K-water BIM 적용지침 표 2.3-2\" above <h1> \"BIM 모델 색상&middot;재질 기준\"",
-      "line": 423
-    },
-    {
-      "source": "C:\\Pruden_KH\\CodeSearch\\.claude\\worktrees\\wbs-tree-viz\\index.html",
-      "rule": "hero-eyebrow-chip",
-      "category": "layout",
-      "severity": "high",
-      "evidence": "eyebrow \"K-water WBS (부속서-2 §3.8)\" above <h1> \"WBS 계층 트리\"",
-      "line": 441
-    },
-    {
-      "source": "C:\\Pruden_KH\\CodeSearch\\.claude\\worktrees\\wbs-tree-viz\\index.html",
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
       "rule": "nested-cards",
       "category": "layout",
       "severity": "high",
-      "evidence": "<button class=\"tree-toggle-btn\"> is a card inside a card ancestor",
-      "line": 455
+      "evidence": "<div class=\"node parent\"> is a card inside a card ancestor",
+      "line": 161
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 163
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 164
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 165
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 166
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 167
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node parent\"> is a card inside a card ancestor",
+      "line": 172
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 174
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 175
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 176
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 177
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node parent\"> is a card inside a card ancestor",
+      "line": 182
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 184
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 185
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 186
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 187
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 188
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"unclassified\"> is a card inside a card ancestor",
+      "line": 193
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 199
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 200
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 201
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 202
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 203
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node parent\"> is a card inside a card ancestor",
+      "line": 219
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 222
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 224
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node child\"> is a card inside a card ancestor",
+      "line": 228
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 230
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 231
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 232
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 233
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "nested-cards",
+      "category": "layout",
+      "severity": "high",
+      "evidence": "<div class=\"node\"> is a card inside a card ancestor",
+      "line": 234
+    },
+    {
+      "source": "C:\\Pruden_KH\\CodeSearch\\.design-foundations\\build\\wbs-tree-viz-mock.html",
+      "rule": "em-dash-overuse",
+      "category": "copy",
+      "severity": "medium",
+      "evidence": "5 em-dashes in body copy",
+      "line": null
     }
   ],
   "counts": {
-    "total": 4,
+    "total": 34,
     "byRule": {
-      "hero-eyebrow-chip": 3,
-      "nested-cards": 1
+      "hero-eyebrow-chip": 1,
+      "nested-cards": 32,
+      "em-dash-overuse": 1
     }
   }
 }
