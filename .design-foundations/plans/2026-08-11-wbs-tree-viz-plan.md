@@ -1,9 +1,8 @@
 # Plan: WBS 계층 트리 다이어그램
 
-**Status:** complete
+**Status:** in-progress
 **Started:** 2026-08-11 15:35
-**Completed:** 2026-08-11 15:55
-**Current Phase:** 1 (final)
+**Current Phase:** 1
 **Track:** Quick (1 phase)
 **Entry stage:** Design (DESIGN.md 파일 자체는 없지만, render.js의 색상/서페이스 토큰 — `--bg/--panel/--ink/--muted/--border/--accent/--code-bg/--grid-line` 등 — 은 이미 확정되어 있어 그 범위에 한해 locked로 간주. 단 타입 스케일(`--text-xs`…`--text-4xl`)과 기능색 램프(`--error/--success/--warning/--info-*`)는 토큰화돼 있지 않으므로 "DESIGN.md 전체가 locked"는 아님 — 이번 phase가 필요로 하는 색/서페이스 토큰만 재사용.
 **JOURNEY.md 부재 확인:** JOURNEY.md도 없음 — workflow-conventions.md §2에 따라 wireframe mode로 진행, 이 갭을 명시적으로 플래그함. 트리 진입점(사이드바 탭 vs 기존 탭 내 토글) 배치는 정식 페이지 스펙 없이 mock 단계에서 wireframe로 결정.)
@@ -65,17 +64,3 @@
 - DW-1.4: 라이트/다크 각 배경-텍스트 조합 대비비 계산 (라이트는 필수, 다크는 참고용)
 - DW-1.5: Playwright로 index.html/artifact.html 로드 후 콘솔 에러 0건 확인
 - Dirty case: L6 데이터가 0건일 때 → "미분류"만 표시하지 않고 빈 상태 안내 문구가 뜨는지 확인
-
----
-
-## Execution Log
-
-### Phase 1: WBS 계층 트리 다이어그램 (Gate: Standard)
-- [x] BUILD: Discovery + design + production complete (sonnet)
-- [x] REVIEW: fail → pass (2 attempts — 1차는 리뷰 스코프 버그로 인한 오탐: 이 phase가 건드리지 않은 기존 코드의 하드코딩 hex/eyebrow 패턴을 새로 추가된 것처럼 플래그함. git diff로 확인 후 스코프를 수정해 재검토, 2차 PASS) (haiku)
-- [x] Committed
-Commit: 27e2e67862f5267d920fe91b628b3d1adf5dd9ec
-Summary: "WBS 트리" 탭 추가 — 공종(L5→L6, 437쌍 실검증 + 미분류 5개) · 시설(L1→L2→L3, 9노드/8엣지) 트리 다이어그램, 기존 토큰 재사용, 사이드바 탭 패턴 확장. DW-1.1~1.5 전부 독립 검증 통과.
-
-**Status:** complete
-**Completed:** 2026-08-11 15:55
