@@ -127,7 +127,7 @@ function buildPage() {
   .chip:not(.active) { opacity: .55; }
   .chip:not(.active) .dot { opacity: .5; }
 
-  #meta, #colorMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
+  #meta, #colorMeta, #wbsTreeMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
 
   .layout {
     display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start;
@@ -320,6 +320,78 @@ function buildPage() {
   .cube-face.top { transform: rotateX(90deg) translateZ(29px); }
   .cube-face.side { transform: rotateY(90deg) translateZ(29px); }
 
+  /* --- WBS 트리 탭: 공종(Lv5→Lv6) · 시설(Lv1→Lv3) 계층 트리 --- */
+  .subhead { font-size: 12.5px; color: var(--muted); max-width: 760px; line-height: 1.6; margin: 0 0 4px; }
+  .wbstree-layout { max-width: 1200px; margin: 0 auto; padding: 18px 22px 60px; display: flex; flex-direction: column; gap: 26px; }
+  .section-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px 22px; }
+  .section-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    margin: 0 0 4px; padding-bottom: 12px; border-bottom: 1.5px solid var(--border); }
+  .section-title { font-size: 12.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+  .section-sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .section-actions { display: flex; align-items: center; gap: 8px; }
+  .tree-toggle-btn {
+    font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--panel); color: var(--muted); cursor: pointer;
+  }
+  .tree-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .tree-toggle-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .node {
+    display: inline-flex; align-items: baseline; gap: 8px;
+    background: var(--code-bg); border-left: 3px solid var(--accent);
+    border-radius: 0 5px 5px 0; padding: 5px 9px;
+  }
+  .node .code { font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace; font-weight: 700; font-size: 12.5px; color: var(--ink); }
+  .node .name { font-size: 12px; color: var(--muted); }
+  .node.parent { background: color-mix(in srgb, var(--accent) 9%, var(--panel)); border-left-color: var(--accent); }
+  .node.parent .code { font-size: 13px; }
+  .node.parent .name { color: var(--ink); font-weight: 600; }
+  .node.child { background: var(--code-bg); border-left: 3px solid color-mix(in srgb, var(--accent) 45%, var(--border)); }
+
+  .tree-group { margin: 0 0 4px; }
+  .tree-group summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 3px 0; }
+  .tree-group summary::-webkit-details-marker { display: none; }
+  .tree-group summary::before {
+    content: ''; width: 0; height: 0; flex: none;
+    border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 5px solid var(--muted);
+    transition: transform .1s ease; margin-right: 1px;
+  }
+  .tree-group[open] > summary::before { transform: rotate(90deg); }
+  .tree-group summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .tree-group-count { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .tree-group-empty { display: flex; align-items: center; gap: 8px; padding: 3px 0 3px 13px; }
+
+  ul.tree-children { list-style: none; margin: 4px 0 2px 9px; padding: 0; }
+  ul.tree-children > li { position: relative; padding: 4px 0 4px 24px; }
+  ul.tree-children > li::before {
+    content: ''; position: absolute; top: 50%; left: 0; width: 18px; height: 2px;
+    background: color-mix(in srgb, var(--accent) 30%, var(--border));
+  }
+  ul.tree-children > li::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 2px; height: 50%;
+    background: color-mix(in srgb, var(--accent) 30%, var(--border));
+  }
+  ul.tree-children > li:not(:last-child)::after { height: 100%; }
+  ul.tree-children ul.tree-children { margin-left: 4px; }
+
+  .discipline-groups { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
+
+  .unclassified {
+    margin-top: 16px; border: 1.5px dashed var(--border); border-radius: 8px;
+    padding: 12px 14px; background: var(--bg);
+  }
+  .unclassified-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .unclassified-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .03em; padding: 2.5px 8px; border-radius: 4px;
+    background: var(--mark-bg); color: var(--mark-ink);
+  }
+  .unclassified-count { font-size: 11.5px; color: var(--muted); }
+  .unclassified-nodes { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .unclassified-nodes .node { border-left-color: color-mix(in srgb, var(--mark-bg) 70%, var(--border)); background: var(--code-bg); }
+  .unclassified-note { font-size: 11.5px; color: var(--muted); line-height: 1.6; margin: 0; }
+
+  .facility-wrap { max-width: 620px; margin-top: 4px; }
+
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   `;
 
@@ -327,6 +399,7 @@ function buildPage() {
   const TOGGLE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>';
   const NAV_SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>';
   const NAV_PALETTE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c1.7 0 3.1-1.4 3.1-3.1C20.5 6.6 16.7 2 12 2Z"></path><circle cx="7" cy="10" r="1.2"></circle><circle cx="12" cy="7" r="1.2"></circle><circle cx="16.5" cy="10" r="1.2"></circle></svg>';
+  const NAV_TREE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.3"></circle><circle cx="6" cy="18" r="2.3"></circle><circle cx="18" cy="12" r="2.3"></circle><path d="M8.1 6.9 15.9 11.1M8.1 17.1 15.9 12.9"></path></svg>';
 
   const bodyHtml = `<div class="app">
   <aside class="sidebar" id="sidebar">
@@ -384,6 +457,45 @@ function buildPage() {
       </header>
       <div class="color-groups" id="colorGroups"></div>
     </section>
+    <section class="tab-panel" data-tab="wbstree" style="display:none">
+      <header>
+        <div class="header-top">
+          <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
+          <div class="header-main">
+            <p class="eyebrow">K-water WBS (부속서-2 §3.8)</p>
+            <h1>WBS 계층 트리</h1>
+            <p class="subhead">공종(工種)과 시설(施設)은 WBS 상 서로 독립된 두 개의 분류축이라 각각 별도 트리로 표시합니다 · 신뢰 가능한 부모 링크가 없는 Lv4·Lv7은 트리에서 제외됩니다.</p>
+            <div id="wbsTreeMeta"></div>
+          </div>
+        </div>
+      </header>
+      <div class="wbstree-layout" id="wbsTreeLayout">
+        <section class="section-panel">
+          <div class="section-head">
+            <div>
+              <div class="section-title">공종 분류 (Lv5 → Lv6)</div>
+              <div class="section-sub">공종대분류 → 공종중분류 · prefix-match(부속서-2 §3.8)로 검증된 관계만 표시</div>
+            </div>
+            <div class="section-actions">
+              <button class="tree-toggle-btn" id="treeToggleBtn" type="button">모두 펼치기</button>
+            </div>
+          </div>
+          <div id="disciplineTreeBody">
+            <div class="discipline-groups" id="disciplineGroups"></div>
+            <div id="disciplineUnclassified"></div>
+          </div>
+        </section>
+        <section class="section-panel">
+          <div class="section-head">
+            <div>
+              <div class="section-title">시설 분류 (Lv1 → Lv2 → Lv3)</div>
+              <div class="section-sub">발주분야 → 시설대분류 → 시설중분류</div>
+            </div>
+          </div>
+          <div id="facilityTreeBody"></div>
+        </section>
+      </div>
+    </section>
   </div>
 </div>
 <script>
@@ -438,6 +550,7 @@ function esc(s) {
 const TABS = [
   { id: 'codesearch', label: '코드서치', icon: '${NAV_SEARCH_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
+  { id: 'wbstree', label: 'WBS 트리', icon: '${NAV_TREE_ICON}' },
 ];
 const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
@@ -940,6 +1053,128 @@ colorGroupsEl.addEventListener('click', (ev) => {
 });
 colorQEl.addEventListener('input', renderColors);
 renderColors();
+
+// --- WBS 트리 탭: 공종(Lv5→Lv6) · 시설(Lv1→Lv3) 계층 트리 ---
+// 두 트리 모두 하드코딩된 샘플이 아니라 매 로드 시 DATA(search-index.json)에서 다시 계산한다 -
+// 소스 데이터가 재빌드돼도 트리가 자동으로 최신 상태를 반영하고, 검증되지 않은 관계는 그리지 않는다.
+function nodeHtml(code, name, cls) {
+  return '<div class="node' + (cls ? ' ' + cls : '') + '"><span class="code">' + esc(code) + '</span><span class="name">' + esc(name) + '</span></div>';
+}
+
+// 공종 Lv5→Lv6: 부속서-2 §3.8 - Lv6(3자리) 앞 2자리가 그대로 Lv5(2자리) 코드로 확장되는 공식 규칙.
+// 이 prefix가 실제 Lv5 코드 집합에 없는 Lv6는 "미분류"로 별도 표시하고 조용히 누락하지 않는다.
+function buildDisciplineTree() {
+  const lv5 = DATA.filter((e) => e.source === 'WBS-Lv5').slice().sort((a, b) => (a.code || '').localeCompare(b.code || ''));
+  const lv6 = DATA.filter((e) => e.source === 'WBS-공종(Lv6)').slice().sort((a, b) => (a.code || '').localeCompare(b.code || ''));
+  const bodyEl = document.getElementById('disciplineTreeBody');
+  const toggleBtn = document.getElementById('treeToggleBtn');
+  if (lv5.length === 0 || lv6.length === 0) {
+    bodyEl.innerHTML = '<div class="empty">공종 계층 데이터를 불러오지 못했습니다 (Lv5 또는 Lv6 원본이 비어 있습니다). 소스 데이터(search-index.json)를 다시 빌드하거나 페이지를 새로고침해 주세요.</div>';
+    if (toggleBtn) toggleBtn.style.display = 'none';
+    return { groups: 0, children: 0, unclassified: 0 };
+  }
+  const lv5Codes = new Set(lv5.map((e) => e.code));
+  const childrenByParent = new Map(lv5.map((p) => [p.code, []]));
+  const unclassified = [];
+  for (const c of lv6) {
+    const prefix = (c.code || '').slice(0, 2);
+    if (childrenByParent.has(prefix)) childrenByParent.get(prefix).push(c);
+    else unclassified.push(c);
+  }
+  const groupsHtml = lv5.map((p) => {
+    const kids = childrenByParent.get(p.code) || [];
+    const parentNode = nodeHtml(p.code, p.name, 'parent');
+    if (kids.length === 0) {
+      return '<div class="tree-group-empty">' + parentNode + '<span class="tree-group-count">0개</span></div>';
+    }
+    const kidsHtml = kids.map((c) => '<li>' + nodeHtml(c.code, c.name, 'child') + '</li>').join('');
+    return '<details class="tree-group"><summary>' + parentNode +
+      '<span class="tree-group-count">' + kids.length + '개</span></summary>' +
+      '<ul class="tree-children">' + kidsHtml + '</ul></details>';
+  }).join('');
+  document.getElementById('disciplineGroups').innerHTML = groupsHtml;
+
+  const unclassifiedEl = document.getElementById('disciplineUnclassified');
+  if (unclassified.length === 0) {
+    unclassifiedEl.innerHTML = '';
+  } else {
+    const missingPrefixes = [...new Set(unclassified.map((c) => (c.code || '').slice(0, 2)))];
+    const nodesHtml = unclassified.map((c) => nodeHtml(c.code, c.name, '')).join('');
+    unclassifiedEl.innerHTML = '<div class="unclassified">' +
+      '<div class="unclassified-head"><span class="unclassified-tag">미분류</span>' +
+      '<span class="unclassified-count">Lv6 ' + unclassified.length + '개 · Lv5 부모 코드 "' + missingPrefixes.map(esc).join('", "') + '"가 소스 데이터에 없음</span></div>' +
+      '<div class="unclassified-nodes">' + nodesHtml + '</div>' +
+      '<p class="unclassified-note">원본 데이터에 해당 Lv5 마스터 행 자체가 누락된 것으로 추정됩니다 - 조용히 빠뜨리지 않고 별도 그룹으로 표시합니다 (부속서-2 §3.8 prefix 규칙 기준 미매칭 항목).</p></div>';
+  }
+  if (toggleBtn) {
+    toggleBtn.style.display = '';
+    toggleBtn.addEventListener('click', () => {
+      const details = document.querySelectorAll('#disciplineGroups .tree-group');
+      const anyClosed = [...details].some((d) => !d.open);
+      details.forEach((d) => { d.open = anyClosed; });
+      toggleBtn.textContent = anyClosed ? '모두 접기' : '모두 펼치기';
+    });
+  }
+  return { groups: lv5.length, children: lv6.length, unclassified: unclassified.length };
+}
+
+// 시설 Lv1→Lv2→Lv3: Lv1→Lv2는 소스에 연결 필드가 없어, 현재처럼 Lv1이 정확히 1개일 때만
+// "모든 Lv2가 그 Lv1의 자식"이라는 관계를 안전하게 추론할 수 있다 (그 외엔 표시하지 않음 - 추측 금지).
+// Lv2→Lv3는 코드 prefix로 일반화되지 않으므로(F00→'1'이 규칙을 깨뜨림), 코드서치 탭의
+// "경로보기" 기능에서 이미 교차 검증된 FACILITY_ROUTES를 재사용하되, 실제 lv2/lv3 레코드
+// 존재 여부를 다시 확인해 검증 안 된 관계는 그리지 않는다.
+function buildFacilityTree() {
+  const lv1 = DATA.filter((e) => e.source === 'WBS-Lv1');
+  const lv2 = DATA.filter((e) => e.source === 'WBS-Lv2');
+  const lv3 = DATA.filter((e) => e.source === 'WBS-Lv3');
+  const bodyEl = document.getElementById('facilityTreeBody');
+  if (lv1.length === 0 || lv2.length === 0 || lv3.length === 0) {
+    bodyEl.innerHTML = '<div class="empty">시설 계층 데이터를 불러오지 못했습니다 (Lv1, Lv2 또는 Lv3 원본이 비어 있습니다). 소스 데이터(search-index.json)를 다시 빌드하거나 페이지를 새로고침해 주세요.</div>';
+    return { nodes: 0, edges: 0 };
+  }
+  if (lv1.length !== 1) {
+    bodyEl.innerHTML = '<div class="empty">Lv1이 ' + lv1.length + '개로 늘어나 Lv1→Lv2 관계를 소스 데이터만으로 안전하게 판별할 수 없어 트리 표시를 건너뜁니다.</div>';
+    return { nodes: 0, edges: 0 };
+  }
+  const root = lv1[0];
+  const lv3ByCode = new Map(lv3.map((e) => [e.code, e]));
+  const l2Children = new Map(lv2.map((e) => [e.code, []]));
+  let edgeCount = lv2.length; // L1 -> 각 L2
+  for (const route of FACILITY_ROUTES) {
+    if (!l2Children.has(route.l2)) continue;
+    const l3Entry = lv3ByCode.get(route.l3);
+    if (!l3Entry) continue;
+    l2Children.get(route.l2).push(l3Entry);
+    edgeCount++;
+  }
+  const l2Html = lv2.map((l2) => {
+    const kids = l2Children.get(l2.code) || [];
+    const kidsHtml = kids.map((l3) => '<li>' + nodeHtml(l3.code, l3.name, '') + '</li>').join('');
+    return '<li>' + nodeHtml(l2.code, l2.name, 'child') +
+      (kidsHtml ? '<ul class="tree-children">' + kidsHtml + '</ul>' : '') + '</li>';
+  }).join('');
+  bodyEl.innerHTML = '<div class="facility-wrap"><div class="tree-root">' +
+    nodeHtml(root.code, root.name, 'parent') +
+    '<ul class="tree-children">' + l2Html + '</ul></div></div>';
+  let leafCount = 0;
+  for (const kids of l2Children.values()) leafCount += kids.length;
+  return { nodes: 1 + lv2.length + leafCount, edges: edgeCount };
+}
+
+(function renderWbsTree() {
+  const discResult = buildDisciplineTree();
+  const facResult = buildFacilityTree();
+  const metaEl = document.getElementById('wbsTreeMeta');
+  if (metaEl) {
+    const parts = [];
+    if (discResult.groups) {
+      parts.push('공종 Lv5 ' + discResult.groups + '개 · Lv6 ' + discResult.children + '개' +
+        (discResult.unclassified ? ' (미분류 ' + discResult.unclassified + '개 포함)' : ''));
+    }
+    if (facResult.nodes) parts.push('시설 ' + facResult.nodes + '개 노드 / ' + facResult.edges + '개 엣지');
+    metaEl.textContent = parts.join(' · ');
+  }
+})();
 </script>`;
 
   return {
