@@ -1,0 +1,14 @@
+{
+  "name": "kwater-pps-code-search",
+  "version": "1.0.0",
+  "description": "K-water/PPS BIM code reference search (static HTML, no server needed)",
+  "private": true,
+  "scripts": {
+    "extract": "node scripts/xlsx2json.js",
+    "build-index": "node scripts/build-index.js",
+    "build-html": "node scripts/build-html.js",
+    "build-artifact": "node scripts/build-artifact.js",
+    "build": "npm run build-index && npm run build-html && npm run build-artifact",
+    "verify": "node scripts/verify.js"
+  }
+}

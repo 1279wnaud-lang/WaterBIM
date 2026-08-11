@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WBS 계층 트리 다이어그램 — mock</title>
+<style>
+  /* === DESIGN TOKENS — verbatim from scripts/render.js :root (locked-for-this-purpose) === */
+  :root {
+    --bg: #EEF1EC; --panel: #FFFFFF; --ink: #16231F; --muted: #5B6B63;
+    --border: #D6DED4; --accent: #0E7C86; --accent-ink: #ffffff;
+    --code-bg: #E4EAE2; --grid-line: rgba(14,124,134,.07); --mark-bg: #F4CE68; --mark-ink: #2A2205;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
+      var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  ::selection { background: var(--accent); color: var(--accent-ink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+
+  .mono {
+    font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+  }
+
+  header {
+    background: color-mix(in srgb, var(--panel) 92%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px 16px;
+  }
+  .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 4px;
+  }
+  h1 { font-size: 18px; margin: 0 0 6px; font-weight: 700; letter-spacing: -.01em; }
+  .subhead { font-size: 12.5px; color: var(--muted); max-width: 760px; line-height: 1.6; }
+
+  main {
+    max-width: 1240px; margin: 0 auto; padding: 24px 24px 70px;
+    display: flex; flex-direction: column; gap: 34px;
+  }
+
+  .section-panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 22px 24px;
+  }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    margin: 0 0 4px; padding-bottom: 12px; border-bottom: 1.5px solid var(--border); }
+  .section-title { font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); }
+  .section-sub { font-size: 11.5px; color: var(--muted); }
+
+  .scale-note {
+    font-size: 12px; color: var(--muted); margin-top: 14px; padding: 8px 12px;
+    background: var(--code-bg); border-radius: 6px; line-height: 1.6;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Tree structure — orthogonal elbow connectors (piping/circuit look) */
+  /* ---------------------------------------------------------------- */
+
+  .forest {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px;
+  }
+
+  .tree-root {
+    display: flex; flex-direction: column;
+  }
+
+  .node {
+    display: inline-flex; align-items: baseline; gap: 8px;
+    background: var(--code-bg); border-left: 3px solid var(--accent);
+    border-radius: 0 5px 5px 0; padding: 6px 10px;
+  }
+  .node .code { font-weight: 700; font-size: 13px; color: var(--ink); }
+  .node .name { font-size: 12.5px; color: var(--muted); }
+
+  .node.parent {
+    background: color-mix(in srgb, var(--accent) 9%, var(--panel));
+    border-left-color: var(--accent);
+  }
+  .node.parent .code { font-size: 13.5px; }
+  .node.parent .name { color: var(--ink); font-weight: 600; }
+
+  .node.child { background: var(--code-bg); border-left: 3px solid color-mix(in srgb, var(--accent) 45%, var(--border)); }
+
+  /* Elbow-connector list — classic continuous-trunk trick:
+     each li draws its own vertical run down to its elbow midpoint;
+     non-last children extend that run to 100% so the trunk continues
+     to the next sibling, and it terminates exactly at the last child. */
+  ul.tree-children {
+    list-style: none; margin: 6px 0 0 9px; padding: 0;
+  }
+  ul.tree-children > li {
+    position: relative; padding: 5px 0 5px 26px;
+  }
+  ul.tree-children > li::before {
+    content: ''; position: absolute; top: 50%; left: 0; width: 20px; height: 2px;
+    background: color-mix(in srgb, var(--accent) 30%, var(--border));
+  }
+  ul.tree-children > li::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 2px; height: 50%;
+    background: color-mix(in srgb, var(--accent) 30%, var(--border));
+  }
+  ul.tree-children > li:not(:last-child)::after { height: 100%; }
+
+  /* nested (Lv3-under-Lv2) trees reuse the same rules one level deeper */
+  ul.tree-children ul.tree-children { margin-left: 4px; }
+
+  /* 미분류 bucket — flagged, not silent: dashed border + existing highlight tokens */
+  .unclassified {
+    margin-top: 18px; border: 1.5px dashed var(--border); border-radius: 8px;
+    padding: 12px 14px; background: var(--bg);
+  }
+  .unclassified-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .unclassified-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .03em; padding: 2.5px 8px; border-radius: 4px;
+    background: var(--mark-bg); color: var(--mark-ink);
+  }
+  .unclassified-count { font-size: 11.5px; color: var(--muted); }
+  .unclassified-nodes { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .unclassified-nodes .node { border-left-color: color-mix(in srgb, var(--mark-bg) 70%, var(--border)); background: var(--code-bg); }
+  .unclassified-note { font-size: 11.5px; color: var(--muted); line-height: 1.6; margin: 0; }
+
+  .facility-wrap { max-width: 620px; }
+
+  footer.mock-footer {
+    max-width: 1240px; margin: 0 auto; padding: 0 24px 40px; font-size: 11.5px; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">K-water</p>
+  <h1>WBS 계층 트리 다이어그램</h1>
+  <p class="subhead">코드 검색 결과의 구조적 위치를 시각적으로 보여주는 새 뷰 — 공종(工種)과 시설(施設)은 WBS 상 서로 독립된 두 개의 분류축이라 하나의 트리로 합치지 않고 각각 별도 다이어그램으로 표시합니다.</p>
+</header>
+
+<main>
+
+  <section class="section-panel">
+    <div class="section-head">
+      <span class="section-title">공종 분류 (Lv5 → Lv6)</span>
+      <span class="section-sub">공종대분류 → 공종중분류 · prefix-match로 검증된 관계만 표시</span>
+    </div>
+
+    <div class="forest">
+      <div class="tree-root">
+        <div class="node parent"><span class="code mono">CA</span><span class="name">공통공사</span></div>
+        <ul class="tree-children">
+          <li><div class="node child"><span class="code mono">CAB</span><span class="name">가설건물</span></div></li>
+          <li><div class="node child"><span class="code mono">CAA</span><span class="name">임시시설</span></div></li>
+          <li><div class="node child"><span class="code mono">CAF</span><span class="name">지장물보호시설</span></div></li>
+          <li><div class="node child"><span class="code mono">CAG</span><span class="name">비계및동바리</span></div></li>
+          <li><div class="node child"><span class="code mono">CAH</span><span class="name">반력벽</span></div></li>
+        </ul>
+      </div>
+
+      <div class="tree-root">
+        <div class="node parent"><span class="code mono">AF</span><span class="name">조적공사(건축)</span></div>
+        <ul class="tree-children">
+          <li><div class="node child"><span class="code mono">AFA</span><span class="name">벽돌공사</span></div></li>
+          <li><div class="node child"><span class="code mono">AFB</span><span class="name">블럭공사</span></div></li>
+          <li><div class="node child"><span class="code mono">AFC</span><span class="name">경량콘크리트판</span></div></li>
+          <li><div class="node child"><span class="code mono">AFD</span><span class="name">조적부대공사</span></div></li>
+        </ul>
+      </div>
+
+      <div class="tree-root">
+        <div class="node parent"><span class="code mono">MB</span><span class="name">배관공(기계)</span></div>
+        <ul class="tree-children">
+          <li><div class="node child"><span class="code mono">MBA</span><span class="name">강관(기계)</span></div></li>
+          <li><div class="node child"><span class="code mono">MBB</span><span class="name">동관</span></div></li>
+          <li><div class="node child"><span class="code mono">MBC</span><span class="name">스테인레스관(기계)</span></div></li>
+          <li><div class="node child"><span class="code mono">MBD</span><span class="name">주철관(기계)</span></div></li>
+          <li><div class="node child"><span class="code mono">MBE</span><span class="name">PVC관(기계)</span></div></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="unclassified">
+      <div class="unclassified-head">
+        <span class="unclassified-tag">미분류</span>
+        <span class="unclassified-count">Lv6 5개 — Lv5 부모 코드 "CE"가 소스 데이터에 없음</span>
+      </div>
+      <div class="unclassified-nodes">
+        <div class="node"><span class="code mono">CEF</span><span class="name">구조물줄눈</span></div>
+        <div class="node"><span class="code mono">CEG</span><span class="name">구조물제작</span></div>
+        <div class="node"><span class="code mono">CEH</span><span class="name">콘크리트보수</span></div>
+        <div class="node"><span class="code mono">CEI</span><span class="name">콘크리트부대공</span></div>
+        <div class="node"><span class="code mono">CEJ</span><span class="name">구조물철거</span></div>
+      </div>
+      <p class="unclassified-note">원본 데이터에 Lv5 부모 코드 "CE" 마스터 행 자체가 누락된 것으로 추정 — 조용히 빠뜨리지 않고 별도 그룹으로 명시. 전체 442개 Lv6 중 5개(소수)에 한함.</p>
+    </div>
+
+    <p class="scale-note">실제 데이터는 67개 Lv5 부모 / 442개 Lv6 자식 — 전체 버전은 스크롤/접기 UI 필요 (이 mock은 패턴 검증용 샘플, 위 3개 부모 + 미분류만 표시).</p>
+  </section>
+
+  <section class="section-panel">
+    <div class="section-head">
+      <span class="section-title">시설 분류 (Lv1 → Lv2 → Lv3)</span>
+      <span class="section-sub">발주분야 → 시설대분류 → 시설중분류 · 전체 9노드(엣지 8개), search-index.json과 1:1 일치</span>
+    </div>
+
+    <div class="facility-wrap">
+      <div class="tree-root">
+        <div class="node parent"><span class="code mono">S</span><span class="name">수도분야</span></div>
+        <ul class="tree-children">
+          <li>
+            <div class="node child"><span class="code mono">F00</span><span class="name">공통시설</span></div>
+            <ul class="tree-children">
+              <li><div class="node"><span class="code mono">1</span><span class="name">공통시설</span></div></li>
+            </ul>
+          </li>
+          <li>
+            <div class="node child"><span class="code mono">F14</span><span class="name">상수도시설</span></div>
+            <ul class="tree-children">
+              <li><div class="node"><span class="code mono">1411</span><span class="name">취수시설</span></div></li>
+              <li><div class="node"><span class="code mono">1421</span><span class="name">도수시설</span></div></li>
+              <li><div class="node"><span class="code mono">1431</span><span class="name">정수시설</span></div></li>
+              <li><div class="node"><span class="code mono">1441</span><span class="name">송수시설</span></div></li>
+              <li><div class="node"><span class="code mono">1451</span><span class="name">급배수시설</span></div></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="mock-footer">
+  throwaway-fidelity checkpoint mock · 색상 토큰은 scripts/render.js :root 값만 사용 (신규 색상 없음) · L4/L7은 신뢰 가능한 부모 링크가 없어 트리에서 제외
+</footer>
+
+</body>
+</html>
