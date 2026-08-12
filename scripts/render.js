@@ -1,8 +1,11 @@
 // Shared page renderer: produces {title, description, styleCss, bodyHtml}.
-// Design language: clean data-dense SaaS dashboard - navy/blue/green professional
-// palette, white rounded cards with soft shadows, pill-shaped badges/chips, grouped
-// sidebar navigation. Per ui-ux-pro-max design-system recommendation for an internal
-// engineering reference tool (2026-08-12 visual reskin, reference: clinic dashboard UI).
+// Design language (2026-08-12, frontend-design skill): Retro-Futuristic terminal /
+// CAD-workstation register. Green-phosphor-on-black, D2Coding/IBM Plex Mono for
+// everything (Korean included - D2Coding is a real Korean coding font), scanline
+// texture, flat bordered panels (no rounded shadow cards), section headers as
+// "> " terminal prompts. Chosen over the safer "Industrial" read because the tool's
+// own subject (BIM/CAD) traces directly to CAD workstation CRTs, not because "it's
+// technical data" - deliberately replaces the earlier clean-SaaS-dashboard reskin.
 const fs = require('fs');
 const path = require('path');
 
@@ -51,52 +54,51 @@ function buildPage() {
   }
   const dictData = dictDataRaw.map((e) => ({ ...e, categoryGroup: normalizeCategory(e.category) }));
 
-  // Layer palette - considered, CAD-layer-inspired hues (not default Tailwind blue/purple/green/amber/red).
+  // Terminal register: one signal color (phosphor green), not a rainbow of layer hues -
+  // per-source distinction now carries entirely on the label text, matching how real
+  // terminal UIs differentiate (text, not color-coding).
   const SOURCE_META = {
-    'WBS-Lv1': { group: 'K-water WBS (부속서-2)', label: 'Lv1 발주분야', color: '#3B6EA8' },
-    'WBS-Lv2': { group: 'K-water WBS (부속서-2)', label: 'Lv2 시설대분류', color: '#3B6EA8' },
-    'WBS-Lv3': { group: 'K-water WBS (부속서-2)', label: 'Lv3 시설중분류', color: '#3B6EA8' },
-    'WBS-시설(Lv4)': { group: 'K-water WBS (부속서-2)', label: 'Lv4 시설소분류', color: '#3B6EA8' },
-    'WBS-Lv5': { group: 'K-water WBS (부속서-2)', label: 'Lv5 공종대분류', color: '#5B7DA6' },
-    'WBS-공종(Lv6)': { group: 'K-water WBS (부속서-2)', label: 'Lv6 공종중분류', color: '#5B7DA6' },
-    'WBS-기타(참고, Lv7류)': { group: 'K-water WBS (부속서-2)', label: '참고 (Lv7류)', color: '#8C9A93' },
-    'WBS-기타(참고)': { group: 'K-water WBS (부속서-2)', label: '참고', color: '#8C9A93' },
-    Pset: { group: 'K-water 속성정보세트 (부속서-7)', label: 'Pset', color: '#4C8C5B' },
+    'WBS-Lv1': { group: 'K-water WBS (부속서-2)', label: 'Lv1 발주분야', color: '#00FF66' },
+    'WBS-Lv2': { group: 'K-water WBS (부속서-2)', label: 'Lv2 시설대분류', color: '#00FF66' },
+    'WBS-Lv3': { group: 'K-water WBS (부속서-2)', label: 'Lv3 시설중분류', color: '#00FF66' },
+    'WBS-시설(Lv4)': { group: 'K-water WBS (부속서-2)', label: 'Lv4 시설소분류', color: '#00FF66' },
+    'WBS-Lv5': { group: 'K-water WBS (부속서-2)', label: 'Lv5 공종대분류', color: '#00FF66' },
+    'WBS-공종(Lv6)': { group: 'K-water WBS (부속서-2)', label: 'Lv6 공종중분류', color: '#00FF66' },
+    'WBS-기타(참고, Lv7류)': { group: 'K-water WBS (부속서-2)', label: '참고 (Lv7류)', color: '#FFB000' },
+    'WBS-기타(참고)': { group: 'K-water WBS (부속서-2)', label: '참고', color: '#FFB000' },
+    Pset: { group: 'K-water 속성정보세트 (부속서-7)', label: 'Pset', color: '#00FF66' },
   };
 
   const styleCss = `
+  /* Retro-Futuristic terminal register: one fixed dark register, deliberately -
+     a "light-mode CRT" isn't a coherent thing, so no prefers-color-scheme branch here. */
   :root {
-    --bg: #F8FAFC; --panel: #FFFFFF; --ink: #0F172A; --muted: #64748B;
-    --border: #E4E7EB; --accent: #2563EB; --accent-ink: #ffffff;
-    --primary: #1E3A5F; --success: #059669; --danger: #DC2626;
-    --code-bg: #F1F3F5; --mark-bg: #FDE68A; --mark-ink: #713F12;
-    --shadow: 0 1px 2px rgba(15,23,42,.04), 0 1px 8px rgba(15,23,42,.06);
+    --bg: #0A0F0C; --panel: #0F1611; --ink: #C9F5D2; --muted: #688F76;
+    --border: #1C2B20; --accent: #00FF66; --accent-ink: #06120A; --amber: #FFB000;
+    --code-bg: #121A15; --mark-bg: #003318; --mark-ink: #6BFFA0;
+    --glow: 0 0 8px rgba(0,255,102,.35);
   }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #0B1220; --panel: #131C2E; --ink: #E7ECF5; --muted: #93A3BC;
-      --border: #24314A; --accent: #5B8DEF; --accent-ink: #051225;
-      --primary: #7FA6D6; --success: #34D399; --danger: #F87171;
-      --code-bg: #1A2437; --mark-bg: #4A3B0E; --mark-ink: #FDE68A;
-      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 8px rgba(0,0,0,.35); }
-  }
-  :root[data-theme="dark"] { --bg: #0B1220; --panel: #131C2E; --ink: #E7ECF5; --muted: #93A3BC;
-    --border: #24314A; --accent: #5B8DEF; --accent-ink: #051225;
-    --primary: #7FA6D6; --success: #34D399; --danger: #F87171;
-    --code-bg: #1A2437; --mark-bg: #4A3B0E; --mark-ink: #FDE68A;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 8px rgba(0,0,0,.35); }
-  :root[data-theme="light"] { --bg: #F8FAFC; --panel: #FFFFFF; --ink: #0F172A; --muted: #64748B;
-    --border: #E4E7EB; --accent: #2563EB; --accent-ink: #ffffff;
-    --primary: #1E3A5F; --success: #059669; --danger: #DC2626;
-    --code-bg: #F1F3F5; --mark-bg: #FDE68A; --mark-ink: #713F12;
-    --shadow: 0 1px 2px rgba(15,23,42,.04), 0 1px 8px rgba(15,23,42,.06); }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    font-family: 'Poppins', 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'D2Coding', 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, 'Malgun Gothic', monospace;
     background: var(--bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
+    position: relative;
+  }
+  /* CRT scanline texture - fixed overlay, faint, never intercepts clicks. */
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background: repeating-linear-gradient(
+      to bottom, rgba(0,0,0,.09) 0px, rgba(0,0,0,.09) 1px, transparent 1px, transparent 3px
+    );
+    mix-blend-mode: multiply;
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 998;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.45) 130%);
   }
   ::selection { background: var(--accent); color: var(--accent-ink); }
 
@@ -114,20 +116,23 @@ function buildPage() {
   .nav-list { padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
   .nav-item {
     display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer;
-    font-size: 13px; font-weight: 600; color: var(--muted); border-radius: 8px;
+    font-size: 13px; font-weight: 600; color: var(--muted); border-radius: 0;
+    border-left: 2px solid transparent;
   }
   .nav-item svg { width: 16px; height: 16px; flex: none; }
   .nav-item:hover { color: var(--ink); background: var(--code-bg); }
   .nav-item.active {
-    color: var(--accent-ink); background: var(--accent);
+    color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent);
+    border-left-color: var(--accent); text-shadow: var(--glow);
   }
+  .nav-item.active::before { content: '>'; font-weight: 700; }
 
   .main-area { flex: 1; min-width: 0; }
   .header-top { display: flex; align-items: flex-start; gap: 12px; }
   .header-main { flex: 1; min-width: 0; }
   .sidebar-toggle {
     display: inline-flex; align-items: center; justify-content: center; flex: none;
-    width: 32px; height: 32px; border-radius: 7px; border: 1px solid var(--border);
+    width: 32px; height: 32px; border-radius: 2px; border: 1px solid var(--border);
     background: var(--panel); color: var(--muted); cursor: pointer; margin-top: 1px;
   }
   .sidebar-toggle:hover { background: var(--code-bg); color: var(--ink); }
@@ -136,24 +141,29 @@ function buildPage() {
 
   header {
     position: sticky; top: 0; z-index: 10;
-    background: color-mix(in srgb, var(--panel) 92%, transparent);
+    background: color-mix(in srgb, var(--panel) 94%, transparent);
     backdrop-filter: blur(6px);
     border-bottom: 1px solid var(--border);
     padding: 18px 22px 14px;
   }
   .eyebrow {
-    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
     color: var(--muted); margin: 0 0 4px;
   }
-  h1 { font-size: 19px; margin: 0 0 12px; font-weight: 700; letter-spacing: -.01em; text-wrap: balance; color: var(--primary); }
+  .eyebrow::before { content: '// '; color: var(--border); }
+  h1 {
+    font-size: 19px; margin: 0 0 12px; font-weight: 700; letter-spacing: -.01em; text-wrap: balance;
+    color: var(--accent); text-shadow: var(--glow);
+  }
 
   .search-row { position: relative; }
   .search-row input {
-    width: 100%; font-size: 15.5px; padding: 12px 14px 12px 38px; border-radius: 10px;
-    border: 1.5px solid var(--border); background: var(--panel); color: var(--ink); outline: none;
-    font-family: inherit; box-shadow: var(--shadow);
+    width: 100%; font-size: 15.5px; padding: 12px 14px 12px 38px; border-radius: 2px;
+    border: 1px solid var(--border); background: var(--code-bg); color: var(--ink); outline: none;
+    font-family: inherit; caret-color: var(--accent);
   }
-  .search-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .search-row input::placeholder { color: var(--muted); }
+  .search-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--glow); }
   .search-row svg.search-icon {
     position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
     width: 16px; height: 16px; color: var(--muted); pointer-events: none;
@@ -162,13 +172,15 @@ function buildPage() {
   .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
   .chip {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 600; padding: 6px 12px 6px 9px; border-radius: 999px;
-    border: 1px solid var(--border); background: var(--panel); color: var(--muted); cursor: pointer; user-select: none;
+    font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 2px;
+    border: 1px solid var(--border); background: var(--code-bg); color: var(--muted); cursor: pointer; user-select: none;
     transition: opacity .12s;
   }
-  .chip .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
-  .chip.active { color: var(--ink); border-color: color-mix(in srgb, var(--chip-color, var(--accent)) 45%, var(--border)); background: color-mix(in srgb, var(--chip-color, var(--accent)) 12%, var(--panel)); }
-  .chip:not(.active) { opacity: .55; }
+  .chip::before { content: '['; color: var(--border); }
+  .chip::after { content: ']'; color: var(--border); }
+  .chip .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .chip.active { color: var(--ink); border-color: color-mix(in srgb, var(--chip-color, var(--accent)) 55%, var(--border)); background: color-mix(in srgb, var(--chip-color, var(--accent)) 10%, var(--code-bg)); }
+  .chip:not(.active) { opacity: .5; }
   .chip:not(.active) .dot { opacity: .5; }
 
   #meta, #colorMeta, #dictMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
@@ -188,29 +200,30 @@ function buildPage() {
 
   .card {
     background: var(--panel); border: 1px solid var(--border);
-    border-radius: 14px; padding: 15px 17px; margin: 0 0 10px; box-shadow: var(--shadow);
-    transition: box-shadow .15s, border-color .15s;
+    border-radius: 2px; padding: 15px 17px; margin: 0 0 10px;
+    transition: border-color .15s, box-shadow .15s;
   }
-  .card:hover { border-color: color-mix(in srgb, var(--card-color, var(--accent)) 35%, var(--border)); }
+  .card:hover { border-color: color-mix(in srgb, var(--card-color, var(--accent)) 55%, var(--border)); box-shadow: var(--glow); }
   .card-top { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
   .badge {
-    font-size: 10.5px; font-weight: 700; letter-spacing: .03em; padding: 3px 9px; border-radius: 999px;
-    color: white; white-space: nowrap;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .03em; padding: 2.5px 7px; border-radius: 2px;
+    color: var(--accent-ink); white-space: nowrap;
   }
   .code-wrap { display: inline-flex; align-items: center; gap: 3px; }
   .code {
-    font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    font-family: inherit;
     font-weight: 600; font-size: 13.5px; letter-spacing: .01em;
-    background: var(--code-bg); padding: 1.5px 6px; border-radius: 6px;
+    background: var(--code-bg); color: var(--accent); padding: 1.5px 6px; border-radius: 2px;
+    text-shadow: var(--glow);
   }
   .copy-btn {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; padding: 0; border-radius: 5px; border: 1px solid transparent;
+    width: 22px; height: 22px; padding: 0; border-radius: 2px; border: 1px solid transparent;
     background: transparent; color: var(--muted); cursor: pointer;
   }
-  .copy-btn:hover { background: var(--code-bg); color: var(--ink); border-color: var(--border); }
+  .copy-btn:hover { background: var(--code-bg); color: var(--accent); border-color: var(--border); }
   .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .copy-btn.copied { color: #4C8C5B; }
+  .copy-btn.copied { color: var(--accent); text-shadow: var(--glow); }
   .copy-btn svg { width: 13px; height: 13px; pointer-events: none; }
   .name { font-size: 14.5px; font-weight: 600; }
   .breadcrumb { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
@@ -218,39 +231,40 @@ function buildPage() {
   .extra { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
   .tag {
     font-size: 11px; background: var(--code-bg); color: var(--muted);
-    padding: 3px 8px; border-radius: 5px; font-variant-numeric: tabular-nums;
+    padding: 3px 8px; border-radius: 2px; font-variant-numeric: tabular-nums;
+    border: 1px solid var(--border);
   }
   .empty { color: var(--muted); text-align: center; padding: 50px 0; font-size: 13.5px; }
-  mark { background: var(--mark-bg); color: var(--mark-ink); border-radius: 3px; padding: 0 1px; }
+  mark { background: var(--mark-bg); color: var(--mark-ink); border-radius: 2px; padding: 0 1px; text-shadow: var(--glow); }
 
   kbd {
-    font-family: ui-monospace, Consolas, monospace; font-size: 11px; background: var(--code-bg);
-    border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px; color: var(--muted);
+    font-family: inherit; font-size: 11px; background: var(--code-bg);
+    border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 2px; padding: 1px 5px; color: var(--muted);
   }
 
   .add-btn {
     display: inline-flex; align-items: center; gap: 4px;
-    height: 24px; padding: 0 9px; border-radius: 6px; border: 1px solid transparent;
+    height: 24px; padding: 0 9px; border-radius: 2px; border: 1px solid var(--accent);
     background: var(--accent); color: var(--accent-ink); cursor: pointer; font-size: 11.5px; font-weight: 700;
   }
-  .add-btn:hover { filter: brightness(1.08); }
+  .add-btn:hover { box-shadow: var(--glow); }
   .add-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .add-btn.added { background: #4C8C5B; }
+  .add-btn.added { background: var(--amber); border-color: var(--amber); }
   .add-btn svg { width: 13px; height: 13px; pointer-events: none; }
 
   .route-btn {
     display: inline-flex; align-items: center; gap: 4px;
-    height: 24px; padding: 0 9px; border-radius: 6px;
-    border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+    height: 24px; padding: 0 9px; border-radius: 2px;
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
     background: color-mix(in srgb, var(--accent) 8%, var(--panel)); color: var(--accent);
     cursor: pointer; font-size: 11.5px; font-weight: 700;
   }
-  .route-btn:hover { background: color-mix(in srgb, var(--accent) 18%, var(--panel)); }
+  .route-btn:hover { background: color-mix(in srgb, var(--accent) 18%, var(--panel)); box-shadow: var(--glow); }
   .route-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .route-btn svg { width: 13px; height: 13px; pointer-events: none; }
 
   .route-panel {
-    margin-top: 10px; padding: 10px 12px; border-radius: 8px;
+    margin-top: 10px; padding: 10px 12px; border-radius: 2px;
     background: var(--code-bg); border: 1px solid var(--border);
   }
   .route-hint { font-size: 11.5px; color: var(--muted); margin: 0 0 10px; line-height: 1.5; }
@@ -263,12 +277,12 @@ function buildPage() {
   .route-chips { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
   .route-chip {
     display: inline-flex; align-items: baseline; gap: 4px;
-    border-radius: 6px; padding: 3px 7px; font-size: 11.5px; line-height: 1.4;
+    border-radius: 2px; padding: 3px 7px; font-size: 11.5px; line-height: 1.4;
     background: color-mix(in srgb, var(--chip-color, var(--accent)) 12%, var(--panel));
     border: 1px solid color-mix(in srgb, var(--chip-color, var(--accent)) 40%, var(--border));
   }
   .route-chip b {
-    font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    font-family: 'D2Coding', 'IBM Plex Mono', ui-monospace, Consolas, monospace;
     font-weight: 700; color: var(--ink); font-size: 12px;
   }
   .route-chip-label { font-size: 9.5px; font-weight: 700; letter-spacing: .03em; color: var(--muted); }
@@ -276,14 +290,14 @@ function buildPage() {
     background: transparent; border: 1px dashed var(--border); color: var(--muted); font-style: italic;
   }
   .route-apply {
-    flex: none; font-size: 11.5px; padding: 5px 10px; border-radius: 5px; border: 1px solid var(--border);
+    flex: none; font-size: 11.5px; padding: 5px 10px; border-radius: 2px; border: 1px solid var(--border);
     background: var(--panel); color: var(--ink); cursor: pointer; margin-left: auto;
   }
   .route-apply:hover { border-color: var(--accent); color: var(--accent); }
 
   .tray {
     position: sticky; top: var(--tray-top, 90px);
-    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 2px;
     padding: 20px 24px 24px; max-height: calc(100vh - var(--tray-top, 90px) - 20px); overflow-y: auto;
   }
   .tray-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
@@ -304,22 +318,22 @@ function buildPage() {
   .slot-dot { width: 9px; height: 9px; border-radius: 2px; flex: none; }
   .slot-empty-text { font-size: 13px; color: var(--border); }
   .slot-code {
-    font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    font-family: 'D2Coding', 'IBM Plex Mono', ui-monospace, Consolas, monospace;
     font-size: 13.5px; font-weight: 700; letter-spacing: .01em; flex: none;
-    background: var(--code-bg); padding: 2px 7px; border-radius: 4px;
+    background: var(--code-bg); padding: 2px 7px; border-radius: 2px;
   }
   .slot-name {
     font-size: 12.5px; color: var(--muted); min-width: 0;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .slot-section {
-    width: 34px; text-align: center; font-family: ui-monospace, Consolas, monospace; font-size: 12px;
-    border: 1px dashed var(--accent); border-radius: 4px; background: var(--bg); color: var(--accent);
+    width: 34px; text-align: center; font-family: 'D2Coding', 'IBM Plex Mono', ui-monospace, Consolas, monospace; font-size: 12px;
+    border: 1px dashed var(--accent); border-radius: 2px; background: var(--bg); color: var(--accent);
     padding: 2px 3px; flex: none; font-weight: 700;
   }
   .slot-remove {
     display: inline-flex; align-items: center; justify-content: center; margin-left: auto;
-    width: 20px; height: 20px; border-radius: 4px; border: none; background: transparent; color: var(--muted); cursor: pointer; padding: 0; flex: none;
+    width: 20px; height: 20px; border-radius: 2px; border: none; background: transparent; color: var(--muted); cursor: pointer; padding: 0; flex: none;
   }
   .slot-remove:hover { background: var(--border); color: var(--ink); }
   .slot-remove svg { width: 11px; height: 11px; }
@@ -328,16 +342,16 @@ function buildPage() {
 
   .tray-row2 { display: flex; align-items: center; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
   .tray-preview {
-    font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace; font-size: 15px; font-weight: 700;
-    background: var(--code-bg); border-radius: 7px; padding: 10px 14px; flex: 1; min-width: 0;
+    font-family: 'D2Coding', 'IBM Plex Mono', ui-monospace, Consolas, monospace; font-size: 15px; font-weight: 700;
+    background: var(--code-bg); border-radius: 2px; padding: 10px 14px; flex: 1; min-width: 0;
     overflow-x: auto; white-space: nowrap;
   }
   .tray-copy {
     display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600;
-    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 7px; padding: 10px 16px; cursor: pointer; flex: none;
+    background: var(--accent); color: var(--accent-ink); border: none; border-radius: 2px; padding: 10px 16px; cursor: pointer; flex: none;
   }
   .tray-copy svg { width: 14px; height: 14px; }
-  .tray-copy.copied { background: #4C8C5B; }
+  .tray-copy.copied { background: var(--amber); }
   .tray-hint { font-size: 11.5px; color: var(--muted); margin-top: 12px; line-height: 1.55; }
 
   /* --- 색상기준 탭: 정육면체(true 3D cube) 스와치 그리드 --- */
@@ -350,7 +364,7 @@ function buildPage() {
   .color-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 14px; }
   .color-tile {
     display: flex; flex-direction: column; align-items: center; gap: 8px;
-    background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px 8px 12px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 2px; padding: 16px 8px 12px;
   }
   .color-tile-name { font-size: 12.5px; font-weight: 600; text-align: center; line-height: 1.3; }
   .color-tile-rgb-row { display: flex; align-items: center; gap: 3px; }
@@ -361,11 +375,11 @@ function buildPage() {
   .dict-word { font-size: 16px; }
   .dict-hanja { font-size: 12.5px; color: var(--muted); }
   .dict-explain {
-    font-size: 13px; margin-top: 9px; padding: 9px 12px; border-radius: 8px;
+    font-size: 13px; margin-top: 9px; padding: 9px 12px; border-radius: 2px;
     background: var(--code-bg); color: var(--ink); line-height: 1.55;
   }
   .dict-explain strong { color: var(--accent); margin-right: 4px; }
-  .color-tile-rgb { font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted); }
+  .color-tile-rgb { font-family: 'D2Coding', 'IBM Plex Mono', ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted); }
 
   .cube-scene { width: 58px; height: 58px; margin: 6px auto 14px; perspective: 320px; }
   .cube {
