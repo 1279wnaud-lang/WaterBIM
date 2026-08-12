@@ -365,7 +365,6 @@ function buildPage() {
   .dict-list { max-width: 1320px; margin: 0; padding: 18px 22px 60px 66px; }
   .dict-card-top { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
   .dict-word { font-size: 16px; }
-  .dict-hanja { font-size: 12.5px; color: var(--muted); }
   .dict-explain {
     font-size: 13px; margin-top: 9px; padding: 9px 12px; border-radius: 10px;
     background: var(--code-bg); color: var(--ink); line-height: 1.55;
@@ -1072,7 +1071,6 @@ function dictCardHtml(row) {
   return '<div class="card dict-card">' +
     '<div class="dict-card-top">' +
     '<span class="name dict-word">' + esc(row.word) + '</span>' +
-    (row.hanja ? '<span class="dict-hanja">' + esc(row.hanja) + '</span>' : '') +
     '<span class="tag">' + esc(row.pos) + '</span>' +
     '<span class="tag" title="' + esc(row.category) + '">' + esc(row.categoryGroup) + '</span>' +
     '</div>' +
