@@ -63,7 +63,7 @@ function buildPage() {
     'WBS-시설(Lv4)': { group: 'K-water WBS (부속서-2)', label: 'Lv4 시설소분류', color: '#2F6FED' },
     'WBS-Lv5': { group: 'K-water WBS (부속서-2)', label: 'Lv5 공종대분류', color: '#2F6FED' },
     'WBS-공종(Lv6)': { group: 'K-water WBS (부속서-2)', label: 'Lv6 공종중분류', color: '#2F6FED' },
-    'WBS-기타(참고, Lv7류)': { group: 'K-water WBS (부속서-2)', label: '참고 (Lv7류)', color: '#D97706' },
+    'WBS-기타(참고, Lv7류)': { group: 'K-water WBS (부속서-2)', label: 'Lv7 공종소분류', color: '#2F6FED' },
     'WBS-기타(참고)': { group: 'K-water WBS (부속서-2)', label: '참고', color: '#D97706' },
     Pset: { group: 'K-water 속성정보세트 (부속서-7)', label: 'Pset', color: '#2F6FED' },
   };
