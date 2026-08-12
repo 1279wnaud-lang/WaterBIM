@@ -10,7 +10,46 @@ function buildPage() {
   const DATA = path.join(__dirname, '..', 'data');
   const entries = JSON.parse(fs.readFileSync(path.join(DATA, 'search-index.json'), 'utf8'));
   const bimColorsRaw = JSON.parse(fs.readFileSync(path.join(DATA, 'bim-colors-raw.json'), 'utf8'));
-  const dictData = JSON.parse(fs.readFileSync(path.join(DATA, 'wbs-dictionary.json'), 'utf8'));
+  const dictDataRaw = JSON.parse(fs.readFileSync(path.join(DATA, 'wbs-dictionary.json'), 'utf8'));
+
+  // Raw dictionary "category" values are free-text combos ("토목·상하수도", "건설/토목" 등) -
+  // 215 distinct raw strings across 97 underlying domain tokens, unusable as filter chips as-is.
+  // Consolidate into ~11 top-level domains by mapping each raw token (split on · or /) to a
+  // canonical bucket, keeping the first-matching token's bucket as the entry's primary category -
+  // this groups by the domains already present in the data rather than inventing new meaning.
+  const CATEGORY_MAP = {
+    토목: '토목', 도로: '토목', 터널: '토목', 지질: '토목', 지반: '토목', 측량: '토목', 하천: '토목',
+    토공: '토목', 철근: '토목', 기초: '토목', 지중화: '토목', 교통: '토목', 수자원: '토목', 구조: '토목',
+    건축: '건축', 마감: '건축', 도장: '건축', 조적: '건축', 외장: '건축', 미장: '건축', 금속: '건축',
+    재료: '건축', 건축재료: '건축', 가설: '건축', 가설공사: '건축',
+    기계: '기계·설비', 기계설비: '기계·설비', 배관: '기계·설비', 공조: '기계·설비', 냉난방: '기계·설비',
+    계측: '기계·설비', 동력: '기계·설비', 운반: '기계·설비', 설비: '기계·설비',
+    건축설비: '기계·설비', 플랜트: '기계·설비',
+    전기: '전기·제어', 전기설비: '전기·제어', 조명: '전기·제어', 발전: '전기·제어', 수배전: '전기·제어',
+    배선: '전기·제어', 자동제어: '전기·제어', 제어: '전기·제어', 제어설비: '전기·제어',
+    상하수도: '상하수도·환경', 수처리: '상하수도·환경', 수처리설비: '상하수도·환경', 위생설비: '상하수도·환경',
+    환경: '상하수도·환경', 환경기계: '상하수도·환경',
+    통신: '통신', 정보통신: '통신', 통신설비: '통신', 방범: '통신', 보안: '통신', 전산: '통신', 전자: '통신',
+    조경: '조경',
+    안전: '안전·품질', 소방: '안전·품질', 소방설비: '안전·품질', 점검: '안전·품질', 품질: '안전·품질', 품질관리: '안전·품질',
+    사업관리: '사업관리·행정', 관리: '사업관리·행정', 유지관리: '사업관리·행정', 행정: '사업관리·행정',
+    공무: '사업관리·행정', 견적: '사업관리·행정', 내역: '사업관리·행정', 계약: '사업관리·행정',
+    설계: '사업관리·행정', 시공: '사업관리·행정', 규정: '사업관리·행정', 재무: '사업관리·행정',
+    문서: '사업관리·행정', 정보: '사업관리·행정', 계획: '사업관리·행정', 자재: '사업관리·행정',
+    부품: '사업관리·행정', 공사명: '사업관리·행정',
+    BIM: 'BIM',
+    공통: '공통', 일반: '공통', 건설: '공통', 건설일반: '공통',
+  };
+  function normalizeCategory(raw) {
+    const tokens = (raw || '').split(/[·/]/).map((t) => t.trim()).filter(Boolean);
+    for (const t of tokens) {
+      const key = t.replace(/\s+일반$/, '').trim();
+      if (CATEGORY_MAP[key]) return CATEGORY_MAP[key];
+      if (CATEGORY_MAP[t]) return CATEGORY_MAP[t];
+    }
+    return '기타';
+  }
+  const dictData = dictDataRaw.map((e) => ({ ...e, categoryGroup: normalizeCategory(e.category) }));
 
   // Layer palette - considered, CAD-layer-inspired hues (not default Tailwind blue/purple/green/amber/red).
   const SOURCE_META = {
@@ -132,7 +171,7 @@ function buildPage() {
   .chip:not(.active) { opacity: .55; }
   .chip:not(.active) .dot { opacity: .5; }
 
-  #meta, #colorMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
+  #meta, #colorMeta, #dictMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
 
   .layout {
     display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start;
@@ -358,7 +397,7 @@ function buildPage() {
         <div class="header-top">
           <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
           <div class="header-main">
-            <p class="eyebrow">K-water</p>
+            <p class="eyebrow">BIM Code &amp; Standard Search</p>
             <h1>BIM 코드&middot;기준 검색</h1>
             <div class="search-row">
               ${SEARCH_ICON}
@@ -390,7 +429,7 @@ function buildPage() {
         <div class="header-top">
           <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
           <div class="header-main">
-            <p class="eyebrow">K-water BIM 적용지침 표 2.3-2</p>
+            <p class="eyebrow">BIM Model Color &amp; Material Standards</p>
             <h1>BIM 모델 색상&middot;재질 기준</h1>
             <div class="search-row">
               ${SEARCH_ICON}
@@ -408,7 +447,7 @@ function buildPage() {
         <div class="header-top">
           <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
           <div class="header-main">
-            <p class="eyebrow">비전공자를 위한 용어 설명</p>
+            <p class="eyebrow">Dictionary</p>
             <h1>수도분야 용어사전</h1>
             <div class="search-row">
               ${SEARCH_ICON}
@@ -984,7 +1023,7 @@ const dictListEl = document.getElementById('dictList');
 const dictQEl = document.getElementById('dictQ');
 const dictFiltersEl = document.getElementById('dictFilters');
 const dictMetaEl = document.getElementById('dictMeta');
-const DICT_CATEGORY_ORDER = [...new Set(DICT_DATA.map((r) => r.category))];
+const DICT_CATEGORY_ORDER = [...new Set(DICT_DATA.map((r) => r.categoryGroup))];
 const selectedDictCategories = new Set();
 
 const dictChipMap = new Map();
@@ -1029,7 +1068,7 @@ function dictCardHtml(row) {
     '<span class="name dict-word">' + esc(row.word) + '</span>' +
     (row.hanja ? '<span class="dict-hanja">' + esc(row.hanja) + '</span>' : '') +
     '<span class="tag">' + esc(row.pos) + '</span>' +
-    '<span class="tag">' + esc(row.category) + '</span>' +
+    '<span class="tag" title="' + esc(row.category) + '">' + esc(row.categoryGroup) + '</span>' +
     '</div>' +
     '<div class="desc">' + esc(row.definition) + '</div>' +
     (row.explanation ? '<div class="dict-explain"><strong>쉽게 말하면</strong> ' + esc(row.explanation) + '</div>' : '') +
@@ -1038,7 +1077,7 @@ function dictCardHtml(row) {
 
 function renderDict() {
   const q = dictQEl.value.trim().toLowerCase();
-  const pool = DICT_DATA.filter((r) => selectedDictCategories.size === 0 || selectedDictCategories.has(r.category));
+  const pool = DICT_DATA.filter((r) => selectedDictCategories.size === 0 || selectedDictCategories.has(r.categoryGroup));
   const rows = pool.filter((r) => !q ||
     r.word.toLowerCase().includes(q) ||
     (r.hanja || '').toLowerCase().includes(q) ||
