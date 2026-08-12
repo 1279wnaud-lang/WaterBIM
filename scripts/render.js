@@ -700,12 +700,11 @@ function removeSlot(level) {
   renderTray();
 }
 function routeLevelValues(route, entry) {
+  // L4~L7은 이 항목 자신의 레벨만 채운다 - 트레이에 남아있는 다른(무관한) 검색의
+  // 슬롯 값을 끌어다 쓰면 마치 이 경로에 속하는 값처럼 보여 오해를 준다 (실사용 버그 신고로 확인).
   const ownLevel = WBS_LEVEL[entry.source];
-  const vals = { L1: 'S', L2: route.l2, L3: route.l3 };
-  ['L4', 'L5', 'L6', 'L7'].forEach((lv) => {
-    let code = lv === ownLevel ? entry.code : (slots[lv] && slots[lv].code);
-    vals[lv] = code ? (lv === 'L7' ? padL7(code) : code) : null;
-  });
+  const vals = { L1: 'S', L2: route.l2, L3: route.l3, L4: null, L5: null, L6: null, L7: null };
+  vals[ownLevel] = ownLevel === 'L7' ? padL7(entry.code) : entry.code;
   return vals;
 }
 function routeChipHtml(level, code) {
