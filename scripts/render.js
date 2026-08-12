@@ -1,8 +1,8 @@
 // Shared page renderer: produces {title, description, styleCss, bodyHtml}.
-// Design language: CAD "drawing layer" metaphor - each data source is a layer with its
-// own layer color (like AutoCAD layer colors), codes read like part/drawing numbers on
-// a technical data sheet, faint graph-paper grid evokes a drawing canvas. Blueprint teal
-// accent instead of a generic SaaS blue, to stay grounded in the BIM/CAD subject matter.
+// Design language: clean data-dense SaaS dashboard - navy/blue/green professional
+// palette, white rounded cards with soft shadows, pill-shaped badges/chips, grouped
+// sidebar navigation. Per ui-ux-pro-max design-system recommendation for an internal
+// engineering reference tool (2026-08-12 visual reskin, reference: clinic dashboard UI).
 const fs = require('fs');
 const path = require('path');
 
@@ -26,30 +26,35 @@ function buildPage() {
 
   const styleCss = `
   :root {
-    --bg: #EEF1EC; --panel: #FFFFFF; --ink: #16231F; --muted: #5B6B63;
-    --border: #D6DED4; --accent: #0E7C86; --accent-ink: #ffffff;
-    --code-bg: #E4EAE2; --grid-line: rgba(14,124,134,.07); --mark-bg: #F4CE68; --mark-ink: #2A2205;
+    --bg: #F8FAFC; --panel: #FFFFFF; --ink: #0F172A; --muted: #64748B;
+    --border: #E4E7EB; --accent: #2563EB; --accent-ink: #ffffff;
+    --primary: #1E3A5F; --success: #059669; --danger: #DC2626;
+    --code-bg: #F1F3F5; --mark-bg: #FDE68A; --mark-ink: #713F12;
+    --shadow: 0 1px 2px rgba(15,23,42,.04), 0 1px 8px rgba(15,23,42,.06);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #0E1512; --panel: #16211D; --ink: #E7EFE9; --muted: #8CA396;
-      --border: #26352E; --accent: #37C6D0; --accent-ink: #06231F;
-      --code-bg: #1D2A24; --grid-line: rgba(55,198,208,.08); --mark-bg: #4A3B0E; --mark-ink: #F6E4A8; }
+    :root { --bg: #0B1220; --panel: #131C2E; --ink: #E7ECF5; --muted: #93A3BC;
+      --border: #24314A; --accent: #5B8DEF; --accent-ink: #051225;
+      --primary: #7FA6D6; --success: #34D399; --danger: #F87171;
+      --code-bg: #1A2437; --mark-bg: #4A3B0E; --mark-ink: #FDE68A;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 8px rgba(0,0,0,.35); }
   }
-  :root[data-theme="dark"] { --bg: #0E1512; --panel: #16211D; --ink: #E7EFE9; --muted: #8CA396;
-    --border: #26352E; --accent: #37C6D0; --accent-ink: #06231F;
-    --code-bg: #1D2A24; --grid-line: rgba(55,198,208,.08); --mark-bg: #4A3B0E; --mark-ink: #F6E4A8; }
-  :root[data-theme="light"] { --bg: #EEF1EC; --panel: #FFFFFF; --ink: #16231F; --muted: #5B6B63;
-    --border: #D6DED4; --accent: #0E7C86; --accent-ink: #ffffff;
-    --code-bg: #E4EAE2; --grid-line: rgba(14,124,134,.07); --mark-bg: #F4CE68; --mark-ink: #2A2205; }
+  :root[data-theme="dark"] { --bg: #0B1220; --panel: #131C2E; --ink: #E7ECF5; --muted: #93A3BC;
+    --border: #24314A; --accent: #5B8DEF; --accent-ink: #051225;
+    --primary: #7FA6D6; --success: #34D399; --danger: #F87171;
+    --code-bg: #1A2437; --mark-bg: #4A3B0E; --mark-ink: #FDE68A;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 1px 8px rgba(0,0,0,.35); }
+  :root[data-theme="light"] { --bg: #F8FAFC; --panel: #FFFFFF; --ink: #0F172A; --muted: #64748B;
+    --border: #E4E7EB; --accent: #2563EB; --accent-ink: #ffffff;
+    --primary: #1E3A5F; --success: #059669; --danger: #DC2626;
+    --code-bg: #F1F3F5; --mark-bg: #FDE68A; --mark-ink: #713F12;
+    --shadow: 0 1px 2px rgba(15,23,42,.04), 0 1px 8px rgba(15,23,42,.06); }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    font-family: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
-    background:
-      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
-      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
-      var(--bg);
+    font-family: 'Poppins', 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
   }
@@ -66,16 +71,15 @@ function buildPage() {
   .sidebar.collapsed { width: 0; border-right: none; opacity: 0; }
   .sidebar-head { padding: 16px 18px; border-bottom: 1px solid var(--border); }
   .sidebar-title { font-size: 13px; font-weight: 700; letter-spacing: -.01em; }
-  .nav-list { padding: 10px 0; }
+  .nav-list { padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
   .nav-item {
-    display: flex; align-items: center; gap: 10px; padding: 9px 18px; cursor: pointer;
-    font-size: 13px; font-weight: 600; color: var(--muted); border-left: 3px solid transparent;
+    display: flex; align-items: center; gap: 10px; padding: 9px 12px; cursor: pointer;
+    font-size: 13px; font-weight: 600; color: var(--muted); border-radius: 8px;
   }
-  .nav-item svg { width: 15px; height: 15px; flex: none; }
+  .nav-item svg { width: 16px; height: 16px; flex: none; }
   .nav-item:hover { color: var(--ink); background: var(--code-bg); }
   .nav-item.active {
-    color: var(--ink); border-left-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+    color: var(--accent-ink); background: var(--accent);
   }
 
   .main-area { flex: 1; min-width: 0; }
@@ -98,16 +102,16 @@ function buildPage() {
     padding: 18px 22px 14px;
   }
   .eyebrow {
-    font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase;
-    color: var(--accent); margin: 0 0 4px;
+    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 4px;
   }
-  h1 { font-size: 18px; margin: 0 0 12px; font-weight: 700; letter-spacing: -.01em; text-wrap: balance; }
+  h1 { font-size: 19px; margin: 0 0 12px; font-weight: 700; letter-spacing: -.01em; text-wrap: balance; color: var(--primary); }
 
   .search-row { position: relative; }
   .search-row input {
-    width: 100%; font-size: 15.5px; padding: 12px 14px 12px 38px; border-radius: 8px;
+    width: 100%; font-size: 15.5px; padding: 12px 14px 12px 38px; border-radius: 10px;
     border: 1.5px solid var(--border); background: var(--panel); color: var(--ink); outline: none;
-    font-family: inherit;
+    font-family: inherit; box-shadow: var(--shadow);
   }
   .search-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
   .search-row svg.search-icon {
@@ -118,12 +122,12 @@ function buildPage() {
   .filters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
   .chip {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 12px; font-weight: 600; padding: 5px 10px 5px 8px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; padding: 6px 12px 6px 9px; border-radius: 999px;
     border: 1px solid var(--border); background: var(--panel); color: var(--muted); cursor: pointer; user-select: none;
     transition: opacity .12s;
   }
-  .chip .dot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
-  .chip.active { color: var(--ink); border-color: color-mix(in srgb, var(--chip-color, var(--accent)) 55%, var(--border)); background: color-mix(in srgb, var(--chip-color, var(--accent)) 10%, var(--panel)); }
+  .chip .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .chip.active { color: var(--ink); border-color: color-mix(in srgb, var(--chip-color, var(--accent)) 45%, var(--border)); background: color-mix(in srgb, var(--chip-color, var(--accent)) 12%, var(--panel)); }
   .chip:not(.active) { opacity: .55; }
   .chip:not(.active) .dot { opacity: .5; }
 
@@ -143,19 +147,21 @@ function buildPage() {
   }
 
   .card {
-    background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--card-color, var(--border));
-    border-radius: 8px; padding: 13px 15px; margin: 0 0 10px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 15px 17px; margin: 0 0 10px; box-shadow: var(--shadow);
+    transition: box-shadow .15s, border-color .15s;
   }
+  .card:hover { border-color: color-mix(in srgb, var(--card-color, var(--accent)) 35%, var(--border)); }
   .card-top { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
   .badge {
-    font-size: 10.5px; font-weight: 700; letter-spacing: .03em; padding: 2.5px 7px; border-radius: 4px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: .03em; padding: 3px 9px; border-radius: 999px;
     color: white; white-space: nowrap;
   }
   .code-wrap { display: inline-flex; align-items: center; gap: 3px; }
   .code {
     font-family: ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, monospace;
     font-weight: 600; font-size: 13.5px; letter-spacing: .01em;
-    background: var(--code-bg); padding: 1.5px 6px; border-radius: 4px;
+    background: var(--code-bg); padding: 1.5px 6px; border-radius: 6px;
   }
   .copy-btn {
     display: inline-flex; align-items: center; justify-content: center;
