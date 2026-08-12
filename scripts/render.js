@@ -10,6 +10,7 @@ function buildPage() {
   const DATA = path.join(__dirname, '..', 'data');
   const entries = JSON.parse(fs.readFileSync(path.join(DATA, 'search-index.json'), 'utf8'));
   const bimColorsRaw = JSON.parse(fs.readFileSync(path.join(DATA, 'bim-colors-raw.json'), 'utf8'));
+  const dictData = JSON.parse(fs.readFileSync(path.join(DATA, 'wbs-dictionary.json'), 'utf8'));
 
   // Layer palette - considered, CAD-layer-inspired hues (not default Tailwind blue/purple/green/amber/red).
   const SOURCE_META = {
@@ -301,7 +302,7 @@ function buildPage() {
   .tray-hint { font-size: 11.5px; color: var(--muted); margin-top: 12px; line-height: 1.55; }
 
   /* --- 색상기준 탭: 정육면체(true 3D cube) 스와치 그리드 --- */
-  .color-groups { max-width: 1200px; margin: 0 auto; padding: 18px 22px 60px; }
+  .color-groups { max-width: 1200px; margin: 0; padding: 18px 22px 60px 66px; }
   .color-group { margin-bottom: 30px; }
   .color-group-title {
     font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
@@ -314,6 +315,17 @@ function buildPage() {
   }
   .color-tile-name { font-size: 12.5px; font-weight: 600; text-align: center; line-height: 1.3; }
   .color-tile-rgb-row { display: flex; align-items: center; gap: 3px; }
+
+  /* --- 용어사전 탭 --- */
+  .dict-list { max-width: 1320px; margin: 0; padding: 18px 22px 60px 66px; }
+  .dict-card-top { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+  .dict-word { font-size: 16px; }
+  .dict-hanja { font-size: 12.5px; color: var(--muted); }
+  .dict-explain {
+    font-size: 13px; margin-top: 9px; padding: 9px 12px; border-radius: 8px;
+    background: var(--code-bg); color: var(--ink); line-height: 1.55;
+  }
+  .dict-explain strong { color: var(--accent); margin-right: 4px; }
   .color-tile-rgb { font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted); }
 
   .cube-scene { width: 58px; height: 58px; margin: 6px auto 14px; perspective: 320px; }
@@ -333,6 +345,7 @@ function buildPage() {
   const TOGGLE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>';
   const NAV_SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>';
   const NAV_PALETTE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c1.7 0 3.1-1.4 3.1-3.1C20.5 6.6 16.7 2 12 2Z"></path><circle cx="7" cy="10" r="1.2"></circle><circle cx="12" cy="7" r="1.2"></circle><circle cx="16.5" cy="10" r="1.2"></circle></svg>';
+  const NAV_DICT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path></svg>';
 
   const bodyHtml = `<div class="app">
   <aside class="sidebar" id="sidebar">
@@ -390,6 +403,24 @@ function buildPage() {
       </header>
       <div class="color-groups" id="colorGroups"></div>
     </section>
+    <section class="tab-panel" data-tab="dictionary" style="display:none">
+      <header>
+        <div class="header-top">
+          <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
+          <div class="header-main">
+            <p class="eyebrow">비전공자를 위한 용어 설명</p>
+            <h1>수도분야 용어사전</h1>
+            <div class="search-row">
+              ${SEARCH_ICON}
+              <input id="dictQ" type="text" placeholder="단어, 뜻으로 찾기... (예: 가압장, 밸브)" autocomplete="off">
+            </div>
+            <div class="filters" id="dictFilters"></div>
+            <div id="dictMeta"></div>
+          </div>
+        </div>
+      </header>
+      <div class="dict-list" id="dictList"></div>
+    </section>
   </div>
 </div>
 <script>
@@ -397,6 +428,7 @@ const SOURCE_META = ${JSON.stringify(SOURCE_META)};
 const SOURCES = Object.keys(SOURCE_META);
 const DATA = ${JSON.stringify(entries)};
 const COLOR_DATA = ${JSON.stringify(bimColorsRaw)};
+const DICT_DATA = ${JSON.stringify(dictData)};
 const DATA_BY_ID = {};
 for (const e of DATA) DATA_BY_ID[e.id] = e;
 
@@ -444,6 +476,7 @@ function esc(s) {
 const TABS = [
   { id: 'codesearch', label: '코드서치', icon: '${NAV_SEARCH_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
+  { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
 ];
 const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
@@ -945,6 +978,78 @@ colorGroupsEl.addEventListener('click', (ev) => {
 });
 colorQEl.addEventListener('input', renderColors);
 renderColors();
+
+// --- 용어사전 탭: 비전공자를 위한 수도분야 용어 설명 ---
+const dictListEl = document.getElementById('dictList');
+const dictQEl = document.getElementById('dictQ');
+const dictFiltersEl = document.getElementById('dictFilters');
+const dictMetaEl = document.getElementById('dictMeta');
+const DICT_CATEGORY_ORDER = [...new Set(DICT_DATA.map((r) => r.category))];
+const selectedDictCategories = new Set();
+
+const dictChipMap = new Map();
+const allDictChip = document.createElement('div');
+allDictChip.className = 'chip active';
+allDictChip.title = '전체 분야 보기';
+allDictChip.style.setProperty('--chip-color', 'var(--accent)');
+allDictChip.innerHTML = '<span class="dot" style="background:var(--accent)"></span>전체';
+allDictChip.onclick = () => {
+  selectedDictCategories.clear();
+  updateDictChipsUI();
+  renderDict();
+};
+dictFiltersEl.appendChild(allDictChip);
+
+for (const c of DICT_CATEGORY_ORDER) {
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.style.setProperty('--chip-color', 'var(--accent)');
+  chip.innerHTML = '<span class="dot" style="background:var(--accent)"></span>' + esc(c);
+  chip.onclick = () => {
+    if (selectedDictCategories.has(c)) { selectedDictCategories.delete(c); }
+    else { selectedDictCategories.add(c); }
+    updateDictChipsUI();
+    renderDict();
+  };
+  dictFiltersEl.appendChild(chip);
+  dictChipMap.set(c, chip);
+}
+
+function updateDictChipsUI() {
+  const isAll = selectedDictCategories.size === 0;
+  allDictChip.classList.toggle('active', isAll);
+  for (const [c, chip] of dictChipMap.entries()) {
+    chip.classList.toggle('active', selectedDictCategories.has(c));
+  }
+}
+
+function dictCardHtml(row) {
+  return '<div class="card dict-card">' +
+    '<div class="dict-card-top">' +
+    '<span class="name dict-word">' + esc(row.word) + '</span>' +
+    (row.hanja ? '<span class="dict-hanja">' + esc(row.hanja) + '</span>' : '') +
+    '<span class="tag">' + esc(row.pos) + '</span>' +
+    '<span class="tag">' + esc(row.category) + '</span>' +
+    '</div>' +
+    '<div class="desc">' + esc(row.definition) + '</div>' +
+    (row.explanation ? '<div class="dict-explain"><strong>쉽게 말하면</strong> ' + esc(row.explanation) + '</div>' : '') +
+  '</div>';
+}
+
+function renderDict() {
+  const q = dictQEl.value.trim().toLowerCase();
+  const pool = DICT_DATA.filter((r) => selectedDictCategories.size === 0 || selectedDictCategories.has(r.category));
+  const rows = pool.filter((r) => !q ||
+    r.word.toLowerCase().includes(q) ||
+    (r.hanja || '').toLowerCase().includes(q) ||
+    r.definition.toLowerCase().includes(q) ||
+    (r.explanation || '').toLowerCase().includes(q)
+  ).sort((a, b) => a.word.localeCompare(b.word, 'ko'));
+  dictMetaEl.textContent = (q ? rows.length.toLocaleString() + '개 결과' : '총 ' + rows.length.toLocaleString() + '개 용어 검색 가능');
+  dictListEl.innerHTML = rows.length ? rows.map(dictCardHtml).join('') : '<div class="empty">일치하는 용어가 없습니다</div>';
+}
+dictQEl.addEventListener('input', renderDict);
+renderDict();
 </script>`;
 
   return {
