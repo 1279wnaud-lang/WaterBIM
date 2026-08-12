@@ -513,9 +513,9 @@ function esc(s) {
 // --- 사이드바 / 탭 셸 (TABS에 항목만 추가하면 사이드바 목록과 탭 전환이
 //     자동으로 늘어나도록 데이터 기반으로 구성) ---
 const TABS = [
+  { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
   { id: 'codesearch', label: '코드서치', icon: '${NAV_SEARCH_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
-  { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
 ];
 const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
