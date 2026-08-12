@@ -56,16 +56,20 @@ function buildPage() {
   // One blue mood, per request - all real sources share the accent blue; "참고" (uncertain/
   // reference-only source) keeps a distinct amber because that's a functional data-quality
   // signal (semantic color), not a second decorative brand hue.
+  // Lv1->Lv7 badge color as one continuous blue gradient, darkest at Lv1 to lightest at
+  // Lv7 (HSL 221/78%, lightness 26%->80% in 6 even steps). Badge text flips from white to
+  // a dark navy ink partway through so every stop still clears WCAG AA (>=4.5:1) - verified
+  // per-stop rather than assumed.
   const SOURCE_META = {
-    'WBS-Lv1': { group: 'K-water WBS (부속서-2)', label: 'Lv1 발주분야', color: '#2F6FED' },
-    'WBS-Lv2': { group: 'K-water WBS (부속서-2)', label: 'Lv2 시설대분류', color: '#2F6FED' },
-    'WBS-Lv3': { group: 'K-water WBS (부속서-2)', label: 'Lv3 시설중분류', color: '#2F6FED' },
-    'WBS-시설(Lv4)': { group: 'K-water WBS (부속서-2)', label: 'Lv4 시설소분류', color: '#2F6FED' },
-    'WBS-Lv5': { group: 'K-water WBS (부속서-2)', label: 'Lv5 공종대분류', color: '#2F6FED' },
-    'WBS-공종(Lv6)': { group: 'K-water WBS (부속서-2)', label: 'Lv6 공종중분류', color: '#2F6FED' },
-    'WBS-기타(참고, Lv7류)': { group: 'K-water WBS (부속서-2)', label: 'Lv7 공종소분류', color: '#2F6FED' },
-    'WBS-기타(참고)': { group: 'K-water WBS (부속서-2)', label: '참고', color: '#D97706' },
-    Pset: { group: 'K-water 속성정보세트 (부속서-7)', label: 'Pset', color: '#2F6FED' },
+    'WBS-Lv1': { group: 'K-water WBS (부속서-2)', label: 'Lv1 발주분야', color: '#0F2F76', ink: '#FFFFFF' },
+    'WBS-Lv2': { group: 'K-water WBS (부속서-2)', label: 'Lv2 시설대분류', color: '#14409F', ink: '#FFFFFF' },
+    'WBS-Lv3': { group: 'K-water WBS (부속서-2)', label: 'Lv3 시설중분류', color: '#1950C8', ink: '#FFFFFF' },
+    'WBS-시설(Lv4)': { group: 'K-water WBS (부속서-2)', label: 'Lv4 시설소분류', color: '#2A65E5', ink: '#FFFFFF' },
+    'WBS-Lv5': { group: 'K-water WBS (부속서-2)', label: 'Lv5 공종대분류', color: '#5382EA', ink: '#0E2555' },
+    'WBS-공종(Lv6)': { group: 'K-water WBS (부속서-2)', label: 'Lv6 공종중분류', color: '#7BA0EF', ink: '#0E2555' },
+    'WBS-기타(참고, Lv7류)': { group: 'K-water WBS (부속서-2)', label: 'Lv7 공종소분류', color: '#A4BDF4', ink: '#0E2555' },
+    'WBS-기타(참고)': { group: 'K-water WBS (부속서-2)', label: '참고', color: '#D97706', ink: '#FFFFFF' },
+    Pset: { group: 'K-water 속성정보세트 (부속서-7)', label: 'Pset', color: '#0F2F76', ink: '#FFFFFF' },
   };
 
   const styleCss = `
@@ -669,7 +673,7 @@ function card(e, terms) {
   if (e.sheetName) extras.push('시트: ' + e.sheetName);
   div.innerHTML = \`
     <div class="card-top">
-      <span class="badge" style="background:\${meta.color}">\${esc(meta.label)}</span>
+      <span class="badge" style="background:\${meta.color};color:\${meta.ink || 'var(--accent-ink)'}">\${esc(meta.label)}</span>
       \${e.code ? '<span class="code-wrap"><span class="code">' + highlight(e.code, terms) + '</span><button class="copy-btn" data-copy="' + esc(e.code) + '" title="코드 복사" type="button" aria-label="코드 복사">' + COPY_ICON + '</button>' + (WBS_LEVEL[e.source] ? '<button class="add-btn" data-id="' + esc(e.id) + '" title="' + WBS_LEVEL[e.source] + ' 칸에 담기" type="button" aria-label="조합용으로 담기">' + ADD_ICON + ' 담기</button>' : '') + (['L5', 'L6', 'L7'].includes(WBS_LEVEL[e.source]) ? '<button class="route-btn" data-id="' + esc(e.id) + '" title="이 공종이 적용 가능한 시설 경로 보기" type="button" aria-label="적용 가능 경로 보기">' + ROUTE_ICON + ' 경로보기</button>' : '') + '</span>' : ''}
       <span class="name">\${highlight(e.name, terms)}</span>
     </div>
