@@ -407,7 +407,7 @@ function buildPage() {
           <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
           <div class="header-main">
             <p class="eyebrow">BIM Code &amp; Standard Search</p>
-            <h1>BIM 코드&middot;기준 검색</h1>
+            <h1>상하수도 BIM 코드&middot;기준 검색</h1>
             <div class="search-row">
               ${SEARCH_ICON}
               <input id="q" type="text" placeholder="코드, 이름, 설명으로 검색... (예: 게이트밸브, MFA, O0104, FA11)" autofocus autocomplete="off">
@@ -439,7 +439,7 @@ function buildPage() {
           <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
           <div class="header-main">
             <p class="eyebrow">BIM Model Color &amp; Material Standards</p>
-            <h1>BIM 모델 색상&middot;재질 기준</h1>
+            <h1>상하수도 BIM 모델 색상&middot;재질 기준</h1>
             <div class="search-row">
               ${SEARCH_ICON}
               <input id="colorQ" type="text" placeholder="시설명으로 찾기... (예: 취수구, 정수지)" autocomplete="off">
@@ -457,7 +457,7 @@ function buildPage() {
           <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
           <div class="header-main">
             <p class="eyebrow">Dictionary</p>
-            <h1>수도분야 용어사전</h1>
+            <h1>상하수도 BIM 용어 사전</h1>
             <div class="search-row">
               ${SEARCH_ICON}
               <input id="dictQ" type="text" placeholder="단어, 뜻으로 찾기... (예: 가압장, 밸브)" autocomplete="off">
