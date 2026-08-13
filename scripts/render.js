@@ -350,7 +350,7 @@ function buildPage() {
   .tray-copy.copied { background: var(--amber); }
   .tray-hint { font-size: 11.5px; color: var(--muted); margin-top: 12px; line-height: 1.55; }
 
-  /* --- 색상기준 탭: 정육면체(true 3D cube) 스와치 그리드 --- */
+  /* --- 색상기준 탭: 솔리드 컬러칩 스와치 그리드 --- */
   .color-groups { max-width: 1200px; margin: 0; padding: 18px 22px 60px 66px; }
   .color-group { margin-bottom: 30px; }
   .color-group-title {
@@ -377,15 +377,7 @@ function buildPage() {
   .dict-explain strong { color: var(--accent); margin-right: 4px; }
   .color-tile-rgb { font-family: 'IBM Plex Mono', ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted); }
 
-  .cube-scene { width: 58px; height: 58px; margin: 6px auto 14px; perspective: 320px; }
-  .cube {
-    position: relative; width: 100%; height: 100%; transform-style: preserve-3d;
-    transform: rotateX(-28deg) rotateY(-38deg);
-  }
-  .cube-face { position: absolute; width: 58px; height: 58px; border: 1px solid rgba(0,0,0,.14); }
-  .cube-face.front { transform: translateZ(29px); }
-  .cube-face.top { transform: rotateX(90deg) translateZ(29px); }
-  .cube-face.side { transform: rotateY(90deg) translateZ(29px); }
+  .color-swatch { width: 58px; height: 58px; margin: 6px auto 14px; border-radius: 8px; border: 1px solid rgba(0,0,0,.14); }
 
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   `;
@@ -940,19 +932,12 @@ function shade(rgbStr, amt) {
   const adjust = (c) => amt >= 0 ? Math.round(c + (255 - c) * amt) : Math.round(c * (1 + amt));
   return 'rgb(' + parts.map(adjust).join(',') + ')';
 }
-function cubeHtml(rgbStr) {
-  const front = shade(rgbStr, -0.06);
-  const top = shade(rgbStr, 0.32);
-  const side = shade(rgbStr, -0.32);
-  return '<div class="cube-scene"><div class="cube">' +
-    '<div class="cube-face front" style="background:' + front + '"></div>' +
-    '<div class="cube-face top" style="background:' + top + '"></div>' +
-    '<div class="cube-face side" style="background:' + side + '"></div>' +
-  '</div></div>';
+function swatchHtml(rgbStr) {
+  return '<div class="color-swatch" style="background:' + shade(rgbStr, 0) + '"></div>';
 }
 function colorTileHtml(row) {
   return '<div class="color-tile">' +
-    cubeHtml(row.rgb) +
+    swatchHtml(row.rgb) +
     '<div class="color-tile-name">' + esc(row.name) + '</div>' +
     '<div class="color-tile-rgb-row"><span class="color-tile-rgb">' + esc(row.rgb) + '</span>' +
     '<button class="copy-btn" data-copy="' + esc(row.rgb) + '" type="button" title="RGB 복사" aria-label="RGB 복사">' + COPY_ICON + '</button></div>' +
