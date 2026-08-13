@@ -360,7 +360,7 @@ function buildPage() {
   .color-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 14px; }
   .color-tile {
     display: flex; flex-direction: column; align-items: center; gap: 8px;
-    background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 8px 12px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px 16px 14px;
     box-shadow: var(--shadow);
   }
   .color-tile-name { font-size: 12.5px; font-weight: 600; text-align: center; line-height: 1.3; }
@@ -377,7 +377,7 @@ function buildPage() {
   .dict-explain strong { color: var(--accent); margin-right: 4px; }
   .color-tile-rgb { font-family: 'IBM Plex Mono', ui-monospace, Consolas, monospace; font-size: 11px; color: var(--muted); }
 
-  .color-swatch { width: 58px; height: 58px; margin: 6px auto 14px; border-radius: 8px; border: 1px solid rgba(0,0,0,.14); }
+  .color-swatch { width: 100%; aspect-ratio: 1 / 1; margin: 0 0 14px; border-radius: 14px; border: 1px solid rgba(0,0,0,.14); }
 
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   `;
