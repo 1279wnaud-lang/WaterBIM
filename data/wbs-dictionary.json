@@ -10192,11 +10192,11 @@
     "explanation": "건물을 짓기 전에 컴퓨터 안에 똑같은 쌍둥이 건물을 만들어보고(3D), 그 안에 자재비나 일정 같은 모든 정보를 넣어두는 마법의 설계도입니다."
   },
   {
-    "word": "LOD(상세수준)",
+    "word": "LOD",
     "hanja": "",
     "pos": "명사",
     "category": "BIM",
-    "definition": "BIM 모델 요소의 발전 단계를 나타내는 지표(Level of Development)",
+    "definition": "BIM 모델 요소에 포함된 비형상 모델의 상세 수준(Level of Development)",
     "explanation": "그림을 그릴 때 스케치부터 시작해서 색칠하고 명암까지 넣듯, 3D 모델이 얼마나 구체적으로 만들어졌는지를 나타내는 단계입니다."
   },
   {
