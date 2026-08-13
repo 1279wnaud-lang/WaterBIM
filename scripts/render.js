@@ -1033,7 +1033,8 @@ const dictListEl = document.getElementById('dictList');
 const dictQEl = document.getElementById('dictQ');
 const dictFiltersEl = document.getElementById('dictFilters');
 const dictMetaEl = document.getElementById('dictMeta');
-const DICT_CATEGORY_ORDER = [...new Set(DICT_DATA.map((r) => r.categoryGroup))];
+const DICT_CATEGORY_ORDER = [...new Set(DICT_DATA.map((r) => r.categoryGroup))]
+  .sort((a, b) => (a === '기타') - (b === '기타'));
 const selectedDictCategories = new Set();
 
 const dictChipMap = new Map();
