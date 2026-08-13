@@ -398,7 +398,7 @@ function buildPage() {
 
   const bodyHtml = `<div class="app">
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-head"><span class="sidebar-title">K-water BIM 도구</span></div>
+    <div class="sidebar-head"><span class="sidebar-title">상하수도 BIM 도구</span></div>
     <nav class="nav-list" id="navList"></nav>
   </aside>
   <div class="main-area">
