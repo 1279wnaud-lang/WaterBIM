@@ -73,7 +73,11 @@ function buildPage() {
     Pset: { group: 'K-water 속성정보세트 (부속서-7)', label: 'Pset', color: '#0F2F76', ink: '#FFFFFF' },
   };
 
-  const styleCss = `
+  const reviewCss = fs.readFileSync(path.join(__dirname, 'model-review.css'), 'utf8');
+  const reviewHtml = fs.readFileSync(path.join(__dirname, 'model-review.html'), 'utf8');
+  const reviewClient = fs.readFileSync(path.join(__dirname, 'workflow-graphs.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, 'model-review-client.js'), 'utf8');
+  const reviewTemplates = fs.readFileSync(path.join(DATA, 'design-workflow-templates.json'), 'utf8');
+  const styleCss = `${reviewCss}
   :root {
     --bg: #F6F8FC; --panel: #FFFFFF; --ink: #16202E; --muted: #64748B;
     --border: #E3E8F0; --accent: #2F6FED; --accent-ink: #FFFFFF; --amber: #D97706;
@@ -109,12 +113,13 @@ function buildPage() {
 
   .app { display: flex; align-items: stretch; min-height: 100vh; }
   .sidebar {
-    width: 220px; flex: none; background: var(--panel); border-right: 1px solid var(--border);
+    width: 264px; flex: none; background: var(--panel); border-right: 1px solid var(--border);
     overflow: hidden; white-space: nowrap; transition: width .16s ease, opacity .16s ease;
     position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto;
   }
   .sidebar.collapsed { width: 0; border-right: none; opacity: 0; }
   .sidebar-head { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+  .load-more {display:block;margin:20px auto;padding:12px 24px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer;font:inherit;}
   .sidebar-title { font-size: 13px; font-weight: 700; letter-spacing: -.01em; }
   .nav-list { padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
   .nav-item {
@@ -394,6 +399,7 @@ function buildPage() {
     <nav class="nav-list" id="navList"></nav>
   </aside>
   <div class="main-area">
+    ${reviewHtml}
     <section class="tab-panel" data-tab="codesearch">
       <header>
         <div class="header-top">
@@ -518,6 +524,7 @@ const TABS = [
   { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
   { id: 'codesearch', label: '코드서치', icon: '${NAV_SEARCH_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
+  { id: 'modelreview', label: '설계 프로세스', icon: '${NAV_DICT_ICON}' },
 ];
 const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
@@ -539,6 +546,7 @@ function setActiveTab(id) {
     p.style.display = p.getAttribute('data-tab') === id ? '' : 'none';
   });
   updateTrayTop();
+  document.dispatchEvent(new CustomEvent('tool-tab-change',{detail:id}));
 }
 navListEl.addEventListener('click', (ev) => {
   const item = ev.target.closest('.nav-item');
@@ -885,38 +893,33 @@ trayCopyBtn.addEventListener('click', () => {
 renderTray();
 
 const LIMIT = 150;
+const batchObservers = new WeakMap();
+function renderBatches(container, rows, makeCard) {
+  batchObservers.get(container)?.disconnect();container.replaceChildren();
+  if(!rows.length){container.innerHTML='<div class="empty">일치하는 항목이 없습니다</div>';return;}
+  let shown=0;const more=document.createElement('button');more.type='button';more.className='load-more';
+  const observer=new IntersectionObserver(entries=>{if(batchObservers.get(container)===observer&&entries.some(e=>e.isIntersecting))append();},{rootMargin:'400px'});
+  batchObservers.set(container,observer);
+  function append(){observer.unobserve(more);more.remove();const frag=document.createDocumentFragment();const end=Math.min(shown+LIMIT,rows.length);for(;shown<end;shown++)frag.append(makeCard(rows[shown]));container.append(frag);if(shown<rows.length){more.textContent='더 보기 ('+shown.toLocaleString()+' / '+rows.length.toLocaleString()+')';container.append(more);observer.observe(more);}else observer.disconnect();}
+  more.addEventListener('click',append);append();
+}
+let codeRendered=false;
 function render() {
-  const raw = qEl.value.trim().toLowerCase();
-  const terms = raw.split(/\\s+/).filter(Boolean);
-  let pool = selectedSources.size === 0 ? DATA : DATA.filter((e) => selectedSources.has(e.source));
-  let list, capped;
-  if (terms.length === 0) {
-    // browse mode: no query yet, list everything in SOURCES order (Lv1 발주분야 → ... → Pset) unpaginated
-    list = pool;
-    capped = false;
-  } else {
-    list = pool.filter((e) => matches(e, terms));
-    list.sort((a, b) => score(b, terms) - score(a, terms));
-    capped = true;
-  }
-  resultsEl.innerHTML = '';
-  metaEl.textContent = terms.length === 0
-    ? \`총 \${list.length.toLocaleString()}개 항목\`
-    : \`\${list.length.toLocaleString()}개 결과\${list.length > LIMIT ? ' (상위 ' + LIMIT + '개 표시)' : ''}\`;
-  if (list.length === 0) {
-    resultsEl.innerHTML = '<div class="empty">결과 없음</div>';
-    return;
-  }
-  const frag = document.createDocumentFragment();
-  for (const e of (capped ? list.slice(0, LIMIT) : list)) frag.appendChild(card(e, terms));
-  resultsEl.appendChild(frag);
+  codeRendered=true;
+  const raw = qEl.value.trim().toLowerCase(),terms=raw.split(/\\s+/).filter(Boolean);
+  const pool=selectedSources.size===0?DATA:DATA.filter(e=>selectedSources.has(e.source));
+  let list=terms.length?pool.filter(e=>matches(e,terms)):pool;
+  if(terms.length)list.sort((a,b)=>score(b,terms)-score(a,terms));
+  metaEl.textContent=list.length.toLocaleString()+(terms.length?'개 결과':'개 항목');
+  renderBatches(resultsEl,list,e=>card(e,terms));
 }
 
 qEl.addEventListener('input', render);
 document.addEventListener('keydown', (ev) => {
-  if (ev.key === '/' && document.activeElement !== qEl) { ev.preventDefault(); qEl.focus(); }
+  if(ev.key==='/'&&!ev.target.closest('input,textarea,select,[contenteditable=true]')){const target=activeTab==='codesearch'?qEl:activeTab==='dictionary'?document.getElementById('dictQ'):activeTab==='modelreview'?document.getElementById('mr-query'):document.getElementById('colorQ');if(target){ev.preventDefault();target.focus();}}
 });
-render();
+if(activeTab==='codesearch')render();
+document.addEventListener('tool-tab-change',e=>{if(e.detail==='codesearch'&&!codeRendered)render();});
 
 // --- 색상기준 탭: K-water BIM 적용지침 표 2.3-2, 정육면체 스와치로 훑어보기 ---
 const colorGroupsEl = document.getElementById('colorGroups');
@@ -1070,7 +1073,9 @@ function dictCardHtml(row) {
   '</div>';
 }
 
+let dictRendered=false;
 function renderDict() {
+  dictRendered=true;
   const q = dictQEl.value.trim().toLowerCase();
   const pool = DICT_DATA.filter((r) => selectedDictCategories.size === 0 || selectedDictCategories.has(r.categoryGroup));
   const rows = pool.filter((r) => !q ||
@@ -1080,10 +1085,11 @@ function renderDict() {
     (r.explanation || '').toLowerCase().includes(q)
   ).sort((a, b) => a.word.localeCompare(b.word, 'ko'));
   dictMetaEl.textContent = (q ? rows.length.toLocaleString() + '개 결과' : '총 ' + rows.length.toLocaleString() + '개 용어 검색 가능');
-  dictListEl.innerHTML = rows.length ? rows.map(dictCardHtml).join('') : '<div class="empty">일치하는 용어가 없습니다</div>';
+  renderBatches(dictListEl,rows,row=>{const template=document.createElement('template');template.innerHTML=dictCardHtml(row);return template.content.firstElementChild;});
 }
 dictQEl.addEventListener('input', renderDict);
-renderDict();
+if(activeTab==='dictionary')renderDict();
+document.addEventListener('tool-tab-change',e=>{if(e.detail==='dictionary'&&!dictRendered)renderDict();});
 </script>`;
 
   return {
@@ -1091,7 +1097,7 @@ renderDict();
     description: 'K-water BIM 부속서(WBS·속성정보세트)를 즉시 검색합니다.',
     entryCount: entries.length,
     styleCss,
-    bodyHtml,
+    bodyHtml: bodyHtml + '<script>const WORKFLOW_TEMPLATES = ' + reviewTemplates.replace(/</g, '\\u003c') + ';\n' + reviewClient + '</script>',
   };
 }
 
