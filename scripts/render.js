@@ -524,7 +524,7 @@ const TABS = [
   { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
   { id: 'codesearch', label: '코드서치', icon: '${NAV_SEARCH_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
-  { id: 'modelreview', label: '설계 프로세스', icon: '${NAV_DICT_ICON}' },
+  { id: 'modelreview', label: '업무분류', icon: '${NAV_DICT_ICON}' },
 ];
 const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
