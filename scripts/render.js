@@ -113,7 +113,7 @@ function buildPage() {
 
   .app { display: flex; align-items: stretch; min-height: 100vh; }
   .sidebar {
-    width: 317px; flex: none; background: var(--panel); border-right: 1px solid var(--border);
+    width: 290px; flex: none; background: var(--panel); border-right: 1px solid var(--border);
     overflow: hidden; white-space: nowrap; transition: width .16s ease, opacity .16s ease;
     position: sticky; top: 0; align-self: flex-start; height: 100vh; overflow-y: auto;
   }
