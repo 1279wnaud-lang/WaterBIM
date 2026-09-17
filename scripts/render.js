@@ -497,7 +497,7 @@ const SLOT_GROUPS = [
 ];
 
 // 공종(L5~7) 코드는 시설(L1~4)과 독립적으로 정해져 있고, 어느 시설에 쓰이든
-// L1~L3 접두부만 바뀐다 - CodeSearch 자체 WBS 데이터로 교차 검증된 6개 시설군 경로.
+// L1~L3 접두부만 바뀐다 - WaterBIM 자체 WBS 데이터로 교차 검증된 6개 시설군 경로.
 // (L4는 시설군 안에서도 여러 개라 여기서 자동으로 못 좁혀서 사용자가 직접 검색해서 채움)
 const FACILITY_ROUTES = [
   { group: '공통시설', l2: 'F00', l2Name: '공통시설', l3: '1', l3Name: '공통시설' },
@@ -1093,8 +1093,8 @@ document.addEventListener('tool-tab-change',e=>{if(e.detail==='dictionary'&&!dic
 </script>`;
 
   return {
-    title: 'K-water BIM 코드 검색',
-    description: 'K-water BIM 부속서(WBS·속성정보세트)를 즉시 검색합니다.',
+    title: '상하수도 BIM 도구',
+    description: 'K-water 상하수도 BIM 코드·색상기준·용어사전·업무분류를 한 곳에서 검색·관리합니다.',
     entryCount: entries.length,
     styleCss,
     bodyHtml: bodyHtml + '<script>const WORKFLOW_TEMPLATES = ' + reviewTemplates.replace(/</g, '\\u003c') + ';\n' + reviewClient + '</script>',
