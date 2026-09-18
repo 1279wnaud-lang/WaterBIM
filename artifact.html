@@ -775,7 +775,12 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 @media (max-width:1000px){#mc-app {padding:18px 18px 48px;}.mc-row-head {width:120px;min-width:110px;}}
 @media (max-width:700px){.mc-panel {padding:16px;}.mc-reasons,.mc-range {padding-left:0;margin-left:0;}.mc-cond {grid-template-columns:1fr;gap:6px;}}
 @media print {#mc-app {padding:0;}.mc-panel {break-inside:avoid;box-shadow:none;}}
-</style>
+. m c - g r o u p - r o w   {   c u r s o r :   p o i n t e r ;   u s e r - s e l e c t :   n o n e ;   }  
+ . m c - g r o u p - r o w : h o v e r   t h   {   b a c k g r o u n d :   c o l o r - m i x ( i n   s r g b , v a r ( - - a c c e n t )   1 2 % , v a r ( - - p a n e l ) ) ;   }  
+ . m c - t o g g l e - i c o n   {   d i s p l a y :   i n l i n e - b l o c k ;   t r a n s i t i o n :   t r a n s f o r m   0 . 2 s ;   f o n t - s i z e :   1 0 p x ;   m a r g i n - l e f t :   6 p x ;   o p a c i t y :   0 . 7 ;   }  
+ . m c - c o l l a p s e d   . m c - t o g g l e - i c o n   {   t r a n s f o r m :   r o t a t e ( - 9 0 d e g ) ;   }  
+ . m c - c o l l a p s e d   t r : n o t ( . m c - g r o u p - r o w )   {   d i s p l a y :   n o n e ;   }  
+ </style>
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head"><span class="sidebar-title"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 2.8c3.5 4 5.8 7 5.8 10.1a5.8 5.8 0 0 1-11.6 0c0-3.1 2.3-6.1 5.8-10.1Z"/><path d="M9.4 13.6a2.7 2.7 0 0 0 2.2 2.7" stroke-linecap="round"/></svg></span>WaterBIM</span></div>
@@ -6492,11 +6497,11 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
   let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+'>'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</th>').join('')+'</tr></thead>';
   for(const g of groups){
    const rows=data.rows.filter(r=>r.group===g);
-   html+='<tbody><tr class="mc-group-row"><th colspan="'+(mats.length+1)+'" scope="colgroup"><span>'+esc(g)+'</span></th></tr>'+
+   html+='<tbody class="mc-group-tbody"><tr class="mc-group-row" role="button" tabindex="0" onclick="this.parentElement.classList.toggle(\'mc-collapsed\')"><th colspan="'+(mats.length+1)+'" scope="colgroup"><span>'+esc(g)+' <span class="mc-toggle-icon">▼</span></span></th></tr>'+
     rows.map(r=>'<tr><th scope="row" class="mc-row-head">'+esc(r.label)+(r.source==='ref'?'<span class="mc-src mc-src-ref">참고</span>':'')+'</th>'+
      mats.map(m=>'<td'+(r.short?' class="mc-short"':'')+'>'+cellHtml(m,r)+'</td>').join('')+'</tr>').join('')+'</tbody>';
   }
-  html+='<tbody><tr class="mc-group-row"><th colspan="'+(mats.length+1)+'" scope="colgroup"><span>장점 / 단점</span></th></tr>'+
+  html+='<tbody class="mc-group-tbody"><tr class="mc-group-row" role="button" tabindex="0" onclick="this.parentElement.classList.toggle(\'mc-collapsed\')"><th colspan="'+(mats.length+1)+'" scope="colgroup"><span>장점 / 단점 <span class="mc-toggle-icon">▼</span></span></th></tr>'+
    '<tr><th scope="row" class="mc-row-head">장점</th>'+mats.map(m=>'<td><ul class="mc-pro">'+m.pros.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></td>').join('')+'</tr>'+
    '<tr><th scope="row" class="mc-row-head">단점</th>'+mats.map(m=>'<td><ul class="mc-con">'+m.cons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></td>').join('')+'</tr></tbody>';
   $('table').innerHTML=html;
