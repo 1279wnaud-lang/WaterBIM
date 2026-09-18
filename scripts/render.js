@@ -444,8 +444,15 @@ function buildPage() {
           <span class="home-tool-icon">${NAV_DICT_ICON}</span>
           <span class="home-tool-title">관·이형관 규격 사전</span>
           <span class="home-tool-description">닥타일주철관과 강관의 치수·중량을 찾고,<br>핸드북 원문 도식과 함께 확인하세요.</span>
-          <span class="home-tool-detail">${pipeCatalog.records.length}개 규격 · 원문 근거 · 치수 자료 저장</span>
+          <span class="home-tool-detail">${pipeCatalog.records.length}개 규격 · 핸드북 원문 근거 · 담아서 비교</span>
           <span class="home-tool-link">규격 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="home-tool" data-open-tab="compare">
+          <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
+          <span class="home-tool-title">관종 비교 · 선정 도우미</span>
+          <span class="home-tool-description">설계 조건을 고르면 조건에 맞는 관종과<br>그 근거를 정리해 보여줍니다.</span>
+          <span class="home-tool-detail">6개 관종 · 상수도/하수도 구분 · 생산범위 판정</span>
+          <span class="home-tool-link">관종 고르기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
       </div>
       <p class="home-footer">상단 메뉴에서 언제든 다른 도구로 이동할 수 있습니다.</p>
