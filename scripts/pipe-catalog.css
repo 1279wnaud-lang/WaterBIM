@@ -1,0 +1,54 @@
+@media screen {
+.pc-home-extension { margin-top:18px; }
+.nav-list { min-width:0; overflow-x:auto; }
+.nav-item { flex-shrink:0; }
+@media(max-width:1400px) { .preview-label { display:none; } }
+.pc-intro { color:var(--muted); font-size:14px; margin:0; line-height:1.7; }
+#pc-app { padding:0 36px 36px; }
+#pc-app button,#pc-app input,#pc-app select { font:inherit; font-size:14px; color:var(--ink); border:1px solid var(--border); background:var(--panel); border-radius:12px; min-height:42px; padding:10px 12px; }
+#pc-app button { cursor:pointer; }
+#pc-app button:hover { background:#eee8fa; }
+#pc-app button:disabled { opacity:.5; cursor:default; }
+#pc-app :focus-visible { outline:3px solid #8271b8; outline-offset:3px; }
+.pc-filters { display:grid; grid-template-columns:minmax(220px,2fr) repeat(4,minmax(120px,1fr)) auto; gap:12px; align-items:end; padding:22px; background:#fff; border-radius:24px; }
+.pc-filters label { display:grid; gap:8px; min-width:0; font-size:12px; font-weight:600; }
+.pc-filters input,.pc-filters select { width:100%; min-width:0; }
+.pc-coverage { margin:18px 0; padding:15px 20px; background:#ffffff80; border:1px solid var(--border); border-radius:16px; color:var(--muted); font-size:13px; line-height:1.8; }
+.pc-coverage summary { cursor:pointer; color:var(--ink); }
+.pc-coverage ul { padding-left:20px; }
+.pc-result-head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px; font-size:13px; }
+.pc-workspace { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:18px; align-items:stretch; }
+.pc-list-panel,#pc-detail { background:#fff; border-radius:24px; padding:20px; min-width:0; min-height:0; }
+.pc-list-panel { display:flex; flex-direction:column; }
+.pc-list-panel > .pc-result-head { margin:14px 0 0; padding-top:12px; border-top:1px solid #f0edf5; }
+#pc-detail { overflow:auto; }
+.pc-table-scroll { flex:1; min-height:0; overflow:auto; }
+/* 좌우 챔버의 아래 끝을 맞추고, 넘치는 내용은 각 패널 안에서 스크롤한다. */
+@media(min-width:1001px) { .pc-workspace { height:min(78vh,820px); } }
+.pc-table { width:100%; border-collapse:collapse; font-size:13px; }
+.pc-table th { text-align:left; background:#f5f2fb; padding:12px 10px; position:sticky; top:0; z-index:1; font-weight:600; white-space:nowrap; }
+.pc-table td { padding:13px 10px; border-bottom:1px solid #f0edf5; line-height:1.7; }
+.pc-table tr.pc-selected td { background:#f1ecfa; }
+.pc-table small { display:block; color:var(--muted); font-size:11px; }
+#pc-app .pc-table button { white-space:nowrap; font-size:12px; padding:7px 10px; min-height:36px; }
+.pc-detail-tag { font-size:12px; color:#615771; margin:0 0 10px; }
+#pc-detail h2 { font-size:22px; margin:0 0 10px; letter-spacing:-.5px; }
+.pc-detail-sub { font-size:13px; line-height:1.7; color:var(--muted); }
+.pc-dimensions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:20px 0; }
+.pc-dimensions div { background:#f6f4fb; border-radius:14px; padding:14px; }
+.pc-dimensions dt { color:var(--muted); font-size:12px; }
+.pc-dimensions dd { margin:7px 0 0; font-size:20px; font-variant-numeric:tabular-nums; }
+.pc-dimensions dd small { font-size:12px; margin-left:5px; color:var(--muted); }
+.pc-notes { font-size:12px; line-height:1.8; color:var(--muted); padding-left:19px; }
+.pc-issue { background:#fff5de; color:#70501c; padding:14px; border-radius:12px; font-size:13px; line-height:1.7; }
+.pc-source { font-size:12px; line-height:1.8; padding-top:16px; border-top:1px solid var(--border); overflow-wrap:anywhere; }
+.pc-source summary { cursor:pointer; font-weight:600; font-size:13px; padding:12px 0; }
+.pc-source img { display:block; width:100%; height:auto; border:1px solid var(--border); }
+.pc-source a { display:inline-block; margin-top:9px; text-decoration:underline; }
+.pc-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.pc-status-note { color:#76531a; font-size:11px; }
+.pc-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+@media(max-width:1250px) { .pc-filters { grid-template-columns:repeat(3,minmax(0,1fr)); } .pc-search { grid-column:span 2; } }
+@media(max-width:1000px) { .pc-workspace { grid-template-columns:1fr; height:auto; } .pc-table-scroll { flex:none; max-height:420px; } #pc-detail { overflow:visible; } }
+@media(max-width:600px) { #pc-app { padding:0 20px 24px; } .pc-filters { grid-template-columns:1fr 1fr; padding:16px; } .pc-search { grid-column:1/-1; } .pc-list-panel,#pc-detail { padding:16px; } .pc-result-head { align-items:flex-start; flex-direction:column; } }
+}
