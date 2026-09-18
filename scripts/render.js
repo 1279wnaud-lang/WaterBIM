@@ -80,6 +80,7 @@ function buildPage() {
   const pipeCatalog = JSON.parse(fs.readFileSync(path.join(DATA, 'pipe-catalog.json'), 'utf8'));
   const pipeImages = Object.fromEntries([...new Set(pipeCatalog.records.map(r => r.source.image))].map(name => [name, 'data:image/webp;base64,' + fs.readFileSync(path.join(DATA, 'pipe-sources', name)).toString('base64')]));
   const pipeMaterials = fs.readFileSync(path.join(DATA, 'pipe-materials.json'), 'utf8');
+  const pipeMaterialCount = JSON.parse(pipeMaterials).materials.length;
   const pipeScript = fs.readFileSync(path.join(__dirname, 'pipe-catalog-core.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, 'pipe-compare-client.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, 'pipe-catalog-client.js'), 'utf8');
   const styleCss = `${reviewCss}
   :root {
@@ -399,7 +400,7 @@ function buildPage() {
 
   const bodyHtml = `<div class="app">
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-head"><span class="sidebar-title"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3 3 8v8l9 5 9-5V8L12 3Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg></span>WaterBIM</span></div>
+    <div class="sidebar-head"><span class="sidebar-title"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 2.8c3.5 4 5.8 7 5.8 10.1a5.8 5.8 0 0 1-11.6 0c0-3.1 2.3-6.1 5.8-10.1Z"/><path d="M9.4 13.6a2.7 2.7 0 0 0 2.2 2.7" stroke-linecap="round"/></svg></span>WaterBIM</span></div>
     <nav class="nav-list" id="navList" aria-label="주요 기능"></nav><span class="preview-label">상하수도 BIM 도구</span>
   </aside>
   <div class="main-area">
@@ -412,10 +413,24 @@ function buildPage() {
       <div class="home-tools" aria-label="업무 도구 선택">
         <button type="button" class="home-tool" data-open-tab="dictionary">
           <span class="home-tool-icon">${NAV_DICT_ICON}</span>
-          <span class="home-tool-title">용어사전</span>
+          <span class="home-tool-title">용어 사전</span>
           <span class="home-tool-description">설계 용어와 약어의 의미를<br>분야별로 찾아보세요.</span>
           <span class="home-tool-detail">용어 · 약어 · 분야별 검색</span>
           <span class="home-tool-link">용어 찾아보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="home-tool" data-open-tab="pipes">
+          <span class="home-tool-icon">${NAV_DICT_ICON}</span>
+          <span class="home-tool-title">주철관 · 강관 규격 사전</span>
+          <span class="home-tool-description">닥타일주철관과 강관의 직관 · 이형관 치수를<br>핸드북 원문 도식과 함께 확인하세요.</span>
+          <span class="home-tool-detail">${pipeCatalog.records.length}개 규격 · 직관 · 이형관 · 핸드북 원문 근거</span>
+          <span class="home-tool-link">규격 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="home-tool" data-open-tab="compare">
+          <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
+          <span class="home-tool-title">관종 비교 · 선정 도우미</span>
+          <span class="home-tool-description">설계 조건을 고르면 조건에 맞는 관종과<br>그 근거를 정리해 보여줍니다.</span>
+          <span class="home-tool-detail">${pipeMaterialCount}개 관종 · 상수도/하수도 구분 · 생산범위 판정</span>
+          <span class="home-tool-link">관종 고르기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
         <button type="button" class="home-tool" data-open-tab="codesearch">
           <span class="home-tool-icon">${NAV_SEARCH_ICON}</span>
@@ -437,22 +452,6 @@ function buildPage() {
           <span class="home-tool-description">BIM과 기존 설계방식의 수행 범위를 정리하고<br>프로젝트 검토 결과를 저장하세요.</span>
           <span class="home-tool-detail">업무 목록 · 수행방식 검토 · PDF 출력</span>
           <span class="home-tool-link">업무 정리 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
-        </button>
-      </div>
-      <div class="home-tools pc-home-extension">
-        <button type="button" class="home-tool" data-open-tab="pipes">
-          <span class="home-tool-icon">${NAV_DICT_ICON}</span>
-          <span class="home-tool-title">관·이형관 규격 사전</span>
-          <span class="home-tool-description">닥타일주철관과 강관의 치수·중량을 찾고,<br>핸드북 원문 도식과 함께 확인하세요.</span>
-          <span class="home-tool-detail">${pipeCatalog.records.length}개 규격 · 핸드북 원문 근거 · 담아서 비교</span>
-          <span class="home-tool-link">규격 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
-        </button>
-        <button type="button" class="home-tool" data-open-tab="compare">
-          <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
-          <span class="home-tool-title">관종 비교 · 선정 도우미</span>
-          <span class="home-tool-description">설계 조건을 고르면 조건에 맞는 관종과<br>그 근거를 정리해 보여줍니다.</span>
-          <span class="home-tool-detail">6개 관종 · 상수도/하수도 구분 · 생산범위 판정</span>
-          <span class="home-tool-link">관종 고르기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
       </div>
       <p class="home-footer">상단 메뉴에서 언제든 다른 도구로 이동할 수 있습니다.</p>
@@ -516,7 +515,7 @@ function buildPage() {
           <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
           <div class="header-main">
             <p class="eyebrow">Dictionary</p>
-            <h1>상하수도 BIM 용어 사전</h1>
+            <h1>용어 사전</h1>
             <div class="search-row">
               ${SEARCH_ICON}
               <input id="dictQ" type="text" placeholder="단어, 뜻으로 찾기... (예: 가압장, 밸브)" autocomplete="off">
@@ -583,11 +582,11 @@ function esc(s) {
 const TABS = [
   { id: 'home', label: '홈', icon: '' },
   { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
+  { id: 'pipes', label: '주철관·강관', icon: '${NAV_DICT_ICON}' },
+  { id: 'compare', label: '관종비교', icon: '${NAV_PALETTE_ICON}' },
   { id: 'codesearch', label: '코드검색', icon: '${NAV_SEARCH_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
   { id: 'modelreview', label: '업무분류', icon: '${NAV_DICT_ICON}' },
-  { id: 'pipes', label: '관·이형관', icon: '${NAV_DICT_ICON}' },
-  { id: 'compare', label: '관종비교', icon: '${NAV_PALETTE_ICON}' },
 ];
 const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');

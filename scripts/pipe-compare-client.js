@@ -1,27 +1,5 @@
 /* 관종 비교 · 선정 도우미.
-   점수 규칙은 사내 비교자료의 문장을 근거로만 만들었고, 각 근거는 원문 위치를 그대로 인용한다.
-   장바구니(PipeCart)는 규격 사전 탭과 공유한다. */
-window.PipeCart = (() => {
- const KEY='waterbim-pipe-cart-v1', LIMIT=6;
- let ids=[];
- try{const raw=localStorage.getItem(KEY);if(raw)ids=JSON.parse(raw).filter(x=>typeof x==='string').slice(0,LIMIT);}catch{ids=[];}
- const emit=()=>document.dispatchEvent(new CustomEvent('pipe-cart-change'));
- const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(ids));}catch{}};
- return {
-  LIMIT,
-  list:()=>ids.slice(),
-  count:()=>ids.length,
-  has:id=>ids.includes(id),
-  toggle(id){
-   if(ids.includes(id))ids=ids.filter(x=>x!==id);
-   else{if(ids.length>=LIMIT)return false;ids=[...ids,id];}
-   persist();emit();return true;
-  },
-  remove(id){ids=ids.filter(x=>x!==id);persist();emit();},
-  clear(){ids=[];persist();emit();},
- };
-})();
-
+   점수 규칙은 사내 비교자료의 문장을 근거로만 만들었고, 각 근거는 원문 위치를 그대로 인용한다. */
 (() => {
  'use strict';
  const data=PIPE_MATERIALS, $=id=>document.getElementById('mc-'+id);
@@ -126,8 +104,8 @@ window.PipeCart = (() => {
    CONDITIONS.map(c=>'<div class="mc-cond" role="group" aria-label="'+esc(c.label)+'"><span class="mc-cond-label">'+esc(c.label)+'</span><div class="mc-opts">'+
     c.options.map(([v,t])=>'<button type="button" class="mc-opt'+(state[c.key]===v?' active':'')+'" data-cond="'+c.key+'" data-value="'+v+'" aria-pressed="'+(state[c.key]===v)+'">'+esc(t)+'</button>').join('')+
    '</div></div>').join('');
-  $('conditions').querySelectorAll('[data-cond]').forEach(b=>b.onclick=()=>{state[b.dataset.cond]=b.dataset.value;renderConditions();renderResults();renderCart();});
-  document.getElementById('mc-dn').oninput=e=>{state.dn=e.target.value;renderResults();renderCart();};
+  $('conditions').querySelectorAll('[data-cond]').forEach(b=>b.onclick=()=>{state[b.dataset.cond]=b.dataset.value;renderConditions();renderResults();});
+  document.getElementById('mc-dn').oninput=e=>{state.dn=e.target.value;renderResults();};
  }
 
  function renderResults(){
@@ -156,12 +134,19 @@ window.PipeCart = (() => {
  }
 
  let shown=new Set(data.materials.map(m=>m.id));
+ const PRESETS=[['all','전체',()=>data.materials],['supply','상수도',()=>data.materials.filter(m=>m.useScope!=='sewer')],
+  ['sewer','하수도',()=>data.materials.filter(m=>m.useScope!=='supply')],['khe','사내 자료',()=>data.materials.filter(m=>m.source==='khe')]];
  function renderChips(){
-  $('chips').innerHTML=data.materials.map(m=>'<button type="button" class="mc-chip'+(shown.has(m.id)?' active':'')+'" data-mat="'+m.id+'" aria-pressed="'+shown.has(m.id)+'">'+esc(m.name)+(m.alias?' <small>'+esc(m.alias)+'</small>':'')+'</button>').join('');
+  $('chips').innerHTML='<div class="mc-presets">'+PRESETS.map(([k,t])=>'<button type="button" class="mc-preset" data-preset="'+k+'">'+esc(t)+'</button>').join('')+'</div>'+
+   data.materials.map(m=>'<button type="button" class="mc-chip'+(shown.has(m.id)?' active':'')+'" data-mat="'+m.id+'" aria-pressed="'+shown.has(m.id)+'">'+esc(m.name)+(m.alias?' <small>'+esc(m.alias)+'</small>':'')+'</button>').join('');
   $('chips').querySelectorAll('[data-mat]').forEach(b=>b.onclick=()=>{
    const id=b.dataset.mat;
    if(shown.has(id)){if(shown.size>1)shown.delete(id);}else shown.add(id);
    renderChips();renderTable();
+  });
+  $('chips').querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{
+   const list=PRESETS.find(x=>x[0]===b.dataset.preset)[2]();
+   shown=new Set(list.map(m=>m.id));renderChips();renderTable();
   });
  }
  function cellHtml(m,row){
@@ -179,59 +164,31 @@ window.PipeCart = (() => {
   let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+'>'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</th>').join('')+'</tr></thead>';
   for(const g of groups){
    const rows=data.rows.filter(r=>r.group===g);
-   html+='<tbody><tr class="mc-group-row"><th colspan="'+(mats.length+1)+'" scope="colgroup">'+esc(g)+'</th></tr>'+
+   html+='<tbody><tr class="mc-group-row"><th colspan="'+(mats.length+1)+'" scope="colgroup"><span>'+esc(g)+'</span></th></tr>'+
     rows.map(r=>'<tr><th scope="row" class="mc-row-head">'+esc(r.label)+(r.source==='ref'?'<span class="mc-src mc-src-ref">참고</span>':'')+'</th>'+
      mats.map(m=>'<td'+(r.short?' class="mc-short"':'')+'>'+cellHtml(m,r)+'</td>').join('')+'</tr>').join('')+'</tbody>';
   }
-  html+='<tbody><tr class="mc-group-row"><th colspan="'+(mats.length+1)+'" scope="colgroup">장점 / 단점</th></tr>'+
+  html+='<tbody><tr class="mc-group-row"><th colspan="'+(mats.length+1)+'" scope="colgroup"><span>장점 / 단점</span></th></tr>'+
    '<tr><th scope="row" class="mc-row-head">장점</th>'+mats.map(m=>'<td><ul class="mc-pro">'+m.pros.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></td>').join('')+'</tr>'+
    '<tr><th scope="row" class="mc-row-head">단점</th>'+mats.map(m=>'<td><ul class="mc-con">'+m.cons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></td>').join('')+'</tr></tbody>';
   $('table').innerHTML=html;
  }
 
- function cartRecord(id){return (typeof PIPE_CATALOG==='undefined'?null:PIPE_CATALOG.records.find(r=>r.id===id))||null;}
- function renderCart(){
-  const ids=window.PipeCart.list(),items=ids.map(cartRecord).filter(Boolean);
-  document.querySelectorAll('[data-cart-count]').forEach(el=>{el.textContent=items.length;el.closest('[data-cart-bar]')?.toggleAttribute('hidden',!items.length);});
-  $('cart-clear').disabled=!items.length;
-  if(!items.length){
-   $('cart').innerHTML='<p class="mc-empty">아직 담은 규격이 없습니다. <b>관·이형관</b> 탭에서 규격을 검색하고 <b>담기</b>를 누르면 여기에서 나란히 비교할 수 있습니다. (최대 '+window.PipeCart.LIMIT+'개)</p>';
-   return;
-  }
-  const dimKeys=[...new Set(items.flatMap(r=>Object.keys(r.dimensions)))];
-  const matOf=r=>data.materials.find(m=>m.catalogMaterial===r.material)||null;
-  const head='<tr><th scope="col" class="mc-row-head">구분</th>'+items.map(r=>'<th scope="col">'+esc(r.part)+(r.keys.angle==null?'':' '+r.keys.angle+'°')+'<small>'+esc(r.material)+' · DN '+r.keys.nominalDiameter+'</small><button type="button" class="mc-drop" data-drop="'+esc(r.id)+'" aria-label="'+esc(r.part+' DN '+r.keys.nominalDiameter)+' 비교에서 빼기">빼기</button></th>').join('')+'</tr>';
-  const basic=[
-   ['구분 / 접합',items.map(r=>esc(r.keys.variant)+(r.keys.joint?'<small>'+esc(r.keys.joint)+'</small>':''))],
-   ['생산 범위 판정',items.map(r=>{
-     const m=matOf(r);if(!m)return '<span class="mc-blank">연결된 관종 자료 없음</span>';
-     const dn=r.keys.nominalDiameter,over=dn>m.sizeRange.max,under=dn<m.sizeRange.min;
-     return over?'<span class="mc-flag mc-flag-out">생산 범위 초과</span><em class="mc-extra">D'+m.sizeRange.min+'~'+m.sizeRange.max+' 기준. 해외발주 · 특별주문 확인 필요</em>'
-       :under?'<span class="mc-flag mc-flag-out">하한 미만</span><em class="mc-extra">D'+m.sizeRange.min+'~'+m.sizeRange.max+' 기준</em>'
-       :'<span class="mc-flag mc-flag-in">생산 범위 내</span><em class="mc-extra">D'+m.sizeRange.min+'~'+m.sizeRange.max+'</em>';
-   })],
-   ['검토 상태',items.map(r=>r.validation.status==='needs-review'?'<span class="mc-flag mc-flag-warn">확인 필요</span>':'<span class="mc-flag mc-flag-in">원문 대조</span>')],
-  ];
-  const matRows=['use','joint','pressure','corrosion','roughness'].map(key=>{
-   const row=data.rows.find(r=>r.key===key);
-   return [row.label+(row.source==='ref'?' (참고)':''),items.map(r=>{const m=matOf(r);return m?cellHtml(m,row):'<span class="mc-blank">—</span>';})];
-  });
-  const dimRows=dimKeys.map(k=>{
-   const f=PIPE_CATALOG.fields[k];
-   return [esc(f.label)+' · '+esc(f.sourceSymbol),items.map(r=>k in r.dimensions?esc(r.dimensions[k])+'<small>'+esc(f.unit)+'</small>':'<span class="mc-blank">미수록</span>')];
-  });
-  const body=(title,rows)=>'<tbody><tr class="mc-group-row"><th colspan="'+(items.length+1)+'" scope="colgroup">'+title+'</th></tr>'+
-   rows.map(([label,cells])=>'<tr><th scope="row" class="mc-row-head">'+label+'</th>'+cells.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody>';
-  $('cart').innerHTML='<div class="mc-table-scroll"><table class="mc-table mc-cart-table"><thead>'+head+'</thead>'+
-   body('규격',basic)+body('치수 · 중량 (규격 사전)',dimRows)+body('관종 특성 (비교표 연결)',matRows)+'</table></div>'+
-   '<p class="mc-source-note">치수·중량은 규격 사전의 핸드북 수록값이고, 관종 특성은 위 비교표에서 같은 관종을 찾아 연결한 값입니다. 비교표에 없는 관종(HDPE·PEP·GRP·PVC)은 규격 사전에 아직 수록되지 않아 연결되지 않습니다.</p>';
-  $('cart').querySelectorAll('[data-drop]').forEach(b=>b.onclick=()=>window.PipeCart.remove(b.dataset.drop));
+ /* 표 위에서 휠을 굴리면 가로로 스크롤한다. 양 끝에 닿으면 페이지 스크롤로 넘겨
+    사용자가 표 안에 갇히지 않게 한다. */
+ function wheelToHorizontal(el){
+  el.addEventListener('wheel',e=>{
+   if(e.deltaX||e.shiftKey||e.ctrlKey)return;
+   const max=el.scrollWidth-el.clientWidth;
+   if(max<=1)return;
+   const next=el.scrollLeft+e.deltaY;
+   if(next<0||next>max)return;
+   el.scrollLeft=next;e.preventDefault();
+  },{passive:false});
  }
-
- $('reset').onclick=()=>{Object.assign(state,{use:'supply',dn:300,flow:'gravity',ground:'normal',env:'normal',site:'normal'});renderConditions();renderResults();renderCart();};
- $('cart-clear').onclick=()=>window.PipeCart.clear();
- document.addEventListener('pipe-cart-change',renderCart);
+ $('reset').onclick=()=>{Object.assign(state,{use:'supply',dn:300,flow:'gravity',ground:'normal',env:'normal',site:'normal'});renderConditions();renderResults();};
  $('notes').innerHTML=data.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
- renderConditions();renderResults();renderChips();renderTable();renderCart();
+ renderConditions();renderResults();renderChips();renderTable();
+ document.querySelectorAll('#mc-app .mc-table-scroll').forEach(wheelToHorizontal);
 })();

@@ -33,18 +33,11 @@
   const flagged=rows.filter(r=>r.validation.status==='needs-review').length;
   $('count').textContent=`${rows.length}개 결과 / 전체 ${catalog.records.length}개`+(flagged?` · 확인 필요 ${flagged}개`:'');
   $('empty').hidden=!!rows.length;
-  $('rows').innerHTML=pageRows.map(r=>'<tr class="'+(r.id===selected?'pc-selected':'')+'"><td>'+escape(r.part)+(r.keys.angle==null?'':' '+r.keys.angle+'°')+'<small>'+escape(r.material)+'</small></td><td>DN '+r.keys.nominalDiameter+'</td><td>'+escape(r.keys.variant)+'<small>'+escape(r.keys.joint)+'</small>'+(r.validation.status==='needs-review'?'<span class="pc-status-note">확인 필요</span>':'')+'</td><td><button type="button" data-pipe-id="'+escape(r.id)+'" aria-pressed="'+(r.id===selected)+'" aria-label="'+escape(r.material+' '+r.part+' DN '+r.keys.nominalDiameter+' '+r.keys.variant+' '+r.keys.joint+(r.keys.angle==null?'':' '+r.keys.angle+'도'))+' 상세">보기</button></td><td><button type="button" class="pc-cart-btn'+(window.PipeCart.has(r.id)?' in':'')+'" data-cart-id="'+escape(r.id)+'" aria-pressed="'+window.PipeCart.has(r.id)+'">'+(window.PipeCart.has(r.id)?'담김':'담기')+'</button></td></tr>').join('');
+  $('rows').innerHTML=pageRows.map(r=>'<tr class="'+(r.id===selected?'pc-selected':'')+'"><td>'+escape(r.part)+(r.keys.angle==null?'':' '+r.keys.angle+'°')+'<small>'+escape(r.material)+'</small></td><td>DN '+r.keys.nominalDiameter+'</td><td>'+escape(r.keys.variant)+'<small>'+escape(r.keys.joint)+'</small>'+(r.validation.status==='needs-review'?'<span class="pc-status-note">확인 필요</span>':'')+'</td><td><button type="button" data-pipe-id="'+escape(r.id)+'" aria-pressed="'+(r.id===selected)+'" aria-label="'+escape(r.material+' '+r.part+' DN '+r.keys.nominalDiameter+' '+r.keys.variant+' '+r.keys.joint+(r.keys.angle==null?'':' '+r.keys.angle+'도'))+' 상세">보기</button></td></tr>').join('');
   detail();
  }
  controls.forEach(id=>$(id).addEventListener(id==='query'?'input':'change',render));
  $('reset').onclick=()=>{controls.forEach(id=>$(id).value='');render();};
- $('rows').addEventListener('click',event=>{
-  const cart=event.target.closest('[data-cart-id]');if(!cart)return;
-  if(!window.PipeCart.toggle(cart.dataset.cartId))$('message').textContent='비교함에는 최대 '+window.PipeCart.LIMIT+'개까지 담을 수 있습니다. 담긴 규격을 먼저 빼주세요.';
-  else $('message').textContent='';
- });
- $('cart-clear').onclick=()=>window.PipeCart.clear();
- document.addEventListener('pipe-cart-change',()=>{if(catalogRendered)render();});
  $('rows').onclick=event=>{const button=event.target.closest('[data-pipe-id]');if(!button)return;selected=button.dataset.pipeId;render();$('detail').querySelector('h2').focus({preventScroll:true});if(window.innerWidth<=1000)$('detail').scrollIntoView({block:'start',behavior:'auto'});};
  document.addEventListener('tool-tab-change',event=>{if(event.detail==='pipes'&&!catalogRendered)render();});
  if(document.querySelector('.tab-panel[data-tab="pipes"]').style.display!=='none')render();
