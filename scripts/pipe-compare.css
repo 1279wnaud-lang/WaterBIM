@@ -11,12 +11,13 @@
 .mc-source-note {font-size:12.5px;line-height:1.7;color:var(--muted);margin:14px 0 0;}
 .mc-empty {font-size:14px;line-height:1.7;color:var(--muted);margin:0;padding:22px;border:1px dashed var(--border);border-radius:12px;text-align:center;}
 
-.mc-conditions {display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;}
-.mc-cond {border:0;margin:0;padding:0;display:grid;gap:8px;align-content:start;font-size:13px;font-weight:600;color:var(--ink);}
-.mc-cond legend {padding:0;font-size:13px;font-weight:600;color:var(--ink);}
-.mc-cond-dn input {font:inherit;font-size:14px;font-weight:600;width:100%;min-height:42px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--ink);font-variant-numeric:tabular-nums;}
-.mc-opts {display:flex;flex-wrap:wrap;gap:6px;}
-.mc-opt {font:inherit;font-size:13px;font-weight:500;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:7px 13px;cursor:pointer;}
+/* 조건은 라벨을 왼쪽에 고정해 줄마다 같은 자리에서 시작하게 한다. */
+.mc-conditions {display:grid;gap:10px;}
+.mc-cond {display:grid;grid-template-columns:104px minmax(0,1fr);align-items:center;gap:8px 14px;border:0;margin:0;padding:0;}
+.mc-cond-label {font-size:13px;font-weight:600;color:var(--ink);line-height:1.5;}
+.mc-opts {display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+#mc-dn {font:inherit;font-size:14px;font-weight:600;width:160px;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);color:var(--ink);font-variant-numeric:tabular-nums;}
+.mc-opt {font:inherit;font-size:13px;font-weight:500;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:999px;height:36px;padding:0 15px;display:inline-flex;align-items:center;cursor:pointer;}
 .mc-opt:hover {border-color:var(--accent);color:var(--ink);}
 .mc-opt.active {background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700;}
 
@@ -96,5 +97,5 @@
 .pc-cart-btn.in {background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
 
 @media (max-width:1000px){#mc-app {padding:18px 18px 48px;}.mc-row-head {width:120px;min-width:110px;}}
-@media (max-width:700px){.mc-panel {padding:16px;}.mc-reasons,.mc-range {padding-left:0;margin-left:0;}}
+@media (max-width:700px){.mc-panel {padding:16px;}.mc-reasons,.mc-range {padding-left:0;margin-left:0;}.mc-cond {grid-template-columns:1fr;gap:6px;}}
 @media print {#mc-app {padding:0;}.mc-panel {break-inside:avoid;box-shadow:none;}}

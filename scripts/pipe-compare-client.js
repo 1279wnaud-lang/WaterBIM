@@ -101,17 +101,19 @@ window.PipeCart = (() => {
     const text=citeText(m,r.cite);if(!text)continue;
     score+=r.score;reasons.push({kind:r.score>0?'pro':'con',text,src:'khe'});
    }
-   if(state.use==='sewer'){
-    const sewer=m.use.sewer;
-    const ok=!/별도 표준/.test(sewer);
-    score+=ok?0:-2;
-    reasons.push({kind:ok?'note':'con',text:`하수도: ${sewer}`,src:'ref'});
+   if(m.useScope!=='both'&&m.useScope!==state.use){
+    blocked='scope';
+    reasons.unshift({kind:'block',text:(state.use==='supply'?'상수도 관로용 관종이 아닙니다':'하수도 관거용 관종이 아닙니다'),src:'ref',
+      extra:state.use==='supply'?m.use.supply:m.use.sewer});
+   }else if(m.useScope==='both'){
+    reasons.push({kind:'note',text:(state.use==='supply'?m.use.supply:m.use.sewer),src:'ref'});
    }
    return {m,score,reasons,blocked};
   }).sort((a,b)=>(a.blocked?1:0)-(b.blocked?1:0)||b.score-a.score||a.m.name.localeCompare(b.m.name,'ko'));
  }
  function verdict(r){
-  if(r.blocked)return{cls:'out',label:'적용 불가'};
+  if(r.blocked==='scope')return{cls:'out',label:'용도 다름'};
+  if(r.blocked)return{cls:'out',label:'생산 범위 밖'};
   if(r.score>=5)return{cls:'best',label:'적합'};
   if(r.score>=1)return{cls:'good',label:'검토 가능'};
   if(r.score>=-1)return{cls:'mid',label:'조건부'};
@@ -120,10 +122,10 @@ window.PipeCart = (() => {
 
  function renderConditions(){
   $('conditions').innerHTML=
-   '<label class="mc-cond mc-cond-dn">호칭경 (mm)<input id="mc-dn" type="number" min="10" max="3000" step="10" value="'+state.dn+'" inputmode="numeric"></label>'+
-   CONDITIONS.map(c=>'<fieldset class="mc-cond"><legend>'+esc(c.label)+'</legend><div class="mc-opts">'+
+   '<div class="mc-cond"><label class="mc-cond-label" for="mc-dn">호칭경 (mm)</label><div class="mc-opts"><input id="mc-dn" type="number" min="10" max="3000" step="10" value="'+state.dn+'" inputmode="numeric"></div></div>'+
+   CONDITIONS.map(c=>'<div class="mc-cond" role="group" aria-label="'+esc(c.label)+'"><span class="mc-cond-label">'+esc(c.label)+'</span><div class="mc-opts">'+
     c.options.map(([v,t])=>'<button type="button" class="mc-opt'+(state[c.key]===v?' active':'')+'" data-cond="'+c.key+'" data-value="'+v+'" aria-pressed="'+(state[c.key]===v)+'">'+esc(t)+'</button>').join('')+
-   '</div></fieldset>').join('');
+   '</div></div>').join('');
   $('conditions').querySelectorAll('[data-cond]').forEach(b=>b.onclick=()=>{state[b.dataset.cond]=b.dataset.value;renderConditions();renderResults();renderCart();});
   document.getElementById('mc-dn').oninput=e=>{state.dn=e.target.value;renderResults();renderCart();};
  }
@@ -133,14 +135,14 @@ window.PipeCart = (() => {
   const usable=list.filter(r=>!r.blocked);
   $('result-meta').textContent=`${usable.length}개 관종 검토 가능 / 전체 ${list.length}개`;
   $('result-hint').innerHTML=state.use==='sewer'
-   ? '이 비교자료는 <b>상수도 관로</b>를 전제로 작성된 표입니다. 하수도 전용 관종(하수도용 이중벽 PE관, 흄관 등)은 이 자료에 없으므로, 아래 결과는 상수도용 관종을 하수도에 쓸 수 있는지 관점에서만 참고하세요.'
+   ? '하수도 관종(흄관 · PE 이중벽관 · 하수도용 PVC관 · 파형강관)은 사내 비교자료에 없어 KS 표준 등 공개 자료로 정리한 것이라 <b>공개 표준 조사</b> 뱃지가 붙습니다. 사내 자료 6종만큼 상세하지 않으니 제조사 자료로 보완하세요.'
    : '근거 문장은 사내 비교자료의 표현을 그대로 옮긴 것입니다. 점수는 조건에 따른 상대적 유불리를 보여주기 위한 것이며, 설계 기준을 대신하지 않습니다.';
   $('results').innerHTML=list.map((r,i)=>{
    const v=verdict(r),m=r.m;
    return '<li class="mc-result mc-'+v.cls+'">'+
     '<div class="mc-result-head"><span class="mc-rank">'+(r.blocked?'—':i+1)+'</span>'+
      '<div class="mc-result-title"><b>'+esc(m.name)+'</b>'+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+
-      '<span class="mc-std">'+esc(m.standard)+'</span></div>'+
+      '<span class="mc-std">'+esc(m.standard)+'</span>'+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준 조사</span>':'')+'</div>'+
      '<span class="mc-verdict">'+v.label+'</span></div>'+
     '<div class="mc-range">D'+m.sizeRange.min+' ~ '+m.sizeRange.max+' mm'+(dn&&!r.blocked?' · DN '+dn+' 생산 범위 내':'')+'</div>'+
     '<ul class="mc-reasons">'+r.reasons.map(x=>'<li class="mc-'+x.kind+'"><span class="mc-mark" aria-hidden="true">'+
@@ -174,7 +176,7 @@ window.PipeCart = (() => {
  function renderTable(){
   const mats=data.materials.filter(m=>shown.has(m.id));
   const groups=[...new Set(data.rows.map(r=>r.group))];
-  let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+'>'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+'</th>').join('')+'</tr></thead>';
+  let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+'>'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</th>').join('')+'</tr></thead>';
   for(const g of groups){
    const rows=data.rows.filter(r=>r.group===g);
    html+='<tbody><tr class="mc-group-row"><th colspan="'+(mats.length+1)+'" scope="colgroup">'+esc(g)+'</th></tr>'+
