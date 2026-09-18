@@ -77,6 +77,10 @@ function buildPage() {
   const reviewHtml = fs.readFileSync(path.join(__dirname, 'model-review.html'), 'utf8');
   const reviewClient = fs.readFileSync(path.join(__dirname, 'workflow-graphs.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, 'model-review-client.js'), 'utf8');
   const reviewTemplates = fs.readFileSync(path.join(DATA, 'design-workflow-templates.json'), 'utf8');
+  const pipeCatalog = JSON.parse(fs.readFileSync(path.join(DATA, 'pipe-catalog.json'), 'utf8'));
+  const pipeImages = Object.fromEntries([...new Set(pipeCatalog.records.map(r => r.source.image))].map(name => [name, 'data:image/webp;base64,' + fs.readFileSync(path.join(DATA, 'pipe-sources', name)).toString('base64')]));
+  const pipeMaterials = fs.readFileSync(path.join(DATA, 'pipe-materials.json'), 'utf8');
+  const pipeScript = fs.readFileSync(path.join(__dirname, 'pipe-catalog-core.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, 'pipe-compare-client.js'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, 'pipe-catalog-client.js'), 'utf8');
   const styleCss = `${reviewCss}
   :root {
     --bg: #F6F8FC; --panel: #FFFFFF; --ink: #16202E; --muted: #64748B;
@@ -395,11 +399,60 @@ function buildPage() {
 
   const bodyHtml = `<div class="app">
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-head"><span class="sidebar-title">상하수도 BIM 도구</span></div>
-    <nav class="nav-list" id="navList"></nav>
+    <div class="sidebar-head"><span class="sidebar-title"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3 3 8v8l9 5 9-5V8L12 3Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg></span>WaterBIM</span></div>
+    <nav class="nav-list" id="navList" aria-label="주요 기능"></nav><span class="preview-label">상하수도 BIM 도구</span>
   </aside>
   <div class="main-area">
+    <section class="tab-panel home-panel" data-tab="home">
+      <header class="home-heading">
+        <p class="eyebrow">상하수도 BIM 설계 도구</p>
+        <h1>오늘의 설계 업무를 시작하세요.</h1>
+        <p class="home-description">기준을 확인하고, 코드를 찾고, 설계 업무를 정리하세요.</p>
+      </header>
+      <div class="home-tools" aria-label="업무 도구 선택">
+        <button type="button" class="home-tool" data-open-tab="dictionary">
+          <span class="home-tool-icon">${NAV_DICT_ICON}</span>
+          <span class="home-tool-title">용어사전</span>
+          <span class="home-tool-description">설계 용어와 약어의 의미를<br>분야별로 찾아보세요.</span>
+          <span class="home-tool-detail">용어 · 약어 · 분야별 검색</span>
+          <span class="home-tool-link">용어 찾아보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="home-tool" data-open-tab="codesearch">
+          <span class="home-tool-icon">${NAV_SEARCH_ICON}</span>
+          <span class="home-tool-title">코드 검색</span>
+          <span class="home-tool-description">시설과 공종에 맞는 WBS 코드를 찾고,<br>필요한 코드를 조합하세요.</span>
+          <span class="home-tool-detail">WBS · OBS · 코드 조합</span>
+          <span class="home-tool-link">코드 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="home-tool" data-open-tab="colors">
+          <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
+          <span class="home-tool-title">색상 기준</span>
+          <span class="home-tool-description">모델에 적용할 시설별 색상을 확인하고<br>RGB 값을 복사하세요.</span>
+          <span class="home-color-sample" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          <span class="home-tool-link">색상 확인 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="home-tool" data-open-tab="modelreview">
+          <span class="home-tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="m8 9 1.5 1.5L12 8m2 2h3m-9 6h9"/></svg></span>
+          <span class="home-tool-title">업무분류</span>
+          <span class="home-tool-description">BIM과 기존 설계방식의 수행 범위를 정리하고<br>프로젝트 검토 결과를 저장하세요.</span>
+          <span class="home-tool-detail">업무 목록 · 수행방식 검토 · PDF 출력</span>
+          <span class="home-tool-link">업무 정리 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+      </div>
+      <div class="home-tools pc-home-extension">
+        <button type="button" class="home-tool" data-open-tab="pipes">
+          <span class="home-tool-icon">${NAV_DICT_ICON}</span>
+          <span class="home-tool-title">관·이형관 규격 사전</span>
+          <span class="home-tool-description">닥타일주철관과 강관의 치수·중량을 찾고,<br>핸드북 원문 도식과 함께 확인하세요.</span>
+          <span class="home-tool-detail">${pipeCatalog.records.length}개 규격 · 원문 근거 · 치수 자료 저장</span>
+          <span class="home-tool-link">규격 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+      </div>
+      <p class="home-footer">상단 메뉴에서 언제든 다른 도구로 이동할 수 있습니다.</p>
+    </section>
     ${reviewHtml}
+    ${fs.readFileSync(path.join(__dirname, 'pipe-catalog.html'), 'utf8')}
+    ${fs.readFileSync(path.join(__dirname, 'pipe-compare.html'), 'utf8')}
     <section class="tab-panel" data-tab="codesearch">
       <header>
         <div class="header-top">
@@ -521,21 +574,24 @@ function esc(s) {
 // --- 사이드바 / 탭 셸 (TABS에 항목만 추가하면 사이드바 목록과 탭 전환이
 //     자동으로 늘어나도록 데이터 기반으로 구성) ---
 const TABS = [
+  { id: 'home', label: '홈', icon: '' },
   { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
-  { id: 'codesearch', label: '코드서치', icon: '${NAV_SEARCH_ICON}' },
+  { id: 'codesearch', label: '코드검색', icon: '${NAV_SEARCH_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
   { id: 'modelreview', label: '업무분류', icon: '${NAV_DICT_ICON}' },
+  { id: 'pipes', label: '관·이형관', icon: '${NAV_DICT_ICON}' },
+  { id: 'compare', label: '관종비교', icon: '${NAV_PALETTE_ICON}' },
 ];
 const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
 
-let activeTab = localStorage.getItem('kwater-tool-active-tab') || TABS[0].id;
+let activeTab = 'home';
 if (!TABS.some((t) => t.id === activeTab)) activeTab = TABS[0].id;
 
 function renderNav() {
   navListEl.innerHTML = TABS.map((t) =>
-    '<div class="nav-item' + (t.id === activeTab ? ' active' : '') + '" data-tab="' + t.id + '">' +
-    (t.icon || '') + '<span>' + esc(t.label) + '</span></div>'
+    '<button type="button" aria-pressed="' + (t.id === activeTab) + '" class="nav-item' + (t.id === activeTab ? ' active' : '') + '" data-tab="' + t.id + '">' +
+    (t.icon || '') + '<span>' + esc(t.label) + '</span></button>'
   ).join('');
 }
 function setActiveTab(id) {
@@ -550,7 +606,21 @@ function setActiveTab(id) {
 }
 navListEl.addEventListener('click', (ev) => {
   const item = ev.target.closest('.nav-item');
-  if (item) setActiveTab(item.getAttribute('data-tab'));
+  if (item) {
+    const id = item.getAttribute('data-tab');
+    setActiveTab(id);
+    navListEl.querySelector('[data-tab="' + id + '"]').focus({preventScroll:true});
+    window.scrollTo({top:0});
+  }
+});
+document.querySelectorAll('[data-open-tab]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const id = button.getAttribute('data-open-tab');
+    setActiveTab(id);
+    const heading = document.querySelector('.tab-panel[data-tab="' + id + '"] h1');
+    if (heading) { heading.tabIndex = -1; heading.focus({preventScroll:true}); }
+    window.scrollTo({top:0});
+  });
 });
 renderNav();
 setActiveTab(activeTab);
@@ -863,7 +933,7 @@ function renderTray() {
 }
 
 function updateTrayTop() {
-  const header = document.querySelector('header');
+  const header = document.getElementById('sidebar');
   if (!header) return;
   document.documentElement.style.setProperty('--tray-top', (header.offsetHeight + 16) + 'px');
 }
@@ -1096,8 +1166,8 @@ document.addEventListener('tool-tab-change',e=>{if(e.detail==='dictionary'&&!dic
     title: '상하수도 BIM 도구',
     description: 'K-water 상하수도 BIM 코드·색상기준·용어사전·업무분류를 한 곳에서 검색·관리합니다.',
     entryCount: entries.length,
-    styleCss,
-    bodyHtml: bodyHtml + '<script>const WORKFLOW_TEMPLATES = ' + reviewTemplates.replace(/</g, '\\u003c') + ';\n' + reviewClient + '</script>',
+    styleCss: styleCss + fs.readFileSync(path.join(__dirname, "design-preview.css"), "utf8") + fs.readFileSync(path.join(__dirname, 'pipe-catalog.css'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pipe-compare.css'), 'utf8'),
+    bodyHtml: bodyHtml + '<script>const WORKFLOW_TEMPLATES = ' + reviewTemplates.replace(/</g, '\\u003c') + ';\n' + reviewClient + '</script>' + '<script>const PIPE_CATALOG = ' + JSON.stringify(pipeCatalog).replace(/</g, '\\u003c') + ';\nconst PIPE_SOURCE_IMAGES = ' + JSON.stringify(pipeImages) + ';\nconst PIPE_MATERIALS = ' + pipeMaterials.replace(/</g, '\\u003c') + ';\n' + pipeScript + '</script>',
   };
 }
 
