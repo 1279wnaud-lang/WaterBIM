@@ -19,20 +19,24 @@ def field(label, unit, symbol):
     return dict(label=label, unit=unit, sourceSymbol=symbol)
 
 fields = {
- 'outsideDiameter':field('바깥지름','mm','DE / D2'), 'thickness':field('관 두께','mm','e / T'),
+ 'outsideDiameter':field('바깥지름','mm','DE / D2'), 'thickness':field('관 두께','mm','e / e1 / T'),
  'massPerLength':field('직관부 단위중량','kg/m','M무게 / W'), 'length':field('길이','mm','L'),
  'mass':field('무게','kg','무게'), 'socketDiameter':field('이음관 치수 d','mm','d'),
  'radius':field('곡률반경','mm','R'), 'innerDiameter':field('안지름','mm','안지름'),
  'l1':field('분할 치수 l1','mm','l1'), 'l2':field('분할 치수 l2','mm','l2'), 'l3':field('끝단 치수 l3','mm','l3'),
- 'centerLength':field('관심 길이','mm','관심 길이'), 't':field('곡관 치수 t','mm','t'), 's':field('곡관 치수 s','mm','s')
+ 'centerLength':field('관심 길이','mm','관심 길이'), 't':field('곡관 치수 t','mm','t'), 's':field('각부 치수 s','mm','s / S')
 }
 
-def add(source, kind, dn, variant, dims, pdf, printed, table, *, angle=None, joint='', notes=None, issues=None, method='원문 이미지 대조'):
+def add(source, kind, dn, variant, dims, pdf, printed, table, *, angle=None, joint='', notes=None, issues=None, method='원문 이미지 대조', branch=None):
     keys = dict(nominalDiameter=dn, nominalDiameterUnit='mm', variant=variant, joint=joint)
     if angle is not None: keys.update(angle=angle, angleUnit='deg')
+    if branch is not None: keys.update(branchNominalDiameter=branch, branchNominalDiameterUnit='mm')
     record = dict(id=f'{source}-{kind}-{dn}-{variant}-{joint}-{angle}', material='닥타일주철관' if source=='ductile' else '강관', part=kind, keys=keys, dimensions=dims,
       source=dict(documentId=source, pdfPage=pdf, printedPage=printed, table=table, image=f'{source}-{pdf}.webp'),
       validation=dict(status='needs-review' if issues else 'source-checked', method=method, issues=issues or [], currentStandardVerified=False), notes=notes or [])
+    if branch is not None:
+        record['id'] += f'-branch-{branch}'
+        keys['variant'] += f' / 지관 DN{branch}'
     records.append(record)
 
 dn=[80,100,125,150,200,250,300,350,400,450,500,600,700,800,900,1000,1100,1200,1400,1600,1800,2000,2200,2400,2600]
@@ -83,7 +87,7 @@ with pdfplumber.open(SOURCE/FILES['steel']) as doc:
     dims={key:float(cols[col][i]) for key,col in [('outsideDiameter',0),('thickness',tcol),('innerDiameter',icol),('radius',7),('l1',8),('l2',9),('l3',10),('length',11),('centerLength',12),('mass',wcol)]}
     issues=[]
     if abs(dims['outsideDiameter']-2*dims['thickness']-dims['innerDiameter'])>0.15:issues.append('원문 안지름이 바깥지름−2×두께와 불일치합니다. 원문 값을 보존했으며 적용 전 확인이 필요합니다.')
-    add('steel','곡관',n,variant,dims,page,str(page-18),f'부도 {page-174} {angle}° 곡관',angle=angle,joint='용접',notes=['수록 표준 KS D 3578-1997. 치수 기호는 원문 도식을 참조하세요.','F20은 이번 구조화 범위에 포함하지 않았습니다.'],issues=issues,method='표 추출 및 원문 열 대조')
+    add('steel','곡관',n,variant,dims,page,str(page-18),f'부도 {page-174} {angle}° 곡관',angle=angle,joint='용접',notes=['수록 표준 KS D 3578-1997. 치수 기호는 원문 도식을 참조하세요.'],issues=issues,method='표 추출 및 원문 열 대조')
 
 # Ductile socket bends (닥타일 곡관), 원문 p.101-104 (pdf 51-53), V. 닥타일 주철 이형관 항목 4-7.
 # 원문 t 칼럼은 "표준값(KP값)" 형태이며, KP메커니컬·KP-L 접합은 괄호 안 KP값을 사용합니다(원문 각주 "( )는 KP치수임").
@@ -151,15 +155,21 @@ w1125={
 }
 add_bend(11.25,53,'104',25,R1125,t1125,tKP1125,w1125)
 
+from pipe_catalog_ductile import extend as extend_ductile
+extend_ductile(add, fields, field)
+from pipe_catalog_steel import extend as extend_steel
+extend_steel(add, fields, field, SOURCE/FILES['steel'])
+
 # Source snapshots are shipped locally, independent of the original G: drive.
 for key,page in sorted({(r['source']['documentId'],r['source']['pdfPage']) for r in records}):
  doc=pdfium.PdfDocument(str(SOURCE/FILES[key]))
  doc[page-1].render(scale=2, rotation=90 if key=='ductile' and page==42 else 0).to_pil().save(OUT/f'{key}-{page}.webp',quality=88)
 
 catalog=dict(schemaVersion=1, title='관·이형관 규격 사전', sources=sources, fields=fields, records=records,
- coverage=dict(stage='1차 정리',included=['닥타일 상수 2·3종 직관부','닥타일 플랜지 소켓관·플랜지관·이음관','닥타일 소켓곡관 90·45·22½·11¼°','강관 STWW 290·370·400 A 직관','강관 F12·F15 90°·45° 곡관'],pending=['닥타일 T관·이경관·특수이형관','강관 F20 곡관·T관·이경관·플랜지','직관 소켓·라이닝 및 관 길이별 총중량','현재 표준·제조사 공급 범위 확인']),
+ coverage=dict(stage='2차 정리',included=['닥타일 상수 2·3종 직관부','닥타일 V장 이형관 1~16항: 소켓곡관·T관·편락관·마개플랜지·플랜지곡관 등','닥타일 VI장 특수이형관 1~13항: 나팔관·드레인관·U형관·십자관·Y형관·밸브 부관·캡·합플랜지·TM 이음관·KP 특수압륜','강관 STWW 290·370·400 A 직관','강관 F12·F15·F20 90·45·22½·11¼·5⅝° 곡관','강관 F12·F15 일반 T관 및 F12·F15·F20 플랜지 붙이 T관','강관 F12·F15·F20 편락관 및 RF·GF 플랜지 (PDF 210 등급 표제 불일치 표시)'],pending=['직관 소켓·라이닝 및 관 길이별 총중량','강관 STWW400 B 및 이번 대상 외 부도 8~11·13A/B·14 등 부속표','현재 표준·제조사 공급 범위 확인'],unavailable=[dict(item='강관 F20 일반 T관',reason='부도 6은 F12/F15 수치표만 수록. F20은 KS B 1541·KS B 1543 또는 인수·인도 당사자 협의에 따른다는 원문 주석이므로 수치 레코드를 생성하지 않음.',documentId='steel',pdfPage=180,printedPage='162',table='부도 6 T자관')]),
  disclaimer='핸드북 수록값을 정리한 참고 자료입니다. 최신 표준 적합성이나 현재 공급 가능 여부를 판정하지 않습니다.')
-assert len({r['id'] for r in records})==len(records)
+from collections import Counter
+assert len({r['id'] for r in records})==len(records), [k for k,v in Counter(r['id'] for r in records).items() if v>1]
 for r in records:
  assert all(k in fields and isinstance(v,(float,int)) and v>0 for k,v in r['dimensions'].items())
 (ROOT/'data'/'pipe-catalog.json').write_text(json.dumps(catalog,ensure_ascii=False,indent=2),encoding='utf8')
