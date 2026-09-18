@@ -6514,23 +6514,10 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
   $('table').innerHTML=html;
  }
 
- /* 표 위에서 휠을 굴리면 가로로 스크롤한다. 양 끝에 닿으면 페이지 스크롤로 넘겨
-    사용자가 표 안에 갇히지 않게 한다. */
- function wheelToHorizontal(el){
-  el.addEventListener('wheel',e=>{
-   if(e.deltaX||e.shiftKey||e.ctrlKey)return;
-   const max=el.scrollWidth-el.clientWidth;
-   if(max<=1)return;
-   const next=el.scrollLeft+e.deltaY;
-   if(next<0||next>max)return;
-   el.scrollLeft=next;e.preventDefault();
-  },{passive:false});
- }
  $('reset').onclick=()=>{Object.assign(state,{use:'supply',dn:300,flow:'gravity',ground:'normal',env:'normal',site:'normal'});renderConditions();renderResults();};
  $('notes').innerHTML=data.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
  renderConditions();renderResults();renderChips();renderTable();
- document.querySelectorAll('#mc-app .mc-table-scroll').forEach(wheelToHorizontal);
 })();
 
 (() => {
