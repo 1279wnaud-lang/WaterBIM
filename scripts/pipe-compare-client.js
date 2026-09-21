@@ -62,6 +62,4 @@
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
  renderChips();renderTable();
 
- 
- });
 })();
