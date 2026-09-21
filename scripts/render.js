@@ -396,6 +396,7 @@ function buildPage() {
   const TOGGLE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>';
   const NAV_SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>';
   const NAV_PALETTE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c1.7 0 3.1-1.4 3.1-3.1C20.5 6.6 16.7 2 12 2Z"></path><circle cx="7" cy="10" r="1.2"></circle><circle cx="12" cy="7" r="1.2"></circle><circle cx="16.5" cy="10" r="1.2"></circle></svg>';
+  const NAV_PIPE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5"></path><path d="M2 13h20v5H2z"></path></svg>';
   const NAV_DICT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path></svg>';
 
   const bodyHtml = `<div class="app">
@@ -583,7 +584,7 @@ const TABS = [
   { id: 'home', label: '홈', icon: '' },
   { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
   { id: 'pipes', label: '주철관·강관', icon: '${NAV_DICT_ICON}' },
-  { id: 'compare', label: '관종비교', icon: '${NAV_PALETTE_ICON}' },
+  { id: 'compare', label: '관종', icon: '${NAV_PIPE_ICON}' },
   { id: 'codesearch', label: '코드검색', icon: '${NAV_SEARCH_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
   { id: 'modelreview', label: '업무분류', icon: '${NAV_DICT_ICON}' },

@@ -759,6 +759,16 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-th-text { flex: 1; min-width: 0; }
 .mc-th-img { flex-shrink: 0; width: 64px; height: 64px; background: #fff; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 2px; }
 .mc-th-img img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+
+.mc-search-card { display:flex; flex-wrap:wrap; gap:20px; border:1px solid var(--border); border-radius:12px; padding:20px; background:color-mix(in srgb,var(--accent) 3%,var(--panel)); }
+.mc-search-card-img { flex: 0 0 200px; max-width:100%; border-radius:8px; border:1px solid var(--border); background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.mc-search-card-img img { max-width:100%; max-height:200px; object-fit:contain; mix-blend-mode:multiply; }
+.mc-search-card-body { flex:1; min-width:300px; }
+.mc-search-card-body h3 { margin:0 0 8px; font-size:18px; }
+.mc-search-card-body p { margin:0 0 16px; font-size:13px; color:var(--muted); line-height:1.6; }
+.mc-search-card-dl { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; font-size:13px; }
+.mc-search-card-dl dt { font-weight:700; color:var(--muted); }
+.mc-search-card-dl dd { margin:0; }
 </style>
 <div class="app">
   <aside class="sidebar" id="sidebar">
@@ -871,6 +881,15 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
   <p class="pc-intro">관종별 재질 · 규격 · 물리적 특성 · 내압 · 장단점을 한 표에서 비교합니다. 사내 관종 비교 검토자료의 6종과, 공개 표준으로 정리한 5종을 함께 담았습니다.</p>
  </header>
  <div id="mc-app">
+
+  <section class="mc-panel">
+   <div class="mc-panel-head"><h2>관종 상세 검색</h2><span class="mc-hint-inline">관종 이름으로 검색하여 특성, 장단점, 사진을 상세히 확인하세요.</span></div>
+   <div style="margin-top:16px;">
+    <input type="text" id="mc-search-input" placeholder="관종 검색... (예: 주철관, PE, 강관)" autocomplete="off" style="width:100%; max-width:400px; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg); font:inherit;">
+   </div>
+   <div id="mc-search-results" style="margin-top:20px; display:none;"></div>
+  </section>
+
 
   <section class="mc-panel">
    <div class="mc-panel-head"><h2>관종 비교표</h2><span class="mc-hint-inline">사내 자료 6종으로 시작합니다. 칩을 눌러 보고 싶은 관종만 골라서 비교하세요.</span></div>
@@ -1011,7 +1030,7 @@ const TABS = [
   { id: 'home', label: '홈', icon: '' },
   { id: 'dictionary', label: '용어사전', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path></svg>' },
   { id: 'pipes', label: '주철관·강관', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path></svg>' },
-  { id: 'compare', label: '관종비교', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c1.7 0 3.1-1.4 3.1-3.1C20.5 6.6 16.7 2 12 2Z"></path><circle cx="7" cy="10" r="1.2"></circle><circle cx="12" cy="7" r="1.2"></circle><circle cx="16.5" cy="10" r="1.2"></circle></svg>' },
+  { id: 'compare', label: '관종', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5"></path><path d="M2 13h20v5H2z"></path></svg>' },
   { id: 'codesearch', label: '코드검색', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>' },
   { id: 'colors', label: '색상기준', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c1.7 0 3.1-1.4 3.1-3.1C20.5 6.6 16.7 2 12 2Z"></path><circle cx="7" cy="10" r="1.2"></circle><circle cx="12" cy="7" r="1.2"></circle><circle cx="16.5" cy="10" r="1.2"></circle></svg>' },
   { id: 'modelreview', label: '업무분류', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path></svg>' },

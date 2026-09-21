@@ -6,6 +6,15 @@
  <div id="mc-app">
 
   <section class="mc-panel">
+   <div class="mc-panel-head"><h2>관종 상세 검색</h2><span class="mc-hint-inline">관종 이름으로 검색하여 특성, 장단점, 사진을 상세히 확인하세요.</span></div>
+   <div style="margin-top:16px;">
+    <input type="text" id="mc-search-input" placeholder="관종 검색... (예: 주철관, PE, 강관)" autocomplete="off" style="width:100%; max-width:400px; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg); font:inherit;">
+   </div>
+   <div id="mc-search-results" style="margin-top:20px; display:none;"></div>
+  </section>
+
+
+  <section class="mc-panel">
    <div class="mc-panel-head"><h2>관종 비교표</h2><span class="mc-hint-inline">사내 자료 6종으로 시작합니다. 칩을 눌러 보고 싶은 관종만 골라서 비교하세요.</span></div>
    <div class="mc-chips" id="mc-chips" role="group" aria-label="비교할 관종 선택"></div>
    <div class="mc-table-scroll"><table class="mc-table" id="mc-table"><caption class="pc-sr">관종별 재질·규격·물리적 특성·내압 비교표</caption></table></div>
