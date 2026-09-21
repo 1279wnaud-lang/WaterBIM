@@ -706,6 +706,7 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-presets {display:flex;gap:6px;flex-basis:100%;margin-bottom:2px;}
 .mc-preset {font:inherit;font-size:12px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border));border-radius:8px;padding:6px 12px;cursor:pointer;}
 .mc-preset:hover {background:color-mix(in srgb,var(--accent) 16%,var(--panel));}
+.mc-preset.active {background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
 
 /* 관종이 11종이라 표가 넓다. 첫 열(구분)과 머리글을 고정해 어느 행·어느 관종을
    보고 있는지 잃지 않게 하고, 휠로 가로 이동할 수 있게 한다. */
@@ -713,7 +714,7 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-table {border-collapse:separate;border-spacing:0;table-layout:fixed;width:max-content;min-width:100%;font-size:13px;line-height:1.65;}
 .mc-table th,.mc-table td {border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:11px 13px;text-align:left;vertical-align:top;}
 .mc-table th:last-child,.mc-table td:last-child {border-right:0;}
-.mc-table thead th {position:sticky;top:0;z-index:2;background:var(--code-bg);font-size:13px;font-weight:700;color:var(--ink);width:232px;}
+.mc-table thead th {position:sticky;top:0;z-index:2;background:var(--code-bg);font-size:13px;font-weight:700;color:var(--ink);width:200px;}
 .mc-table thead th.mc-row-head {z-index:4;}
 .mc-table tbody .mc-row-head {position:sticky;left:0;z-index:1;}
 .mc-table thead .mc-row-head {position:sticky;left:0;z-index:3;}
@@ -722,17 +723,32 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-table thead th .mc-std {display:block;margin-top:3px;}
 .mc-th-pick {background:color-mix(in srgb,var(--accent) 12%,var(--code-bg));}
 .mc-pick-badge {display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink);}
-.mc-table .mc-row-head {width:156px;min-width:156px;background:var(--panel);font-weight:600;color:var(--ink);box-shadow:1px 0 0 var(--border);}
+.mc-table .mc-row-head {width:180px;min-width:180px;background:var(--panel);font-weight:600;color:var(--ink);box-shadow:1px 0 0 var(--border);}
+/* 표가 가로로 길어 오른쪽을 볼 때 행을 놓치기 쉽다. 행 전체를 물들여 시선을 잡아준다. */
+.mc-table tbody tr:not(.mc-group-row):hover th,
+.mc-table tbody tr:not(.mc-group-row):hover td {background:color-mix(in srgb,var(--accent) 6%,var(--panel));}
 .mc-group-row th {position:sticky;left:0;background:color-mix(in srgb,var(--accent) 7%,var(--panel));font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--accent);padding:8px 13px;}
 .mc-table td ul {margin:0;padding-left:16px;}
 .mc-table td li {margin-bottom:3px;}
 .mc-table td li:last-child {margin-bottom:0;}
 .mc-short {font-variant-numeric:tabular-nums;}
 .mc-blank {color:var(--muted);font-size:12px;}
-.mc-cost {list-style:none;padding:0;}
 .mc-pro li::marker,.mc-con li::marker {color:var(--muted);}
 .mc-notes {margin:14px 0 0;padding-left:18px;font-size:12.5px;line-height:1.75;color:var(--muted);}
 .mc-notes li {margin-bottom:4px;}
+
+.mc-proscons {display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,480px),1fr));gap:14px;}
+.mc-pc-card {min-width:0;border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--panel);}
+.mc-pc-card h3 {display:flex;align-items:baseline;flex-wrap:wrap;gap:7px;margin:0 0 11px;font-size:14px;letter-spacing:-.01em;}
+.mc-pc-card h3 small {font-size:11.5px;font-weight:400;color:var(--muted);}
+.mc-pc-card h3 .mc-src,.mc-pc-card h3 .mc-pick-badge {margin:0;}
+.mc-pc-lists {display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.mc-pc-col h4 {margin:0 0 6px;font-size:11.5px;font-weight:700;letter-spacing:.03em;}
+.mc-pc-pros h4 {color:var(--accent);}
+.mc-pc-cons h4 {color:var(--amber);}
+.mc-pc-col ul {margin:0;padding-left:16px;font-size:12.5px;line-height:1.65;}
+.mc-pc-col li {margin-bottom:5px;}
+.mc-pc-col li:last-child {margin-bottom:0;}
 
 .mc-group-row {cursor:pointer;user-select:none;}
 .mc-group-row:hover th {background:color-mix(in srgb,var(--accent) 12%,var(--panel));}
@@ -740,8 +756,8 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-collapsed .mc-toggle-icon {transform:rotate(-90deg);}
 .mc-collapsed tr:not(.mc-group-row) {display:none;}
 
-@media (max-width:1000px){#mc-app {padding:18px 18px 48px;}.mc-row-head {width:120px;min-width:110px;}}
-@media (max-width:700px){.mc-panel {padding:16px;}}
+@media (max-width:1000px){#mc-app {padding:18px 18px 48px;}.mc-table .mc-row-head {width:130px;min-width:120px;}}
+@media (max-width:700px){.mc-panel {padding:16px;}.mc-pc-lists {grid-template-columns:1fr;gap:10px;}}
 @media print {#mc-app {padding:0;}.mc-panel {break-inside:avoid;box-shadow:none;}}
 </style>
 </head>
@@ -859,10 +875,15 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
  <div id="mc-app">
 
   <section class="mc-panel">
-   <div class="mc-panel-head"><h2>관종 비교표</h2><span class="mc-hint-inline">보고 싶은 관종만 골라서 비교할 수 있습니다. 표는 휠로 좌우 이동됩니다.</span></div>
+   <div class="mc-panel-head"><h2>관종 비교표</h2><span class="mc-hint-inline">사내 자료 6종으로 시작합니다. 칩을 눌러 보고 싶은 관종만 골라서 비교하세요.</span></div>
    <div class="mc-chips" id="mc-chips" role="group" aria-label="비교할 관종 선택"></div>
-   <div class="mc-table-scroll"><table class="mc-table" id="mc-table"><caption class="pc-sr">관종별 재질·규격·물리적 특성·내압·장단점 비교표</caption></table></div>
+   <div class="mc-table-scroll"><table class="mc-table" id="mc-table"><caption class="pc-sr">관종별 재질·규격·물리적 특성·내압 비교표</caption></table></div>
    <ul class="mc-notes" id="mc-notes"></ul>
+  </section>
+
+  <section class="mc-panel">
+   <div class="mc-panel-head"><h2>관종별 장점 · 단점</h2><span class="mc-hint-inline">위 비교표에서 고른 관종만 표시됩니다.</span></div>
+   <div class="mc-proscons" id="mc-prosbox"></div>
   </section>
 
  </div>
@@ -6264,7 +6285,7 @@ const PIPE_MATERIALS = {
     "추천안은 원문 검토자료의 결론이며, 사업 조건(관경·수압·지반·공사비)에 따라 달라질 수 있습니다.",
     "생산 규격을 벗어나는 호칭경은 국내 표준 생산 범위 밖이므로 해외발주·특별주문 여부와 납기를 별도로 확인해야 합니다.",
     "사내 비교자료 6종은 상수도 관로를 전제로 작성된 표이고, 하수도 관종 4종(흄관·PE 이중벽관·하수도용 PVC관·파형강관)과 스테인리스강관은 공개 표준을 근거로 뒤에 추가한 것입니다. 표에서 출처 뱃지로 구분됩니다.",
-    "용도(상수도/하수도)를 고르면 해당 용도의 관종만 검토 대상으로 남고, 용도가 다른 관종은 적용 불가로 표시됩니다."
+    "상수도 · 하수도 버튼을 누르면 해당 용도로 쓰이는 관종만 표에 남습니다. 용도 구분은 각 관종의 KS 표준 적용 범위를 정리한 것입니다."
   ]
 }
 ;
@@ -6291,28 +6312,31 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
  const data=PIPE_MATERIALS, $=id=>document.getElementById('mc-'+id);
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
- let shown=new Set(data.materials.map(m=>m.id));
  const PRESETS=[['all','전체',()=>data.materials],['supply','상수도',()=>data.materials.filter(m=>m.useScope!=='sewer')],
   ['sewer','하수도',()=>data.materials.filter(m=>m.useScope!=='supply')],['khe','사내 자료',()=>data.materials.filter(m=>m.source==='khe')]];
+ /* 11종을 다 펼치면 첫 화면부터 가로 스크롤이라 비교가 안 된다.
+    원문 자료의 6종으로 시작하고, 나머지는 칩으로 필요할 때 더한다. */
+ let preset='khe';
+ let shown=new Set(PRESETS.find(p=>p[0]===preset)[2]().map(m=>m.id));
+
  function renderChips(){
-  $('chips').innerHTML='<div class="mc-presets">'+PRESETS.map(([k,t])=>'<button type="button" class="mc-preset" data-preset="'+k+'">'+esc(t)+'</button>').join('')+'</div>'+
+  $('chips').innerHTML='<div class="mc-presets">'+PRESETS.map(([k,t])=>'<button type="button" class="mc-preset'+(preset===k?' active':'')+'" data-preset="'+k+'" aria-pressed="'+(preset===k)+'">'+esc(t)+'</button>').join('')+'</div>'+
    data.materials.map(m=>'<button type="button" class="mc-chip'+(shown.has(m.id)?' active':'')+'" data-mat="'+m.id+'" aria-pressed="'+shown.has(m.id)+'">'+esc(m.name)+(m.alias?' <small>'+esc(m.alias)+'</small>':'')+'</button>').join('');
   $('chips').querySelectorAll('[data-mat]').forEach(b=>b.onclick=()=>{
    const id=b.dataset.mat;
    if(shown.has(id)){if(shown.size>1)shown.delete(id);}else shown.add(id);
-   renderChips();renderTable();
+   preset='';update();
   });
   $('chips').querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{
    const list=PRESETS.find(x=>x[0]===b.dataset.preset)[2]();
-   shown=new Set(list.map(m=>m.id));renderChips();renderTable();
+   preset=b.dataset.preset;shown=new Set(list.map(m=>m.id));update();
   });
  }
+ /* 공사비처럼 원문에 값이 없는 항목은 빈 칸만 차지하므로 표에서 뺀다. 비운 이유는 아래 주석에 남아 있다. */
+ const cellValues=(m,row)=>m.cells[row.key]||[];
+ const hasData=(m,row)=>cellValues(m,row).length>0;
  function cellHtml(m,row){
-  if(row.key==='cost'){
-   const labels=m.cells.costLabels||[];
-   return '<ul class="mc-cost">'+labels.map(l=>'<li>'+esc(l)+' <span class="mc-blank">미기재</span></li>').join('')+'</ul>';
-  }
-  const values=m.cells[row.key]||[];
+  const values=cellValues(m,row);
   if(!values.length)return '<span class="mc-blank">미기재</span>';
   return values.length===1?esc(values[0]):'<ul>'+values.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul>';
  }
@@ -6321,33 +6345,29 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
   const groups=[...new Set(data.rows.map(r=>r.group))];
   let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+'>'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</th>').join('')+'</tr></thead>';
   for(const g of groups){
-   const rows=data.rows.filter(r=>r.group===g);
+   const rows=data.rows.filter(r=>r.group===g&&mats.some(m=>hasData(m,r)));
+   if(!rows.length)continue;
    html+='<tbody class="mc-group-tbody"><tr class="mc-group-row" role="button" tabindex="0" onclick="this.parentElement.classList.toggle(\'mc-collapsed\')"><th colspan="'+(mats.length+1)+'" scope="colgroup"><span>'+esc(g)+' <span class="mc-toggle-icon">▼</span></span></th></tr>'+
     rows.map(r=>'<tr><th scope="row" class="mc-row-head">'+esc(r.label)+(r.source==='ref'?'<span class="mc-src mc-src-ref">참고</span>':'')+'</th>'+
      mats.map(m=>'<td'+(r.short?' class="mc-short"':'')+'>'+cellHtml(m,r)+'</td>').join('')+'</tr>').join('')+'</tbody>';
   }
-  html+='<tbody class="mc-group-tbody"><tr class="mc-group-row" role="button" tabindex="0" onclick="this.parentElement.classList.toggle(\'mc-collapsed\')"><th colspan="'+(mats.length+1)+'" scope="colgroup"><span>장점 / 단점 <span class="mc-toggle-icon">▼</span></span></th></tr>'+
-   '<tr><th scope="row" class="mc-row-head">장점</th>'+mats.map(m=>'<td><ul class="mc-pro">'+m.pros.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></td>').join('')+'</tr>'+
-   '<tr><th scope="row" class="mc-row-head">단점</th>'+mats.map(m=>'<td><ul class="mc-con">'+m.cons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></td>').join('')+'</tr></tbody>';
   $('table').innerHTML=html;
  }
-
- /* 표가 세로로는 넘치지 않으므로 휠을 가로 이동으로 돌린다.
-    양 끝에 닿으면 가로 이동을 놓아 페이지가 다시 세로로 스크롤되게 한다. */
- function wheelToHorizontal(el){
-  el.addEventListener('wheel',e=>{
-   if(e.deltaY===0||e.shiftKey)return;
-   const max=el.scrollWidth-el.clientWidth;
-   if(max<=0)return;
-   if((e.deltaY<0&&el.scrollLeft<=0)||(e.deltaY>0&&el.scrollLeft>=max-1))return;
-   e.preventDefault();el.scrollLeft+=e.deltaY;
-  },{passive:false});
+ /* 장단점은 나란히 비교하는 값이 아니라 읽는 문장이라, 표 안에 두면 행 높이만 키운다. */
+ function renderProsCons(){
+  $('prosbox').innerHTML=data.materials.filter(m=>shown.has(m.id)).map(m=>'<article class="mc-pc-card">'+
+   '<h3>'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+
+    (m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</h3>'+
+   '<div class="mc-pc-lists">'+
+    '<div class="mc-pc-col mc-pc-pros"><h4>장점</h4><ul class="mc-pro">'+m.pros.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
+    '<div class="mc-pc-col mc-pc-cons"><h4>단점</h4><ul class="mc-con">'+m.cons.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>'+
+   '</div></article>').join('');
  }
+ function update(){renderChips();renderTable();renderProsCons();}
 
  $('notes').innerHTML=data.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
- renderChips();renderTable();
-
+ update();
 })();
 
 (() => {
