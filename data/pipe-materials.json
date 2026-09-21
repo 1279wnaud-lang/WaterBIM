@@ -143,6 +143,9 @@
         "use": [
           "상수도: 상수도용 표준",
           "하수도: 하수도는 별도 표준(이중벽관 등) 확인 필요"
+        ],
+        "length": [
+          "6m (주문 시 9m, 12m 생산 가능)"
         ]
       },
       "pros": [
@@ -175,8 +178,7 @@
       },
       "source": "khe",
       "useScope": "supply",
-      "image": "data/images/hdpe.jpg",
-      "length": "6m (주문 시 9m, 12m 생산 가능)"
+      "image": "data/images/hdpe.jpg"
     },
     {
       "id": "cts",
@@ -229,6 +231,9 @@
         "use": [
           "상수도: 상수도용 표준",
           "하수도: 하수 압송관로 적용 시 별도 검토"
+        ],
+        "length": [
+          "6m (주문자 요구에 따라 길이 변경 가능)"
         ]
       },
       "pros": [
@@ -259,8 +264,7 @@
       },
       "source": "khe",
       "useScope": "supply",
-      "image": "data/images/cts.jpg",
-      "length": "6m (주문자 요구에 따라 길이 변경 가능)"
+      "image": "data/images/cts.jpg"
     },
     {
       "id": "pep",
@@ -313,6 +317,9 @@
         "use": [
           "상수도: 상수도용 적용",
           "하수도: 하수 압송관로 적용 시 별도 검토"
+        ],
+        "length": [
+          "6m (원관 규격에 따라 주문 생산)"
         ]
       },
       "pros": [
@@ -345,8 +352,7 @@
       },
       "source": "khe",
       "useScope": "supply",
-      "image": "data/images/pep.jpg",
-      "length": "6m (원관 규격에 따라 주문 생산)"
+      "image": "data/images/pep.jpg"
     },
     {
       "id": "grp",
@@ -396,6 +402,9 @@
         "use": [
           "상수도: 상수도용 표준",
           "하수도: 비압력 배관 포함 표준"
+        ],
+        "length": [
+          "6m (주문자 요구에 따라 길이 변경 가능)"
         ]
       },
       "pros": [
@@ -425,8 +434,7 @@
       },
       "source": "khe",
       "useScope": "both",
-      "image": "data/images/grp.jpg",
-      "length": "6m (주문자 요구에 따라 길이 변경 가능)"
+      "image": "data/images/grp.jpg"
     },
     {
       "id": "pvc",
@@ -478,6 +486,9 @@
         "use": [
           "상수도: 상수도용 표준",
           "하수도: 하수도는 별도 표준 확인 필요"
+        ],
+        "length": [
+          "4m (상수도용 6m 표준)"
         ]
       },
       "pros": [
@@ -507,8 +518,7 @@
       },
       "source": "khe",
       "useScope": "supply",
-      "image": "data/images/pvc.jpg",
-      "length": "4m (상수도용 6m 표준)"
+      "image": "data/images/pvc.jpg"
     },
     {
       "id": "dcip",
@@ -561,6 +571,9 @@
         "use": [
           "상수도: 상수도용 표준",
           "하수도: 하수 압송·차집관로 적용 사례 있음"
+        ],
+        "length": [
+          "6m (유효장 기준)"
         ]
       },
       "pros": [
@@ -592,8 +605,7 @@
       },
       "source": "khe",
       "useScope": "both",
-      "image": "data/images/dcip.jpg",
-      "length": "6m (유효장 기준)"
+      "image": "data/images/dcip.jpg"
     },
     {
       "id": "sts",
@@ -656,6 +668,9 @@
         ],
         "roughness": [
           "130 ~ 150"
+        ],
+        "length": [
+          "6m"
         ]
       },
       "pros": [
@@ -668,8 +683,7 @@
         "재료비가 상대적으로 비싸다",
         "이종금속 접촉부의 갈바닉 부식에 주의가 필요하다"
       ],
-      "image": "data/images/sts.png",
-      "length": "6m"
+      "image": "data/images/sts.png"
     },
     {
       "id": "hume",
@@ -733,6 +747,9 @@
         ],
         "roughness": [
           "100 ~ 110"
+        ],
+        "length": [
+          "2.5m (표준 유효장)"
         ]
       },
       "pros": [
@@ -747,8 +764,7 @@
         "이음부 수밀성 확보가 관건이고 부등침하에 약하다",
         "충격·편심하중에 깨질 수 있다"
       ],
-      "image": "data/images/hume.jpg",
-      "length": "2.5m (표준 유효장)"
+      "image": "data/images/hume.jpg"
     },
     {
       "id": "pe2w",
@@ -811,6 +827,9 @@
         ],
         "roughness": [
           "140 ~ 150"
+        ],
+        "length": [
+          "6m"
         ]
       },
       "pros": [
@@ -825,8 +844,7 @@
         "자외선·열에 장기간 노출되면 열화된다",
         "관로탐지를 위한 별도 탐지선이 필요하다"
       ],
-      "image": "data/images/pe2w.jpg",
-      "length": "6m"
+      "image": "data/images/pe2w.jpg"
     },
     {
       "id": "pvcs",
@@ -888,6 +906,9 @@
         ],
         "roughness": [
           "140 ~ 150"
+        ],
+        "length": [
+          "4m 또는 6m"
         ]
       },
       "pros": [
@@ -900,8 +921,7 @@
         "저온과 외부 충격에 깨질 수 있다",
         "자외선 노출과 열변형에 주의가 필요하다"
       ],
-      "image": "data/images/pvcs.png",
-      "length": "4m 또는 6m"
+      "image": "data/images/pvcs.png"
     },
     {
       "id": "csp",
@@ -962,6 +982,9 @@
         ],
         "roughness": [
           "60 ~ 70 (파형에 의한 저항)"
+        ],
+        "length": [
+          "6m"
         ]
       },
       "pros": [
@@ -974,8 +997,7 @@
         "아연도금이 손상되면 부식이 진행된다",
         "뒷채움 다짐 품질에 구조 안전성이 크게 좌우된다"
       ],
-      "image": "data/images/csp.jpg",
-      "length": "6m"
+      "image": "data/images/csp.jpg"
     }
   ],
   "recommendation": {
