@@ -427,10 +427,10 @@ function buildPage() {
         </button>
         <button type="button" class="home-tool" data-open-tab="compare">
           <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
-          <span class="home-tool-title">관종 비교 · 선정 도우미</span>
-          <span class="home-tool-description">설계 조건을 고르면 조건에 맞는 관종과<br>그 근거를 정리해 보여줍니다.</span>
-          <span class="home-tool-detail">${pipeMaterialCount}개 관종 · 상수도/하수도 구분 · 생산범위 판정</span>
-          <span class="home-tool-link">관종 고르기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+          <span class="home-tool-title">관종 비교</span>
+          <span class="home-tool-description">관종별 재질 · 규격 · 물리적 특성 · 내압 ·<br>장단점을 한 표에서 비교하세요.</span>
+          <span class="home-tool-detail">${pipeMaterialCount}개 관종 · 상수도/하수도 구분 · 생산 규격 범위</span>
+          <span class="home-tool-link">비교표 보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
         <button type="button" class="home-tool" data-open-tab="codesearch">
           <span class="home-tool-icon">${NAV_SEARCH_ICON}</span>

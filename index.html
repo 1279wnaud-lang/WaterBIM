@@ -692,49 +692,8 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-panel {min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);}
 .mc-panel-head {display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
 .mc-panel-head h2 {font-size:16px;margin:0;letter-spacing:-.01em;}
-.mc-panel-head button {margin-left:auto;font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer;}
-.mc-panel-head button:hover:not(:disabled) {border-color:var(--accent);background:var(--code-bg);}
-.mc-panel-head button:disabled {opacity:.45;cursor:not-allowed;}
-.mc-hint,.mc-hint-inline {font-size:13px;line-height:1.7;color:var(--muted);margin:0 0 12px;}
-.mc-hint-inline {margin:0;}
-.mc-source-note {font-size:12.5px;line-height:1.7;color:var(--muted);margin:14px 0 0;}
-.mc-empty {font-size:14px;line-height:1.7;color:var(--muted);margin:0;padding:22px;border:1px dashed var(--border);border-radius:12px;text-align:center;}
-
-/* 조건은 라벨을 왼쪽에 고정해 줄마다 같은 자리에서 시작하게 한다. */
-.mc-conditions {display:grid;gap:10px;}
-.mc-cond {display:grid;grid-template-columns:104px minmax(0,1fr);align-items:center;gap:8px 14px;border:0;margin:0;padding:0;}
-.mc-cond-label {font-size:13px;font-weight:600;color:var(--ink);line-height:1.5;}
-.mc-opts {display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
-#mc-dn {font:inherit;font-size:14px;font-weight:600;width:160px;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:999px;background:var(--panel);color:var(--ink);font-variant-numeric:tabular-nums;}
-.mc-opt {font:inherit;font-size:13px;font-weight:500;color:var(--muted);background:var(--panel);border:1px solid var(--border);border-radius:999px;height:36px;padding:0 15px;display:inline-flex;align-items:center;cursor:pointer;}
-.mc-opt:hover {border-color:var(--accent);color:var(--ink);}
-.mc-opt.active {background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700;}
-
-.mc-results {list-style:none;margin:0;padding:0;display:grid;gap:12px;}
-.mc-result {border:1px solid var(--border);border-left:4px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--panel);}
-.mc-result.mc-best {border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 5%,var(--panel));}
-.mc-result.mc-good {border-left-color:color-mix(in srgb,var(--accent) 55%,var(--border));}
-.mc-result.mc-bad {border-left-color:var(--amber);}
-.mc-result.mc-out {opacity:.72;border-left-color:var(--muted);}
-.mc-result-head {display:flex;align-items:center;gap:10px;}
-.mc-rank {flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--code-bg);color:var(--ink);font-variant-numeric:tabular-nums;}
-.mc-best .mc-rank {background:var(--accent);color:var(--accent-ink);}
-.mc-result-title {display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0;}
-.mc-result-title b {font-size:15px;}
-.mc-result-title small {font-size:12px;color:var(--muted);}
+.mc-hint-inline {font-size:13px;line-height:1.7;color:var(--muted);margin:0;}
 .mc-std {font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',ui-monospace,Consolas,monospace;}
-.mc-verdict {margin-left:auto;flex:none;font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;background:var(--code-bg);color:var(--muted);}
-.mc-best .mc-verdict {background:var(--accent);color:var(--accent-ink);}
-.mc-good .mc-verdict {background:color-mix(in srgb,var(--accent) 14%,var(--panel));color:var(--accent);}
-.mc-bad .mc-verdict,.mc-out .mc-verdict {background:color-mix(in srgb,var(--amber) 16%,var(--panel));color:var(--amber);}
-.mc-range {font-size:12px;color:var(--muted);margin:6px 0 0 36px;font-variant-numeric:tabular-nums;}
-.mc-reasons {list-style:none;margin:10px 0 0;padding:0 0 0 36px;display:grid;gap:6px;}
-.mc-reasons li {display:flex;gap:8px;font-size:13px;line-height:1.65;color:var(--ink);}
-.mc-mark {flex:none;width:18px;height:18px;margin-top:2px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--code-bg);color:var(--muted);}
-.mc-reasons .mc-pro .mc-mark {background:color-mix(in srgb,var(--accent) 16%,var(--panel));color:var(--accent);}
-.mc-reasons .mc-con .mc-mark,.mc-reasons .mc-block .mc-mark {background:color-mix(in srgb,var(--amber) 18%,var(--panel));color:var(--amber);}
-.mc-reasons .mc-con,.mc-reasons .mc-block {color:var(--muted);}
-.mc-extra {display:block;font-style:normal;font-size:12px;color:var(--amber);margin-top:2px;}
 .mc-src {display:inline-block;margin-left:6px;font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:999px;vertical-align:middle;white-space:nowrap;}
 .mc-src-khe {background:var(--code-bg);color:var(--muted);}
 .mc-src-ref {background:color-mix(in srgb,var(--amber) 14%,var(--panel));color:var(--amber);}
@@ -744,6 +703,9 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-chip small {font-weight:400;opacity:.8;}
 .mc-chip.active {background:color-mix(in srgb,var(--accent) 10%,var(--panel));border-color:color-mix(in srgb,var(--accent) 45%,var(--border));color:var(--ink);}
 .mc-chip:not(.active) {opacity:.55;}
+.mc-presets {display:flex;gap:6px;flex-basis:100%;margin-bottom:2px;}
+.mc-preset {font:inherit;font-size:12px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border));border-radius:8px;padding:6px 12px;cursor:pointer;}
+.mc-preset:hover {background:color-mix(in srgb,var(--accent) 16%,var(--panel));}
 
 /* 관종이 11종이라 표가 넓다. 첫 열(구분)과 머리글을 고정해 어느 행·어느 관종을
    보고 있는지 잃지 않게 하고, 휠로 가로 이동할 수 있게 한다. */
@@ -761,9 +723,6 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-th-pick {background:color-mix(in srgb,var(--accent) 12%,var(--code-bg));}
 .mc-pick-badge {display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--accent);color:var(--accent-ink);}
 .mc-table .mc-row-head {width:156px;min-width:156px;background:var(--panel);font-weight:600;color:var(--ink);box-shadow:1px 0 0 var(--border);}
-.mc-presets {display:flex;gap:6px;flex-basis:100%;margin-bottom:2px;}
-.mc-preset {font:inherit;font-size:12px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--panel));border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border));border-radius:8px;padding:6px 12px;cursor:pointer;}
-.mc-preset:hover {background:color-mix(in srgb,var(--accent) 16%,var(--panel));}
 .mc-group-row th {position:sticky;left:0;background:color-mix(in srgb,var(--accent) 7%,var(--panel));font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--accent);padding:8px 13px;}
 .mc-table td ul {margin:0;padding-left:16px;}
 .mc-table td li {margin-bottom:3px;}
@@ -775,17 +734,15 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-notes {margin:14px 0 0;padding-left:18px;font-size:12.5px;line-height:1.75;color:var(--muted);}
 .mc-notes li {margin-bottom:4px;}
 
-
+.mc-group-row {cursor:pointer;user-select:none;}
+.mc-group-row:hover th {background:color-mix(in srgb,var(--accent) 12%,var(--panel));}
+.mc-toggle-icon {display:inline-block;transition:transform .2s;font-size:10px;margin-left:6px;opacity:.7;}
+.mc-collapsed .mc-toggle-icon {transform:rotate(-90deg);}
+.mc-collapsed tr:not(.mc-group-row) {display:none;}
 
 @media (max-width:1000px){#mc-app {padding:18px 18px 48px;}.mc-row-head {width:120px;min-width:110px;}}
-@media (max-width:700px){.mc-panel {padding:16px;}.mc-reasons,.mc-range {padding-left:0;margin-left:0;}.mc-cond {grid-template-columns:1fr;gap:6px;}}
+@media (max-width:700px){.mc-panel {padding:16px;}}
 @media print {#mc-app {padding:0;}.mc-panel {break-inside:avoid;box-shadow:none;}}
-. m
-.mc-group-row { cursor: pointer; user-select: none; }
-.mc-group-row:hover th { background: color-mix(in srgb,var(--accent) 12%,var(--panel)); }
-.mc-toggle-icon { display: inline-block; transition: transform 0.2s; font-size: 10px; margin-left: 6px; opacity: 0.7; }
-.mc-collapsed .mc-toggle-icon { transform: rotate(-90deg); }
-.mc-collapsed tr:not(.mc-group-row) { display: none; }
 </style>
 </head>
 <body>
@@ -818,10 +775,10 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
         </button>
         <button type="button" class="home-tool" data-open-tab="compare">
           <span class="home-tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c1.7 0 3.1-1.4 3.1-3.1C20.5 6.6 16.7 2 12 2Z"></path><circle cx="7" cy="10" r="1.2"></circle><circle cx="12" cy="7" r="1.2"></circle><circle cx="16.5" cy="10" r="1.2"></circle></svg></span>
-          <span class="home-tool-title">관종 비교 · 선정 도우미</span>
-          <span class="home-tool-description">설계 조건을 고르면 조건에 맞는 관종과<br>그 근거를 정리해 보여줍니다.</span>
-          <span class="home-tool-detail">11개 관종 · 상수도/하수도 구분 · 생산범위 판정</span>
-          <span class="home-tool-link">관종 고르기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+          <span class="home-tool-title">관종 비교</span>
+          <span class="home-tool-description">관종별 재질 · 규격 · 물리적 특성 · 내압 ·<br>장단점을 한 표에서 비교하세요.</span>
+          <span class="home-tool-detail">11개 관종 · 상수도/하수도 구분 · 생산 규격 범위</span>
+          <span class="home-tool-link">비교표 보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
         <button type="button" class="home-tool" data-open-tab="codesearch">
           <span class="home-tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></span>
@@ -896,30 +853,17 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 
     <section class="tab-panel" data-tab="compare" style="display:none">
  <header>
-  <p class="eyebrow">관로 설계 자료</p><h1>관종 비교 · 선정 도우미</h1>
-  <p class="pc-intro">설계 조건을 고르면 조건에 맞는 관종과 그 근거를 정리해 보여줍니다. 근거 문장은 사내 관종 비교 검토자료의 표현을 그대로 인용합니다.</p>
+  <p class="eyebrow">관로 설계 자료</p><h1>관종 비교</h1>
+  <p class="pc-intro">관종별 재질 · 규격 · 물리적 특성 · 내압 · 장단점을 한 표에서 비교합니다. 사내 관종 비교 검토자료의 6종과, 공개 표준으로 정리한 5종을 함께 담았습니다.</p>
  </header>
  <div id="mc-app">
 
-  <section class="mc-panel mc-condition-panel">
-   <div class="mc-panel-head"><h2>1. 설계 조건</h2><button id="mc-reset" type="button">조건 초기화</button></div>
-   <div class="mc-conditions" id="mc-conditions"></div>
-  </section>
-
   <section class="mc-panel">
-   <div class="mc-panel-head"><h2>2. 조건에 맞는 관종</h2><span id="mc-result-meta" role="status" aria-live="polite"></span></div>
-   <p class="mc-hint" id="mc-result-hint"></p>
-   <ol class="mc-results" id="mc-results"></ol>
-   <p class="mc-source-note" id="mc-doc-pick"></p>
-  </section>
-
-  <section class="mc-panel">
-   <div class="mc-panel-head"><h2>3. 관종 비교표</h2><span class="mc-hint-inline">보고 싶은 관종만 골라서 비교할 수 있습니다.</span></div>
+   <div class="mc-panel-head"><h2>관종 비교표</h2><span class="mc-hint-inline">보고 싶은 관종만 골라서 비교할 수 있습니다. 표는 휠로 좌우 이동됩니다.</span></div>
    <div class="mc-chips" id="mc-chips" role="group" aria-label="비교할 관종 선택"></div>
    <div class="mc-table-scroll"><table class="mc-table" id="mc-table"><caption class="pc-sr">관종별 재질·규격·물리적 특성·내압·장단점 비교표</caption></table></div>
    <ul class="mc-notes" id="mc-notes"></ul>
   </section>
-
 
  </div>
 </section>
@@ -5197,7 +5141,8 @@ window.workflowGraphHtml = (rows, effort) => {
    const extra=effortDefaults();for(const f of effortFields){const v=r[f]??'';if(typeof v!=='string'||v.length>20000||(isNumericField(f)&&v!==''&&(!Number.isFinite(Number(v))||Number(v)<0||Number(v)>1000000)))throw Error('소요인력 입력값을 확인해주세요.');if(f.endsWith('Difficulty')&&!['','상','중','하'].includes(v))throw Error('난이도를 확인해주세요.');if(f.endsWith('Direct')&&!['','○','X','부분'].includes(v))throw Error('직접 수행 여부를 확인해주세요.');if(['startDate','endDate'].includes(f)&&v!==''&&(!/^\d{4}-\d{2}-\d{2}$/.test(v)||!Number.isFinite(Date.parse(v+'T00:00:00Z'))||new Date(v+'T00:00:00Z').toISOString().slice(0,10)!==v))throw Error('일정 날짜를 확인해주세요.');extra[f]=v;}return {...Object.fromEntries(fields.map(f=>[f,r[f]])),...extra};
   });return {version:2,title:data.title,date:data.date,items};
  }
- try{const raw=localStorage.getItem(KEY);if(raw){const data=JSON.parse(raw);state=validate(data);if(data.version===1)$('save').textContent='이전 판단은 메모에 보존했습니다. 수행방식을 다시 결정해주세요.';}}catch(e){loadFailed=true;$('save').textContent='기존 저장자료를 읽지 못했습니다. 프로젝트 파일을 확인해주세요.';}
+ // 저장된 자료를 불러왔다는 사실을 밝혀두지 않으면 탭을 다시 열었을 때 목록이 기본 제공된 것으로 오해하게 된다.
+ try{const raw=localStorage.getItem(KEY);if(raw){const data=JSON.parse(raw);state=validate(data);if(data.version===1)$('save').textContent='이전 판단은 메모에 보존했습니다. 수행방식을 다시 결정해주세요.';else if(state.items.length)$('save').textContent='이 브라우저에 저장된 업무 '+state.items.length+'개를 불러왔습니다.';}}catch(e){loadFailed=true;$('save').textContent='기존 저장자료를 읽지 못했습니다. 프로젝트 파일을 확인해주세요.';}
  let revision=0,printCacheKey="";
  function save(){revision++;if(loadFailed){$('save').textContent='기존 저장자료 보호 중 · 프로젝트 파일로 저장해주세요.';return;}try{localStorage.setItem(KEY,JSON.stringify(state));$('save').textContent='자동 저장됨 · '+new Date().toLocaleTimeString('ko-KR');}catch(e){$('save').textContent='자동 저장 실패 · 프로젝트 파일로 저장해주세요.';}}
  function counts(){ $('counts').innerHTML=['전체',...statuses].map(s=>'<button type="button" class="chip'+((filter||'전체')===s?' active':'')+'" data-filter="'+(s==='전체'?'':s)+'" aria-pressed="'+((filter||'전체')===s)+'">'+s+'<strong>'+(s==='전체'?state.items.length:state.items.filter(r=>r.status===s).length)+'</strong></button>').join('');}
@@ -6339,140 +6284,12 @@ const PipeCatalogCore = (() => {
 })();
 if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
 
-/* 관종 비교 · 선정 도우미.
-   점수 규칙은 사내 비교자료의 문장을 근거로만 만들었고, 각 근거는 원문 위치를 그대로 인용한다. */
+/* 관종 비교표. 표에 들어가는 값과 장단점 문장은 모두 자료 원문의 표현을 그대로 옮긴 것이고,
+   사내 비교자료에 없는 관종은 공개 표준으로 정리해 출처 뱃지로 구분한다. */
 (() => {
  'use strict';
  const data=PIPE_MATERIALS, $=id=>document.getElementById('mc-'+id);
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- const byId=Object.fromEntries(data.materials.map(m=>[m.id,m]));
- const num=v=>Number(String(v).replace(/[^\d.]/g,''));
-
- const CONDITIONS=[
-  {key:'use',label:'용도',options:[['supply','상수도'],['sewer','하수도']]},
-  {key:'flow',label:'송수 방식',options:[['gravity','자연유하'],['pump','펌프 가압송수'],['head','고낙차']]},
-  {key:'ground',label:'지반 조건',options:[['normal','일반'],['soft','연약지반 · 부등침하'],['water','용수지반 (지하수 많음)']]},
-  {key:'env',label:'부식 환경',options:[['normal','일반'],['coastal','해안 · 염해']]},
-  {key:'site',label:'시공 여건',options:[['normal','일반'],['curved','굴곡 · 하천횡단 많음']]},
- ];
- const state={use:'supply',dn:300,flow:'gravity',ground:'normal',env:'normal',site:'normal'};
-
- /* cite: 자료 안의 실제 문장 위치. 점수는 그 문장이 유리/불리하게 읽히는 정도만 표현한다. */
- const RULES=[
-  {on:['flow','pump','head'],id:'hdpe',score:3,cite:['cells','pumping',0]},
-  {on:['flow','pump','head'],id:'cts',score:1,cite:['cells','pumping',0]},
-  {on:['flow','pump','head'],id:'pep',score:1,cite:['cells','pumping',0]},
-  {on:['flow','pump','head'],id:'grp',score:-4,cite:['cells','pumping',0]},
-  {on:['flow','pump','head'],id:'pvc',score:-2,cite:['cells','pumping',0]},
-  {on:['flow','pump','head'],id:'dcip',score:-2,cite:['cells','pumping',0]},
-
-  {on:['ground','soft'],id:'hdpe',score:3,cite:['pros',3]},
-  {on:['ground','soft'],id:'cts',score:2,cite:['pros',1]},
-  {on:['ground','soft'],id:'pep',score:2,cite:['pros',2]},
-  {on:['ground','soft'],id:'dcip',score:-3,cite:['cons',6]},
-
-  {on:['ground','water'],id:'hdpe',score:-3,cite:['cons',1]},
-  {on:['ground','water'],id:'cts',score:-3,cite:['cons',4]},
-  {on:['ground','water'],id:'pep',score:-3,cite:['cons',4]},
-  {on:['ground','water'],id:'grp',score:-2,cite:['cons',0]},
-
-  {on:['env','coastal'],id:'hdpe',score:2,cite:['pros',4]},
-  {on:['env','coastal'],id:'grp',score:2,cite:['pros',3]},
-  {on:['env','coastal'],id:'pvc',score:2,cite:['pros',3]},
-  {on:['env','coastal'],id:'pep',score:2,cite:['cells','corrosion',0]},
-  {on:['env','coastal'],id:'pep',score:-1,cite:['cells','corrosion',1]},
-  {on:['env','coastal'],id:'cts',score:-3,cite:['cells','corrosion',1]},
-  {on:['env','coastal'],id:'dcip',score:-2,cite:['cells','corrosion',1]},
-
-  {on:['site','curved'],id:'hdpe',score:3,cite:['pros',1]},
-  {on:['site','curved'],id:'hdpe',score:1,cite:['pros',2]},
-  {on:['site','curved'],id:'cts',score:-1,cite:['cons',3]},
-  {on:['site','curved'],id:'grp',score:-1,cite:['cons',4]},
-  {on:['site','curved'],id:'pvc',score:-1,cite:['cons',3]},
-  {on:['site','curved'],id:'dcip',score:-2,cite:['cons',1]},
- ];
- const DN_RULES=[
-  {min:1000,id:'cts',score:2,cite:['pros',4]},
-  {min:1000,id:'pep',score:2,cite:['pros',4]},
-  {min:1000,id:'dcip',score:1,cite:['pros',4]},
-  {min:400,id:'hdpe',score:-2,cite:['cons',3]},
- ];
-
- function citeText(m,path){return path.reduce((o,k)=>o?.[k],m);}
- function evaluate(){
-  const dn=Number(state.dn)||0;
-  return data.materials.map(m=>{
-   const reasons=[];let score=0,blocked=null;
-   const inRange=dn>=m.sizeRange.min&&dn<=m.sizeRange.max;
-   if(dn&&!inRange){
-    blocked=dn>m.sizeRange.max?'over':'under';
-    reasons.push({kind:'block',text:`생산 규격 D${m.sizeRange.min} ~ ${m.sizeRange.max} 범위 밖 (DN ${dn})`,src:'khe',
-      extra:blocked==='over'?'국내 표준 생산 범위를 넘어서므로 해외발주 · 특별주문 여부와 납기를 확인해야 합니다.':'표준 생산 하한보다 작은 관경입니다.'});
-   }
-   for(const r of RULES){
-    if(r.id!==m.id)continue;
-    if(!r.on.slice(1).includes(state[r.on[0]]))continue;
-    const text=citeText(m,r.cite);if(!text)continue;
-    score+=r.score;reasons.push({kind:r.score>0?'pro':'con',text,src:'khe'});
-   }
-   for(const r of DN_RULES){
-    if(r.id!==m.id||!dn||dn<r.min)continue;
-    const text=citeText(m,r.cite);if(!text)continue;
-    score+=r.score;reasons.push({kind:r.score>0?'pro':'con',text,src:'khe'});
-   }
-   if(m.useScope!=='both'&&m.useScope!==state.use){
-    blocked='scope';
-    reasons.unshift({kind:'block',text:(state.use==='supply'?'상수도 관로용 관종이 아닙니다':'하수도 관거용 관종이 아닙니다'),src:'ref',
-      extra:state.use==='supply'?m.use.supply:m.use.sewer});
-   }else if(m.useScope==='both'){
-    reasons.push({kind:'note',text:(state.use==='supply'?m.use.supply:m.use.sewer),src:'ref'});
-   }
-   return {m,score,reasons,blocked};
-  }).sort((a,b)=>(a.blocked?1:0)-(b.blocked?1:0)||b.score-a.score||a.m.name.localeCompare(b.m.name,'ko'));
- }
- function verdict(r){
-  if(r.blocked==='scope')return{cls:'out',label:'용도 다름'};
-  if(r.blocked)return{cls:'out',label:'생산 범위 밖'};
-  if(r.score>=5)return{cls:'best',label:'적합'};
-  if(r.score>=1)return{cls:'good',label:'검토 가능'};
-  if(r.score>=-1)return{cls:'mid',label:'조건부'};
-  return{cls:'bad',label:'주의 필요'};
- }
-
- function renderConditions(){
-  $('conditions').innerHTML=
-   '<div class="mc-cond"><label class="mc-cond-label" for="mc-dn">호칭경 (mm)</label><div class="mc-opts"><input id="mc-dn" type="number" min="10" max="3000" step="10" value="'+state.dn+'" inputmode="numeric"></div></div>'+
-   CONDITIONS.map(c=>'<div class="mc-cond" role="group" aria-label="'+esc(c.label)+'"><span class="mc-cond-label">'+esc(c.label)+'</span><div class="mc-opts">'+
-    c.options.map(([v,t])=>'<button type="button" class="mc-opt'+(state[c.key]===v?' active':'')+'" data-cond="'+c.key+'" data-value="'+v+'" aria-pressed="'+(state[c.key]===v)+'">'+esc(t)+'</button>').join('')+
-   '</div></div>').join('');
-  $('conditions').querySelectorAll('[data-cond]').forEach(b=>b.onclick=()=>{state[b.dataset.cond]=b.dataset.value;renderConditions();renderResults();});
-  document.getElementById('mc-dn').oninput=e=>{state.dn=e.target.value;renderResults();};
- }
-
- function renderResults(){
-  const list=evaluate(),dn=Number(state.dn)||0;
-  const usable=list.filter(r=>!r.blocked);
-  $('result-meta').textContent=`${usable.length}개 관종 검토 가능 / 전체 ${list.length}개`;
-  $('result-hint').innerHTML=state.use==='sewer'
-   ? '하수도 관종(흄관 · PE 이중벽관 · 하수도용 PVC관 · 파형강관)은 사내 비교자료에 없어 KS 표준 등 공개 자료로 정리한 것이라 <b>공개 표준 조사</b> 뱃지가 붙습니다. 사내 자료 6종만큼 상세하지 않으니 제조사 자료로 보완하세요.'
-   : '근거 문장은 사내 비교자료의 표현을 그대로 옮긴 것입니다. 점수는 조건에 따른 상대적 유불리를 보여주기 위한 것이며, 설계 기준을 대신하지 않습니다.';
-  $('results').innerHTML=list.map((r,i)=>{
-   const v=verdict(r),m=r.m;
-   return '<li class="mc-result mc-'+v.cls+'">'+
-    '<div class="mc-result-head"><span class="mc-rank">'+(r.blocked?'—':i+1)+'</span>'+
-     '<div class="mc-result-title"><b>'+esc(m.name)+'</b>'+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+
-      '<span class="mc-std">'+esc(m.standard)+'</span>'+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준 조사</span>':'')+'</div>'+
-     '<span class="mc-verdict">'+v.label+'</span></div>'+
-    '<div class="mc-range">D'+m.sizeRange.min+' ~ '+m.sizeRange.max+' mm'+(dn&&!r.blocked?' · DN '+dn+' 생산 범위 내':'')+'</div>'+
-    '<ul class="mc-reasons">'+r.reasons.map(x=>'<li class="mc-'+x.kind+'"><span class="mc-mark" aria-hidden="true">'+
-      (x.kind==='pro'?'+':x.kind==='con'?'−':x.kind==='block'?'×':'·')+'</span><span>'+esc(x.text)+
-      (x.extra?'<em class="mc-extra">'+esc(x.extra)+'</em>':'')+
-      '<span class="mc-src mc-src-'+x.src+'">'+(x.src==='khe'?'사내 자료':'참고')+'</span></span></li>').join('')+'</ul>'+
-   '</li>';
-  }).join('');
-  const pick=byId[data.recommendation.materialId];
-  $('doc-pick').innerHTML='<b>원문 추천안 · '+esc(pick.name)+'</b> — '+esc(data.recommendation.reason)+' <span class="mc-src mc-src-khe">사내 자료</span>';
- }
 
  let shown=new Set(data.materials.map(m=>m.id));
  const PRESETS=[['all','전체',()=>data.materials],['supply','상수도',()=>data.materials.filter(m=>m.useScope!=='sewer')],
@@ -6515,10 +6332,22 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
   $('table').innerHTML=html;
  }
 
- $('reset').onclick=()=>{Object.assign(state,{use:'supply',dn:300,flow:'gravity',ground:'normal',env:'normal',site:'normal'});renderConditions();renderResults();};
+ /* 표가 세로로는 넘치지 않으므로 휠을 가로 이동으로 돌린다.
+    양 끝에 닿으면 가로 이동을 놓아 페이지가 다시 세로로 스크롤되게 한다. */
+ function wheelToHorizontal(el){
+  el.addEventListener('wheel',e=>{
+   if(e.deltaY===0||e.shiftKey)return;
+   const max=el.scrollWidth-el.clientWidth;
+   if(max<=0)return;
+   if((e.deltaY<0&&el.scrollLeft<=0)||(e.deltaY>0&&el.scrollLeft>=max-1))return;
+   e.preventDefault();el.scrollLeft+=e.deltaY;
+  },{passive:false});
+ }
+
  $('notes').innerHTML=data.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
- renderConditions();renderResults();renderChips();renderTable();
+ renderChips();renderTable();
+ wheelToHorizontal(document.querySelector('#mc-app .mc-table-scroll'));
 })();
 
 (() => {
