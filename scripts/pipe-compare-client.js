@@ -61,4 +61,22 @@
  $('notes').innerHTML=data.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
  renderChips();renderTable();
+
+ // Custom sticky header logic for the window scroll (since overflow-x: auto breaks native vertical sticky)
+ window.addEventListener('scroll', () => {
+  const container = document.querySelector('.mc-table-scroll');
+  const thead = document.querySelector('.mc-table thead');
+  if (!container || !thead) return;
+  const rect = container.getBoundingClientRect();
+  const ths = thead.querySelectorAll('th');
+  let y = 0;
+  if (rect.top < 0 && rect.bottom > thead.offsetHeight) {
+   y = -rect.top;
+   if (y > rect.height - thead.offsetHeight) y = rect.height - thead.offsetHeight;
+  }
+  ths.forEach(th => {
+   th.style.transform = y > 0 ? `translateY(${y}px)` : '';
+  });
+ });
+
 })();
