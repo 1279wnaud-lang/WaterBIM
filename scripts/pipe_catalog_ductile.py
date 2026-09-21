@@ -509,3 +509,37 @@ def extend(add, fields, field):
         for length,w in zip([100,150,250,300,400],weights):
             pass # Removed duplicate add for '소화전용 단관'
 
+    # 직관 (Straight pipes) from page 42
+    import json
+    import os
+    json_path = os.path.join(os.path.dirname(__file__), '..', 'ductile-42-data.json')
+    if os.path.exists(json_path):
+        with open(json_path, 'r', encoding='utf-8') as f:
+            straight_data = json.load(f)
+        for row in straight_data:
+            dn = row.get('DN') or row.get('dn')
+            de = row.get('DE') or row.get('de')
+            e_val = row.get('e')
+            m_weight = row.get('m_weight')
+            cls = row.get('class')
+            
+            for joint_key, joint_name in [('kp', 'KP메커니컬'), ('tyton', '타이튼'), ('mechanical', '메커니컬')]:
+                jdata = row.get(joint_key)
+                if not jdata: continue
+                socket = jdata.get('socket')
+                if socket is None: continue
+                
+                for length_m in [4, 5, 6]:
+                    pipe_w = jdata.get(f'{length_m}m_pipe')
+                    lining_w = jdata.get(f'{length_m}m_lining')
+                    if pipe_w is None or lining_w is None: continue
+                    
+                    total_mass = round(socket + pipe_w + lining_w, 1)
+                    dims = {
+                        'outsideDiameter': de,
+                        'thickness': e_val,
+                        'length': length_m * 1000,
+                        'mass': total_mass,
+                    }
+                    
+                    add('ductile', '직관', dn, f'{cls}종 {length_m}M', dims, 42, '82', f'상수 {cls} 종 관', joint=joint_name)
