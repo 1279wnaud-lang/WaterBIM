@@ -1027,6 +1027,10 @@ const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
 
 let activeTab = 'home';
+try {
+  const saved = localStorage.getItem('kwater-tool-active-tab');
+  if (saved) activeTab = saved;
+} catch (e) {}
 if (!TABS.some((t) => t.id === activeTab)) activeTab = TABS[0].id;
 
 function renderNav() {
@@ -6332,6 +6336,7 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
  /* 11종을 다 펼치면 첫 화면부터 가로 스크롤이라 비교가 안 된다.
     원문 자료의 6종으로 시작하고, 나머지는 칩으로 필요할 때 더한다. */
  let preset='khe';
+ try { const saved = localStorage.getItem('waterbim-compare-preset'); if(saved && PRESETS.some(p=>p[0]===saved)) preset = saved; } catch(e){}
  let shown=new Set(PRESETS.find(p=>p[0]===preset)[2]().map(m=>m.id));
 
  function renderChips(){
@@ -6340,11 +6345,11 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
   $('chips').querySelectorAll('[data-mat]').forEach(b=>b.onclick=()=>{
    const id=b.dataset.mat;
    if(shown.has(id)){if(shown.size>1)shown.delete(id);}else shown.add(id);
-   preset='';update();
+   preset='';try{localStorage.removeItem('waterbim-compare-preset');}catch(e){}update();
   });
   $('chips').querySelectorAll('[data-preset]').forEach(b=>b.onclick=()=>{
    const list=PRESETS.find(x=>x[0]===b.dataset.preset)[2]();
-   preset=b.dataset.preset;shown=new Set(list.map(m=>m.id));update();
+   preset=b.dataset.preset;try{localStorage.setItem('waterbim-compare-preset',preset);}catch(e){}shown=new Set(list.map(m=>m.id));update();
   });
  }
  /* 공사비처럼 원문에 값이 없는 항목은 빈 칸만 차지하므로 표에서 뺀다. 비운 이유는 아래 주석에 남아 있다. */

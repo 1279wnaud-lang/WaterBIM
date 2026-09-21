@@ -592,6 +592,10 @@ const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
 
 let activeTab = 'home';
+try {
+  const saved = localStorage.getItem('kwater-tool-active-tab');
+  if (saved) activeTab = saved;
+} catch (e) {}
 if (!TABS.some((t) => t.id === activeTab)) activeTab = TABS[0].id;
 
 function renderNav() {
