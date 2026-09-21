@@ -103,11 +103,11 @@
                     return '<div class="mc-search-card">' +
             '<div style="display:flex; gap:32px; align-items:flex-start; margin-bottom:20px;">' +
               '<div style="flex:1; min-width:0;">' +
-                '<h3 style="font-size:20px; margin:0 0 8px; color:var(--ink);">' + esc(m.name) + (m.alias ? ' <small style="color:var(--muted); font-weight:normal; font-size:14px;">' + esc(m.alias) + '</small>' : '') + '</h3>' +
-                '<p style="margin:0 0 20px; font-size:14px; color:var(--muted);"><strong>표준:</strong> ' + esc(m.standard) + (m.recommended ? ' <span class="mc-pick-badge">추천</span>' : '') + '</p>' +
+                '<h3 style="font-size:24px; margin:0 0 8px; color:var(--ink);">' + esc(m.name) + (m.alias ? ' <small style="color:var(--muted); font-weight:normal; font-size:15.5px;">' + esc(m.alias) + '</small>' : '') + '</h3>' +
+                '<p style="margin:0 0 20px; font-size:15.5px; color:var(--muted);"><strong>표준:</strong> ' + esc(m.standard) + (m.recommended ? ' <span class="mc-pick-badge">추천</span>' : '') + '</p>' +
                 '<div style="display:flex; gap:32px;">' +
-                   '<div style="flex:1;"><h4 style="margin:0 0 8px; font-size:13px; color:var(--accent);">장점</h4><ul class="mc-pro" style="margin:0; padding-left:20px; font-size:14px; line-height:1.7; color:var(--ink);">' + m.pros.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('') + '</ul></div>' +
-                   '<div style="flex:1;"><h4 style="margin:0 0 8px; font-size:13px; color:var(--amber);">단점</h4><ul class="mc-con" style="margin:0; padding-left:20px; font-size:14px; line-height:1.7; color:var(--ink);">' + m.cons.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('') + '</ul></div>' +
+                   '<div style="flex:1;"><h4 style="margin:0 0 8px; font-size:14.5px; color:var(--accent);">장점</h4><ul class="mc-pro" style="margin:0; padding-left:20px; font-size:15.5px; line-height:1.7; color:var(--ink);">' + m.pros.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('') + '</ul></div>' +
+                   '<div style="flex:1;"><h4 style="margin:0 0 8px; font-size:14.5px; color:var(--amber);">단점</h4><ul class="mc-con" style="margin:0; padding-left:20px; font-size:15.5px; line-height:1.7; color:var(--ink);">' + m.cons.map(x=>'<li style="margin-bottom:4px;">'+esc(x)+'</li>').join('') + '</ul></div>' +
                 '</div>' +
               '</div>' +
               (m.image ? '<div class="mc-search-card-img"><img src="' + esc(m.image) + '" alt=""></div>' : '') +
