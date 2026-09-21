@@ -36,7 +36,7 @@
  function renderTable(){
   const mats=data.materials.filter(m=>shown.has(m.id));
   const groups=[...new Set(data.rows.map(r=>r.group))];
-  let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+'>'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</th>').join('')+'</tr></thead>';
+  let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+'><div class="mc-th-inner"><div class="mc-th-text">'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</div>'+(m.image?'<div class="mc-th-img"><img src="'+esc(m.image)+'" alt=""></div>':'')+'</div></th>').join('')+'</tr></thead>';
   for(const g of groups){
    const rows=data.rows.filter(r=>r.group===g&&mats.some(m=>hasData(m,r)));
    if(!rows.length)continue;

@@ -70,3 +70,8 @@
 @media (max-width:1000px){#mc-app {padding:18px 18px 48px;}.mc-table .mc-row-head {width:130px;min-width:120px;}}
 @media (max-width:700px){.mc-panel {padding:16px;}.mc-pc-lists {grid-template-columns:1fr;gap:10px;}}
 @media print {#mc-app {padding:0;}.mc-panel {break-inside:avoid;box-shadow:none;}}
+
+.mc-th-inner { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.mc-th-text { flex: 1; min-width: 0; }
+.mc-th-img { flex-shrink: 0; width: 64px; height: 64px; background: #fff; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 2px; }
+.mc-th-img img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
