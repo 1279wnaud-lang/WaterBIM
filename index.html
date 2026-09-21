@@ -776,6 +776,9 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 .mc-search-card-dl li { margin-bottom: 4px; }
 .mc-search-card-dl dt { font-weight:700; color:var(--muted); }
 .mc-search-card-dl dd { margin:0; }
+
+.mc-table thead th:not(.mc-row-head) { transition: background 0.2s, box-shadow 0.2s; }
+.mc-table thead th:not(.mc-row-head):hover { background: color-mix(in srgb, var(--accent) 5%, var(--panel)); box-shadow: inset 0 0 0 1px var(--accent); z-index: 10; }
 </style>
 </head>
 <body>
@@ -6427,7 +6430,7 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
  function renderTable(){
   const mats=data.materials.filter(m=>shown.has(m.id));
   const groups=[...new Set(data.rows.map(r=>r.group))];
-  let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+'><div class="mc-th-inner"><div class="mc-th-text">'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</div>'+(m.image?'<div class="mc-th-img"><img src="'+esc(m.image)+'" alt=""></div>':'')+'</div></th>').join('')+'</tr></thead>';
+  let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+' style="cursor:pointer;" title="클릭하여 상세 정보 보기" onclick="document.getElementById(\'mc-search-input\').value=\''+m.name+'\'; document.getElementById(\'mc-search-input\').dispatchEvent(new Event(\'input\')); window.scrollTo({top:0, behavior:\'smooth\'});"><div class="mc-th-inner"><div class="mc-th-text">'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</div>'+(m.image?'<div class="mc-th-img"><img src="'+esc(m.image)+'" alt=""></div>':'')+'</div></th>').join('')+'</tr></thead>';
   for(const g of groups){
    const rows=data.rows.filter(r=>r.group===g&&mats.some(m=>hasData(m,r)));
    if(!rows.length)continue;
