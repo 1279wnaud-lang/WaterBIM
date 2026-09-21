@@ -101,7 +101,7 @@
           }
           
                                                             return '<div class="mc-search-card">' +
-            '<div style="display:flex; gap:32px; align-items:flex-start; margin-bottom:24px;">' +
+            '<div style="display:flex; gap:32px; align-items:stretch; margin-bottom:24px;">' +
               '<div style="flex:1; min-width:0;">' +
                 '<h3 style="font-size:24px; margin:0 0 8px; color:var(--ink);">' + esc(m.name) + (m.alias ? ' <small style="color:var(--muted); font-weight:normal; font-size:15.5px;">' + esc(m.alias) + '</small>' : '') + '</h3>' +
                 '<p style="margin:0 0 20px; font-size:15.5px; color:var(--muted);"><strong>표준:</strong> ' + esc(m.standard) + (m.recommended ? ' <span class="mc-pick-badge">추천</span>' : '') + '</p>' +
