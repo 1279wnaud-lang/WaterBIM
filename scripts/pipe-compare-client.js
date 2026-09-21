@@ -61,27 +61,4 @@
  $('notes').innerHTML=data.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
  renderChips();renderTable();
- wheelToHorizontal(document.querySelector('#mc-app .mc-table-scroll'));
-
- // Add custom sticky header logic for the window scroll
- window.addEventListener('scroll', () => {
-  const container = document.querySelector('.mc-table-scroll');
-  const thead = document.querySelector('.mc-table thead');
-  if (!container || !thead) return;
-  const rect = container.getBoundingClientRect();
-  const ths = thead.querySelectorAll('th');
-  // top padding offset (header offset if any). 
-  // Let's use 0 or maybe a small offset if the UI has a top bar.
-  // Actually, wait, the top bar has no fixed header, it's just the page.
-  let y = 0;
-  if (rect.top < 0 && rect.bottom > 100) {
-   y = -rect.top;
-   // constrain to not go past the bottom
-   if (y > rect.height - 100) y = rect.height - 100;
-  }
-  ths.forEach(th => {
-   th.style.transform = y > 0 ? `translateY(${y}px)` : '';
-  });
- });
-
 })();
