@@ -61,5 +61,63 @@
 
  $('notes').innerHTML=data.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
- update();
+ 
+  const searchInput = $('search-input');
+  const searchResults = $('search-results');
+  const mcApp = $('app');
+  
+  function renderSearch() {
+      const q = searchInput.value.toLowerCase().trim();
+      if (!q) {
+          searchResults.style.display = 'none';
+          mcApp.style.display = 'block';
+          return;
+      }
+      
+      mcApp.style.display = 'none';
+      
+      const matched = data.materials.filter(m => 
+          m.name.toLowerCase().includes(q) || 
+          (m.alias && m.alias.toLowerCase().includes(q)) ||
+          (m.standard && m.standard.toLowerCase().includes(q))
+      );
+      
+      if (matched.length === 0) {
+          searchResults.style.display = 'block';
+          searchResults.innerHTML = '<div class="mc-blank" style="padding:16px;">검색 결과가 없습니다.</div>';
+          return;
+      }
+      
+      searchResults.style.display = 'flex';
+      searchResults.style.flexDirection = 'column';
+      searchResults.style.gap = '20px';
+      
+      searchResults.innerHTML = matched.map(m => {
+          let rowsHtml = '';
+          for (const r of data.rows) {
+              if (hasData(m, r)) {
+                  rowsHtml += '<dt>' + esc(r.label) + '</dt><dd>' + cellHtml(m, r) + '</dd>';
+              }
+          }
+          
+          return '<div class="mc-search-card">' +
+            (m.image ? '<div class="mc-search-card-img"><img src="' + esc(m.image) + '" alt=""></div>' : '') +
+            '<div class="mc-search-card-body">' +
+              '<h3>' + esc(m.name) + (m.alias ? ' <small>' + esc(m.alias) + '</small>' : '') + '</h3>' +
+              '<p><strong>표준:</strong> ' + esc(m.standard) + (m.recommended ? ' <span class="mc-pick-badge">추천</span>' : '') + '</p>' +
+              '<div style="display:flex;gap:20px;margin-bottom:16px;">' +
+                 '<div style="flex:1;"><h4 style="margin:0 0 4px;font-size:12px;color:var(--accent);">장점</h4><ul class="mc-pro" style="margin:0;padding-left:16px;font-size:13px;">' + m.pros.map(x=>'<li>'+esc(x)+'</li>').join('') + '</ul></div>' +
+                 '<div style="flex:1;"><h4 style="margin:0 0 4px;font-size:12px;color:var(--amber);">단점</h4><ul class="mc-con" style="margin:0;padding-left:16px;font-size:13px;">' + m.cons.map(x=>'<li>'+esc(x)+'</li>').join('') + '</ul></div>' +
+              '</div>' +
+              '<dl class="mc-search-card-dl">' + rowsHtml + '</dl>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+  }
+  
+  if (searchInput) {
+      searchInput.addEventListener('input', renderSearch);
+  }
+
+update();
 })();

@@ -886,16 +886,15 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
  <header>
   <p class="eyebrow">관로 설계 자료</p><h1>관종 비교</h1>
   <p class="pc-intro">관종별 재질 · 규격 · 물리적 특성 · 내압 · 장단점을 한 표에서 비교합니다. 사내 관종 비교 검토자료의 6종과, 공개 표준으로 정리한 5종을 함께 담았습니다.</p>
+  <div class="search-row" style="margin-top:20px; max-width:480px;">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+    <input id="mc-search-input" type="text" placeholder="관종 검색... (예: 주철관, PE, 강관)" autocomplete="off">
+  </div>
  </header>
+ <div id="mc-search-results" style="display:none; padding:20px 36px 0;"></div>
  <div id="mc-app">
 
-  <section class="mc-panel">
-   <div class="mc-panel-head"><h2>관종 상세 검색</h2><span class="mc-hint-inline">관종 이름으로 검색하여 특성, 장단점, 사진을 상세히 확인하세요.</span></div>
-   <div style="margin-top:16px;">
-    <input type="text" id="mc-search-input" placeholder="관종 검색... (예: 주철관, PE, 강관)" autocomplete="off" style="width:100%; max-width:400px; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg); font:inherit;">
-   </div>
-   <div id="mc-search-results" style="margin-top:20px; display:none;"></div>
-  </section>
+  
 
 
   <section class="mc-panel">
@@ -6406,7 +6405,65 @@ if(typeof module!=='undefined'&&module.exports)module.exports=PipeCatalogCore;
 
  $('notes').innerHTML=data.notes.map(n=>'<li>'+esc(n)+'</li>').join('')+
   '<li>'+esc(data.sources.khe.note)+'</li><li>'+esc(data.sources.ref.note)+'</li>';
- update();
+ 
+  const searchInput = $('search-input');
+  const searchResults = $('search-results');
+  const mcApp = $('app');
+  
+  function renderSearch() {
+      const q = searchInput.value.toLowerCase().trim();
+      if (!q) {
+          searchResults.style.display = 'none';
+          mcApp.style.display = 'block';
+          return;
+      }
+      
+      mcApp.style.display = 'none';
+      
+      const matched = data.materials.filter(m => 
+          m.name.toLowerCase().includes(q) || 
+          (m.alias && m.alias.toLowerCase().includes(q)) ||
+          (m.standard && m.standard.toLowerCase().includes(q))
+      );
+      
+      if (matched.length === 0) {
+          searchResults.style.display = 'block';
+          searchResults.innerHTML = '<div class="mc-blank" style="padding:16px;">검색 결과가 없습니다.</div>';
+          return;
+      }
+      
+      searchResults.style.display = 'flex';
+      searchResults.style.flexDirection = 'column';
+      searchResults.style.gap = '20px';
+      
+      searchResults.innerHTML = matched.map(m => {
+          let rowsHtml = '';
+          for (const r of data.rows) {
+              if (hasData(m, r)) {
+                  rowsHtml += '<dt>' + esc(r.label) + '</dt><dd>' + cellHtml(m, r) + '</dd>';
+              }
+          }
+          
+          return '<div class="mc-search-card">' +
+            (m.image ? '<div class="mc-search-card-img"><img src="' + esc(m.image) + '" alt=""></div>' : '') +
+            '<div class="mc-search-card-body">' +
+              '<h3>' + esc(m.name) + (m.alias ? ' <small>' + esc(m.alias) + '</small>' : '') + '</h3>' +
+              '<p><strong>표준:</strong> ' + esc(m.standard) + (m.recommended ? ' <span class="mc-pick-badge">추천</span>' : '') + '</p>' +
+              '<div style="display:flex;gap:20px;margin-bottom:16px;">' +
+                 '<div style="flex:1;"><h4 style="margin:0 0 4px;font-size:12px;color:var(--accent);">장점</h4><ul class="mc-pro" style="margin:0;padding-left:16px;font-size:13px;">' + m.pros.map(x=>'<li>'+esc(x)+'</li>').join('') + '</ul></div>' +
+                 '<div style="flex:1;"><h4 style="margin:0 0 4px;font-size:12px;color:var(--amber);">단점</h4><ul class="mc-con" style="margin:0;padding-left:16px;font-size:13px;">' + m.cons.map(x=>'<li>'+esc(x)+'</li>').join('') + '</ul></div>' +
+              '</div>' +
+              '<dl class="mc-search-card-dl">' + rowsHtml + '</dl>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+  }
+  
+  if (searchInput) {
+      searchInput.addEventListener('input', renderSearch);
+  }
+
+update();
 })();
 
 (() => {

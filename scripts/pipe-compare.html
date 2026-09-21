@@ -2,16 +2,15 @@
  <header>
   <p class="eyebrow">관로 설계 자료</p><h1>관종 비교</h1>
   <p class="pc-intro">관종별 재질 · 규격 · 물리적 특성 · 내압 · 장단점을 한 표에서 비교합니다. 사내 관종 비교 검토자료의 6종과, 공개 표준으로 정리한 5종을 함께 담았습니다.</p>
+  <div class="search-row" style="margin-top:20px; max-width:480px;">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+    <input id="mc-search-input" type="text" placeholder="관종 검색... (예: 주철관, PE, 강관)" autocomplete="off">
+  </div>
  </header>
+ <div id="mc-search-results" style="display:none; padding:20px 36px 0;"></div>
  <div id="mc-app">
 
-  <section class="mc-panel">
-   <div class="mc-panel-head"><h2>관종 상세 검색</h2><span class="mc-hint-inline">관종 이름으로 검색하여 특성, 장단점, 사진을 상세히 확인하세요.</span></div>
-   <div style="margin-top:16px;">
-    <input type="text" id="mc-search-input" placeholder="관종 검색... (예: 주철관, PE, 강관)" autocomplete="off" style="width:100%; max-width:400px; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--bg); font:inherit;">
-   </div>
-   <div id="mc-search-results" style="margin-top:20px; display:none;"></div>
-  </section>
+  
 
 
   <section class="mc-panel">
