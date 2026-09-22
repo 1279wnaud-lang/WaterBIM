@@ -785,6 +785,11 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
   --std-guide: #7C3AED;
   --std-civil: #64748B;
   --std-bim: #DB2777;
+  --std-kwdi: #8B5CF6;
+  --std-kwsp: #14B8A6;
+  --std-kwdi: #059669; /* different tone of green? No, wait */
+  --std-kwdi: #2563EB;
+  --std-kwsp: #D97706;
 }
 .std-results {
   display: flex;
@@ -923,6 +928,8 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 #stdFilters .chip[data-filter="guide"] .dot { background: var(--std-guide); }
 #stdFilters .chip[data-filter="bim"] .dot { background: var(--std-bim); }
 #stdFilters .chip[data-filter="civil"] .dot { background: var(--std-civil); }
+#stdFilters .chip[data-filter="kwdi"] .dot { background: var(--std-kwdi); }
+#stdFilters .chip[data-filter="kwsp"] .dot { background: var(--std-kwsp); }
 </style>
 <div class="app">
   <aside class="sidebar" id="sidebar">
@@ -1087,6 +1094,8 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
                 <button class="chip" data-filter="supply"><span class="dot"></span>상수도</button>
                 <button class="chip" data-filter="sewer"><span class="dot"></span>하수도</button>
                 <button class="chip" data-filter="kwcs"><span class="dot"></span>전문시방서</button>
+                <button class="chip" data-filter="kwdi"><span class="dot"></span>K-water 설계지침</button>
+                <button class="chip" data-filter="kwsp"><span class="dot"></span>K-water 과업·운영</button>
                 <button class="chip" data-filter="guide"><span class="dot"></span>실무지침</button>
                 <button class="chip" data-filter="bim"><span class="dot"></span>K-water BIM</button>
                 <button class="chip" data-filter="civil"><span class="dot"></span>토목 공통</button>
@@ -6946,7 +6955,8 @@ update();
     if (doc.document_role === 'revision_comparison') badges += '<span class="std-badge old">신구대비표</span>';
     if (doc.document_role === 'review_draft_label') badges += '<span class="std-badge draft">안</span>';
     if (!doc.revision_date && doc.edition_date_hint) badges += '<span class="std-badge">날짜 추정</span>';
-    const file = (doc.path || '').split('/').pop();
+    // 출처에는 파일명만 보인다. K-water 수집본 경로는 역슬래시(01_원본\적산지침\…)라 두 구분자 모두 자른다.
+    const file = (doc.path || '').split(/[\\/]/).pop();
     return '<article class="std-card" data-i="' + i + '" data-key="' + esc(item.key) + '">' +
       '<div class="std-card-header"><div>' +
         '<div class="std-card-meta"><span>' + esc(doc.code || '') + '</span><span aria-hidden="true">|</span><span>' +

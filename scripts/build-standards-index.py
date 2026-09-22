@@ -1,4 +1,6 @@
 import os
+import sys
+sys.stdout.reconfigure(encoding="utf-8")
 import sqlite3
 import json
 import subprocess
@@ -45,6 +47,70 @@ def category_of(path):
             return cat
     return None
 
+
+
+def get_all_documents():
+    docs, replaced = get_core_documents()
+    import json, datetime
+    cat_path = r'C:\Pruden_KH\.Data\05.K-water_기술기준_2026-09-22\00_목록\catalog.json'
+    cat = json.load(open(cat_path, encoding='utf-8'))
+    
+    old_by_path = {d['path']: d for d in docs}
+    old_by_code = {d['code'].strip(): d for d in docs if d.get('code')}
+    
+    remove_paths = set()
+    new_docs = []
+    skipped_dam_river = []
+    
+    for doc in cat:
+        path = doc['path']
+        comp = doc.get('comparison')
+        code = doc.get('code', '')
+        title = doc.get('title', '')
+        cat_type = doc.get('category', '')
+        rev = doc.get('revision_date', '')
+        
+        if path.endswith('.zip') or path.endswith('.egg') or path.endswith('.drm'):
+            continue
+            
+        if comp == '개정일 동일':
+            continue
+            
+        final_cat = None
+        if '설계지침' in cat_type or '적산지침' in cat_type or '설계도서' in cat_type:
+            final_cat = 'kwdi'
+        elif '과업표준분야' in cat_type or '유지운영분야' in cat_type or 'KWSP' in code or 'KWMI' in code:
+            final_cat = 'kwsp'
+        elif '자재구매시방서' in cat_type or comp == '사이트 게시본이 최신':
+            final_cat = 'kwcs'
+        else:
+            final_cat = 'kwcs'
+            
+        if final_cat in ['kwdi', 'kwsp']:
+            parts = code.split()
+            if len(parts) >= 2 and parts[1] in ['51', '54']:
+                skipped_dam_river.append(doc)
+                continue
+            
+        if comp == '사이트 게시본이 최신':
+            old_path = doc.get('previous_path')
+            if old_path and old_path in old_by_path:
+                remove_paths.add(old_path)
+            elif code in old_by_code:
+                remove_paths.add(old_by_code[code]['path'])
+            new_docs.append({'path': '05.K-water_기술기준_2026-09-22/' + path.replace('\\', '/'), 'title': title, 'code': code, 'revision_date': rev, 'category': final_cat, 'document_role': 'kwcs'})
+            continue
+            
+        if comp == '기존 코드 없음':
+            new_docs.append({'path': '05.K-water_기술기준_2026-09-22/' + path.replace('\\', '/'), 'title': title, 'code': code, 'revision_date': rev, 'category': final_cat, 'document_role': final_cat})
+            
+    docs = [d for d in docs if d['path'] not in remove_paths]
+    docs.extend(new_docs)
+    
+    with open('scratch/skipped_dam_river.json', 'w', encoding='utf-8') as f:
+        json.dump(skipped_dam_river, f, ensure_ascii=False, indent=2)
+        
+    return docs, replaced
 
 def get_core_documents():
     """1차 색인 대상. 범위 안의 압축파일은 압축을 푼 문서(04_압축해제)로 대신 색인한다.
@@ -340,10 +406,10 @@ def split_on_boundaries(lines, target):
     return pieces
 
 def main():
-    docs, replaced_containers = get_core_documents()
+    docs, replaced_containers = get_all_documents()
     print(f"Total documents to process: {len(docs)} (압축파일 {len(replaced_containers)}개는 풀린 문서로 대체)")
     
-    indexed_by_cat = {"supply": [], "sewer": [], "kwcs": [], "guide": [], "civil": [], "bim": []}
+    indexed_by_cat = {"supply": [], "sewer": [], "kwcs": [], "guide": [], "civil": [], "bim": [], "kwdi": [], "kwsp": []}
     failures = []
     total_long_chunks = 0
     total_front_dropped = 0
@@ -351,6 +417,8 @@ def main():
     for i, doc in enumerate(docs):
         path = doc['path']
         full_path = os.path.join(DATA_DIR, path.replace("/", "\\"))
+        if path.startswith("05.K-water"):
+            full_path = os.path.join(r"C:\Pruden_KH\.Data", path.replace("/", "\\"))
         print(f"[{i+1}/{len(docs)}] {path}", flush=True)
         
         if not os.path.exists(full_path):
@@ -376,10 +444,10 @@ def main():
         elif pages:
             chunks, long_chunks = chunk_text(pages, doc['title'])
             # 첫 조항 앞 조각은 표지·목차·개정 이력이다(표지의 세로쓰기 글상자가 한 글자씩 줄로 나와 검색 결과를 어지럽힌다).
-            # 기준 문서(KDS·KCS·KWCS)는 뒤에 조항이 있으면 항상 뺀다. 실무지침은 첫 조항 앞에 고시 연혁·현황표 같은
+            # 기준 문서(KDS·KCS·KWCS와 K-water 수집본 KWDI·KWSP·KWMI·KWPS)는 뒤에 조항이 있으면 항상 뺀다. 실무지침은 첫 조항 앞에 고시 연혁·현황표 같은
             # 본문이 오기도 해서, '목차' 줄이 있거나 300자 이하(표지 글자만 있는 경우)일 때만 뺀다.
             if len(chunks) > 1 and chunks[0]['clause_title'] == '일반사항':
-                is_code_doc = bool(re.match(r'K(DS|CS|WCS)\b', doc.get('code') or ''))
+                is_code_doc = bool(re.match(r'K(DS|CS|WCS|WDI|WSP|WMI|WPS)\b', doc.get('code') or ''))
                 front = chunks[0]['text']
                 is_cover = len(front) <= 300 or re.search(r'^\s*목\s*차\s*$', front, re.M)
                 if is_code_doc or is_cover:

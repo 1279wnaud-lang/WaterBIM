@@ -6,6 +6,11 @@
   --std-guide: #7C3AED;
   --std-civil: #64748B;
   --std-bim: #DB2777;
+  --std-kwdi: #8B5CF6;
+  --std-kwsp: #14B8A6;
+  --std-kwdi: #059669; /* different tone of green? No, wait */
+  --std-kwdi: #2563EB;
+  --std-kwsp: #D97706;
 }
 .std-results {
   display: flex;
@@ -144,3 +149,5 @@
 #stdFilters .chip[data-filter="guide"] .dot { background: var(--std-guide); }
 #stdFilters .chip[data-filter="bim"] .dot { background: var(--std-bim); }
 #stdFilters .chip[data-filter="civil"] .dot { background: var(--std-civil); }
+#stdFilters .chip[data-filter="kwdi"] .dot { background: var(--std-kwdi); }
+#stdFilters .chip[data-filter="kwsp"] .dot { background: var(--std-kwsp); }

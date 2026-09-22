@@ -141,7 +141,8 @@
     if (doc.document_role === 'revision_comparison') badges += '<span class="std-badge old">신구대비표</span>';
     if (doc.document_role === 'review_draft_label') badges += '<span class="std-badge draft">안</span>';
     if (!doc.revision_date && doc.edition_date_hint) badges += '<span class="std-badge">날짜 추정</span>';
-    const file = (doc.path || '').split('/').pop();
+    // 출처에는 파일명만 보인다. K-water 수집본 경로는 역슬래시(01_원본\적산지침\…)라 두 구분자 모두 자른다.
+    const file = (doc.path || '').split(/[\\/]/).pop();
     return '<article class="std-card" data-i="' + i + '" data-key="' + esc(item.key) + '">' +
       '<div class="std-card-header"><div>' +
         '<div class="std-card-meta"><span>' + esc(doc.code || '') + '</span><span aria-hidden="true">|</span><span>' +
