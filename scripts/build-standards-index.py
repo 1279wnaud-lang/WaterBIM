@@ -21,7 +21,22 @@ SCOPES = [
     ("01_국가건설기준/내진/", "civil"),
     ("01_국가건설기준/가설/", "civil"),
     ("01_국가건설기준/측량/", "civil"),
+    # BIM 지침: K-water BIM 적용지침(본문·부속서 한글 파일)만. 국토부·조달청·다른 발주처 지침은 넣지 않는다(사용자 결정).
+    # 같은 내용의 PDF 사본·엑셀 목록서는 bim_excluded에서 뺀다.
+    ("03_기존보유_BIM/02.K-water BIM 적용지침/3-1. KWSP 10 20 01 개정/", "bim"),
+    ("03_기존보유_BIM/02.K-water BIM 적용지침/3-2. KWSP 10 20 02 제정/", "bim"),
 ]
+
+
+def bim_excluded(path):
+    """BIM 범위에서 뺄 파일. 엑셀 목록서(WBS·속성정보세트·라이브러리·수량산출)는 코드검색 탭이 맡고 표 행이 수천 줄이라
+    조항 검색 결과를 덮는다. K-water 폴더의 PDF는 같은 문서의 한글 파일 사본이고, 설계도면 예시는 그림뿐이다."""
+    low = path.lower()
+    if low.endswith(".xlsx"):
+        return True
+    if path.startswith("03_기존보유_BIM/02.K-water") and not low.endswith(".hwp"):
+        return True
+    return False
 
 
 def category_of(path):
@@ -57,6 +72,8 @@ def get_core_documents():
     for path, title, code, revision_date, role, meta_json in rows:
         meta = json.loads(meta_json) if meta_json else {}
         cat = in_scope.get(path)
+        if cat == "bim" and bim_excluded(path):
+            continue
         container = None
         if cat is None and path.startswith("04_압축해제/"):
             container = meta.get("container_path")
@@ -131,6 +148,29 @@ PAGE_NUMBER = re.compile(r'^\s*[-–—]\s*\d{1,4}\s*[-–—]\s*$')
 #   머리글: '앵커 <탭> KDS 11 60 00 : 2025'
 STD_HEADER = re.compile(r'^\s*(?:(?:KDS|KCS|KWCS)\s\d{2}\s\d{2}\s\d{2}(?:\s\d{2})?\s+[가-힣·ㆍ\s]{2,30}(?:설계기준|공사|시방서|기준)|.{0,60}\b(?:KDS|KCS|KWCS)\s\d{2}\s\d{2}\s\d{2}(?:\s\d{2})?\s*:\s*\d{4})\s*$')
 BARE_NUMBER = re.compile(r'^\s*\d{1,3}\s*$')
+TOC_LEADER = re.compile(r'[·.…‥ㆍ─-]{5,}\s*\d{1,4}\s*$')
+
+
+VERTICAL_CHAR = re.compile(r'^\s*[가-힣A-Za-z0-9]\s*$')
+
+
+def join_vertical(lines):
+    """표지·표 칸의 세로쓰기 글상자는 한 글자씩 줄로 나온다('상⏎수⏎도⏎공⏎사', 'K⏎C⏎S⏎2⏎1…'). 글자 한 개짜리 줄이
+    3줄 이상 이어지면 한 단어로 붙인다. 숫자만 이어진 줄은 표의 값 열일 수 있어 글자가 섞였을 때만 붙인다."""
+    out, run = [], []
+    for raw in lines + [None]:
+        if raw is not None and VERTICAL_CHAR.match(raw):
+            run.append(raw)
+            continue
+        word = ''.join(x.strip() for x in run)
+        if len(run) >= 3 and not word.isdigit():
+            out.append(word)
+        else:
+            out.extend(run)
+        run = []
+        if raw is not None:
+            out.append(raw)
+    return out
 
 
 def reflow(pages, heading_pattern, toc_pattern):
@@ -155,9 +195,9 @@ def reflow(pages, heading_pattern, toc_pattern):
     blank_pending = False
     for page_data in pages:
         page_num = page_data.get('page', 0)
-        for raw in page_data.get('text', '').split('\n'):
-            if toc_pattern.search(raw):
-                continue
+        for raw in join_vertical(page_data.get('text', '').split('\n')):
+            if toc_pattern.search(raw) or TOC_LEADER.search(raw):
+                continue  # 목차 줄('제목<탭>12', '4.1 총설 ······ 46')은 본문이 아니다
             if PAGE_NUMBER.match(raw) or key(raw) in running or STD_HEADER.match(raw):
                 after_header = True
                 blank_pending = False  # 머리글 앞뒤 빈 줄은 문단 경계가 아니다(쪽 경계에서 끊긴 문장을 이어야 한다)
@@ -303,9 +343,10 @@ def main():
     docs, replaced_containers = get_core_documents()
     print(f"Total documents to process: {len(docs)} (압축파일 {len(replaced_containers)}개는 풀린 문서로 대체)")
     
-    indexed_by_cat = {"supply": [], "sewer": [], "kwcs": [], "guide": [], "civil": []}
+    indexed_by_cat = {"supply": [], "sewer": [], "kwcs": [], "guide": [], "civil": [], "bim": []}
     failures = []
     total_long_chunks = 0
+    total_front_dropped = 0
     
     for i, doc in enumerate(docs):
         path = doc['path']
@@ -334,6 +375,16 @@ def main():
             failures.append({"path": path, "reason": error})
         elif pages:
             chunks, long_chunks = chunk_text(pages, doc['title'])
+            # 첫 조항 앞 조각은 표지·목차·개정 이력이다(표지의 세로쓰기 글상자가 한 글자씩 줄로 나와 검색 결과를 어지럽힌다).
+            # 기준 문서(KDS·KCS·KWCS)는 뒤에 조항이 있으면 항상 뺀다. 실무지침은 첫 조항 앞에 고시 연혁·현황표 같은
+            # 본문이 오기도 해서, '목차' 줄이 있거나 300자 이하(표지 글자만 있는 경우)일 때만 뺀다.
+            if len(chunks) > 1 and chunks[0]['clause_title'] == '일반사항':
+                is_code_doc = bool(re.match(r'K(DS|CS|WCS)\b', doc.get('code') or ''))
+                front = chunks[0]['text']
+                is_cover = len(front) <= 300 or re.search(r'^\s*목\s*차\s*$', front, re.M)
+                if is_code_doc or is_cover:
+                    chunks = chunks[1:]
+                    total_front_dropped += 1
             if long_chunks > 0:
                 print(f"  -> Had {long_chunks} chunks > 10,000 chars (split)")
                 total_long_chunks += long_chunks
@@ -424,6 +475,7 @@ def main():
         "failures": len(failures),
         "chunks": sum(len(d.get('chunks', [])) for d in indexed),
         "chunks_over_10000_chars_before_split": total_long_chunks,
+        "front_matter_chunks_dropped": total_front_dropped,
         "by_category": {cat: len(items) for cat, items in indexed_by_cat.items()},
         "containers_replaced_by_extracted_files": replaced_containers,
         "files": {name: os.path.getsize(os.path.join(OUT_DIR, name)) for name in manifest_files},

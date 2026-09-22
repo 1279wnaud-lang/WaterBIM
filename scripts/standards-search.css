@@ -5,6 +5,7 @@
   --std-kwcs: #D97706;
   --std-guide: #7C3AED;
   --std-civil: #64748B;
+  --std-bim: #DB2777;
 }
 .std-results {
   display: flex;
@@ -141,4 +142,5 @@
 #stdFilters .chip[data-filter="sewer"] .dot { background: var(--std-sewer); }
 #stdFilters .chip[data-filter="kwcs"] .dot { background: var(--std-kwcs); }
 #stdFilters .chip[data-filter="guide"] .dot { background: var(--std-guide); }
+#stdFilters .chip[data-filter="bim"] .dot { background: var(--std-bim); }
 #stdFilters .chip[data-filter="civil"] .dot { background: var(--std-civil); }

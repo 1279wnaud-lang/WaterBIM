@@ -451,7 +451,7 @@ function buildPage() {
           <span class="home-tool-description">시설과 공종에 맞는 WBS 코드를 찾고,<br>필요한 코드를 조합하세요.</span>
           <span class="home-tool-detail">WBS · OBS · 코드 조합</span>
           <span class="home-tool-link">코드 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
-        </button>
+        </button>
         <button type="button" class="home-tool" data-open-tab="colors">
           <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
           <span class="home-tool-title">색상 기준</span>
@@ -1215,12 +1215,15 @@ function renderDict() {
   dictRendered=true;
   const q = dictQEl.value.trim().toLowerCase();
   const pool = DICT_DATA.filter((r) => selectedDictCategories.size === 0 || selectedDictCategories.has(r.categoryGroup));
-  const rows = pool.filter((r) => !q ||
-    r.word.toLowerCase().includes(q) ||
-    (r.hanja || '').toLowerCase().includes(q) ||
-    r.definition.toLowerCase().includes(q) ||
-    (r.explanation || '').toLowerCase().includes(q)
-  ).sort((a, b) => a.word.localeCompare(b.word, 'ko'));
+  // 용어 이름(카드의 큰 글씨)과 한자만 찾는다. 정의·설명까지 찾으면 '맨홀'에 금속덮개·밀폐공간처럼 설명에 맨홀이 나오는 용어가 다 섞인다.
+  // 띄어쓰기는 무시하고(맨 홀 = 맨홀), 이름이 같은 용어 → 검색어로 시작하는 용어 → 나머지 순으로 보여준다.
+  const nq = q.replace(/\\s+/g, '');
+  const nw = (r) => r.word.toLowerCase().replace(/\\s+/g, '');
+  const rank = (r) => { const w = nw(r); return w === nq ? 0 : w.startsWith(nq) ? 1 : 2; };
+  const rows = pool.filter((r) => !nq ||
+    nw(r).includes(nq) ||
+    (r.hanja || '').toLowerCase().replace(/\\s+/g, '').includes(nq)
+  ).sort((a, b) => (nq ? rank(a) - rank(b) : 0) || a.word.localeCompare(b.word, 'ko'));
   dictMetaEl.textContent = (q ? rows.length.toLocaleString() + '개 결과' : '총 ' + rows.length.toLocaleString() + '개 용어 검색 가능');
   renderBatches(dictListEl,rows,row=>{const template=document.createElement('template');template.innerHTML=dictCardHtml(row);return template.content.firstElementChild;});
 }

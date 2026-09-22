@@ -784,6 +784,7 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
   --std-kwcs: #D97706;
   --std-guide: #7C3AED;
   --std-civil: #64748B;
+  --std-bim: #DB2777;
 }
 .std-results {
   display: flex;
@@ -920,6 +921,7 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
 #stdFilters .chip[data-filter="sewer"] .dot { background: var(--std-sewer); }
 #stdFilters .chip[data-filter="kwcs"] .dot { background: var(--std-kwcs); }
 #stdFilters .chip[data-filter="guide"] .dot { background: var(--std-guide); }
+#stdFilters .chip[data-filter="bim"] .dot { background: var(--std-bim); }
 #stdFilters .chip[data-filter="civil"] .dot { background: var(--std-civil); }
 </style>
 <div class="app">
@@ -970,7 +972,6 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
           <span class="home-tool-detail">WBS · OBS · 코드 조합</span>
           <span class="home-tool-link">코드 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
-
         <button type="button" class="home-tool" data-open-tab="colors">
           <span class="home-tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-3.7 1.5 1.5 0 0 1 1-2.8h3a3 3 0 0 0 3-3A9 9 0 0 0 12 3Z"/><circle cx="7" cy="10" r="1"/><circle cx="11" cy="7" r="1"/><circle cx="16" cy="8" r="1"/></svg></span>
           <span class="home-tool-title">색상 기준</span>
@@ -1087,6 +1088,7 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
                 <button class="chip" data-filter="sewer"><span class="dot"></span>하수도</button>
                 <button class="chip" data-filter="kwcs"><span class="dot"></span>전문시방서</button>
                 <button class="chip" data-filter="guide"><span class="dot"></span>실무지침</button>
+                <button class="chip" data-filter="bim"><span class="dot"></span>K-water BIM</button>
                 <button class="chip" data-filter="civil"><span class="dot"></span>토목 공통</button>
             </div>
             <div id="stdMeta"></div>
@@ -1839,12 +1841,15 @@ function renderDict() {
   dictRendered=true;
   const q = dictQEl.value.trim().toLowerCase();
   const pool = DICT_DATA.filter((r) => selectedDictCategories.size === 0 || selectedDictCategories.has(r.categoryGroup));
-  const rows = pool.filter((r) => !q ||
-    r.word.toLowerCase().includes(q) ||
-    (r.hanja || '').toLowerCase().includes(q) ||
-    r.definition.toLowerCase().includes(q) ||
-    (r.explanation || '').toLowerCase().includes(q)
-  ).sort((a, b) => a.word.localeCompare(b.word, 'ko'));
+  // 용어 이름(카드의 큰 글씨)과 한자만 찾는다. 정의·설명까지 찾으면 '맨홀'에 금속덮개·밀폐공간처럼 설명에 맨홀이 나오는 용어가 다 섞인다.
+  // 띄어쓰기는 무시하고(맨 홀 = 맨홀), 이름이 같은 용어 → 검색어로 시작하는 용어 → 나머지 순으로 보여준다.
+  const nq = q.replace(/\s+/g, '');
+  const nw = (r) => r.word.toLowerCase().replace(/\s+/g, '');
+  const rank = (r) => { const w = nw(r); return w === nq ? 0 : w.startsWith(nq) ? 1 : 2; };
+  const rows = pool.filter((r) => !nq ||
+    nw(r).includes(nq) ||
+    (r.hanja || '').toLowerCase().replace(/\s+/g, '').includes(nq)
+  ).sort((a, b) => (nq ? rank(a) - rank(b) : 0) || a.word.localeCompare(b.word, 'ko'));
   dictMetaEl.textContent = (q ? rows.length.toLocaleString() + '개 결과' : '총 ' + rows.length.toLocaleString() + '개 용어 검색 가능');
   renderBatches(dictListEl,rows,row=>{const template=document.createElement('template');template.innerHTML=dictCardHtml(row);return template.content.firstElementChild;});
 }
