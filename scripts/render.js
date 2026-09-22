@@ -190,7 +190,7 @@ function buildPage() {
   .chip:not(.active) { opacity: .55; }
   .chip:not(.active) .dot { opacity: .5; }
 
-  #meta, #colorMeta, #dictMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
+  #meta, #colorMeta, #dictMeta, #stdMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
 
   .layout {
     display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start;
@@ -424,6 +424,13 @@ function buildPage() {
           <span class="home-tool-detail">용어 · 약어 · 분야별 검색</span>
           <span class="home-tool-link">용어 찾아보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
+        <button type="button" class="home-tool" data-open-tab="standards-search">
+          <span class="home-tool-icon">${NAV_STANDARDS_ICON}</span>
+          <span class="home-tool-title">설계기준 검색</span>
+          <span class="home-tool-description">상하수도 설계기준·시방서·실무지침에서<br>필요한 조항을 원문 그대로 찾으세요.</span>
+          <span class="home-tool-detail">KDS · KCS · KWCS · 실무지침 · 조항 단위</span>
+          <span class="home-tool-link">기준 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
         <button type="button" class="home-tool" data-open-tab="compare">
           <span class="home-tool-icon">${NAV_COMPARE_ICON}</span>
           <span class="home-tool-title">관종 비교</span>
@@ -444,14 +451,7 @@ function buildPage() {
           <span class="home-tool-description">시설과 공종에 맞는 WBS 코드를 찾고,<br>필요한 코드를 조합하세요.</span>
           <span class="home-tool-detail">WBS · OBS · 코드 조합</span>
           <span class="home-tool-link">코드 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
-        </button>
-        <button type="button" class="home-tool" data-open-tab="standards-search">
-          <span class="home-tool-icon">${NAV_STANDARDS_ICON}</span>
-          <span class="home-tool-title">설계기준 검색</span>
-          <span class="home-tool-description">상하수도 설계기준·시방서·실무지침에서<br>필요한 조항을 원문 그대로 찾으세요.</span>
-          <span class="home-tool-detail">KDS · KCS · KWCS · 실무지침 · 조항 단위</span>
-          <span class="home-tool-link">기준 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
-        </button>
+        </button>
         <button type="button" class="home-tool" data-open-tab="colors">
           <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
           <span class="home-tool-title">색상 기준</span>
@@ -596,10 +596,10 @@ function esc(s) {
 const TABS = [
   { id: 'home', label: '홈', icon: '${NAV_HOME_ICON}' },
   { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
+  { id: 'standards-search', label: '설계기준', icon: '${NAV_STANDARDS_ICON}' },
   { id: 'compare', label: '관종', icon: '${NAV_COMPARE_ICON}' },
   { id: 'pipes', label: '주철관·강관', icon: '${NAV_PIPE_ICON}' },
   { id: 'codesearch', label: '코드검색', icon: '${NAV_SEARCH_ICON}' },
-  { id: 'standards-search', label: '설계기준', icon: '${NAV_STANDARDS_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
   { id: 'modelreview', label: '업무분류', icon: '${NAV_WORKFLOW_ICON}' },
 ];

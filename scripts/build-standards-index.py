@@ -14,6 +14,13 @@ SCOPES = [
     ("01_국가건설기준/하수도/", "sewer"),
     ("01_국가건설기준/K-water_전문시방서/", "kwcs"),
     ("02_기관별_지침/상하수도_실무지침/", "guide"),
+    # 상하수도 기준이 직접 참조하는 토목 공통 기준(굴착·흙막이·기초·콘크리트·내진·측량).
+    ("01_국가건설기준/공통/", "civil"),
+    ("01_국가건설기준/지반/", "civil"),
+    ("01_국가건설기준/구조/", "civil"),
+    ("01_국가건설기준/내진/", "civil"),
+    ("01_국가건설기준/가설/", "civil"),
+    ("01_국가건설기준/측량/", "civil"),
 ]
 
 
@@ -116,9 +123,14 @@ def extract_excel_text(filepath):
         return None, str(e)
 
 # 새 줄로 남겨야 하는 줄의 시작(항목 번호·기호·표/그림 표시).
-LIST_START = re.compile(r'^\s*(\(\s*\d{1,2}\s*\)|\d{1,2}\)|[①-⑳⑴-⒇㉠-㉭㉮-㉻]|[가-하][.)]\s+\S|[-·•∙‧・※○●□■◇◆▶▷◦▪*]|<|\[|「|〔|표\s*\d|그림\s*\d)')
+LIST_START = re.compile(r'^\s*(\(\s*\d{1,2}\s*\)|\d{1,2}\)|[①-⑳⑴-⒇㉠-㉭㉮-㉻]|[가-하][.)]\s+\S|[-·•∙‧・⦁※○●□■◇◆▶▷◦▪*]|<|\[|「|〔|표\s*\d|그림\s*\d)')
 SENTENCE_END = re.compile(r'([다음함됨임요]\.|[.:;?!])\s*$')
 PAGE_NUMBER = re.compile(r'^\s*[-–—]\s*\d{1,4}\s*[-–—]\s*$')
+# 기준 문서의 쪽 머리글·바닥글 형식. 짧은 문서는 몇 쪽에만 나와 반복 횟수로는 못 걸러서 형식으로 알아본다.
+#   바닥글: 'KDS 11 00 00 지반설계기준', 'KCS 10 00 00 공통공사'
+#   머리글: '앵커 <탭> KDS 11 60 00 : 2025'
+STD_HEADER = re.compile(r'^\s*(?:(?:KDS|KCS|KWCS)\s\d{2}\s\d{2}\s\d{2}(?:\s\d{2})?\s+[가-힣·ㆍ\s]{2,30}(?:설계기준|공사|시방서|기준)|.{0,60}\b(?:KDS|KCS|KWCS)\s\d{2}\s\d{2}\s\d{2}(?:\s\d{2})?\s*:\s*\d{4})\s*$')
+BARE_NUMBER = re.compile(r'^\s*\d{1,3}\s*$')
 
 
 def reflow(pages, heading_pattern, toc_pattern):
@@ -128,7 +140,8 @@ def reflow(pages, heading_pattern, toc_pattern):
     문장 끝·조항 제목·항목 시작·짧은 줄(표 칸)은 잇지 않는다. 쪽이 바뀌는 곳도 이어 붙인다."""
     # 쪽마다 반복되는 머리글·바닥글(예: '관로시설 설계기준 … KDS 61 40 00 : 2025')과 '- 16 -' 같은
     # 쪽 번호 줄은 본문이 아니다. 그대로 두면 쪽 경계에서 끊긴 문장 사이에 끼어든다.
-    key = lambda s: re.sub(r'\s+', ' ', s).strip()
+    # 머리글 끝에 쪽 번호가 붙어 쪽마다 글자가 달라지는 경우('… 건설측량 설계기준 2')도 같은 머리글로 보도록 끝 숫자는 떼고 비교한다.
+    key = lambda s: re.sub(r'\s*\d{1,4}\s*$', '', re.sub(r'\s+', ' ', s).strip())
     seen = {}
     for page_data in pages:
         for k in {key(x) for x in page_data.get('text', '').split('\n') if key(x)}:
@@ -138,17 +151,28 @@ def reflow(pages, heading_pattern, toc_pattern):
 
     out = []  # (쪽, 문단)
     prev_raw = None
+    after_header = False
+    blank_pending = False
     for page_data in pages:
         page_num = page_data.get('page', 0)
         for raw in page_data.get('text', '').split('\n'):
             if toc_pattern.search(raw):
                 continue
-            if PAGE_NUMBER.match(raw) or key(raw) in running:
+            if PAGE_NUMBER.match(raw) or key(raw) in running or STD_HEADER.match(raw):
+                after_header = True
+                blank_pending = False  # 머리글 앞뒤 빈 줄은 문단 경계가 아니다(쪽 경계에서 끊긴 문장을 이어야 한다)
                 continue  # 머리글·쪽 번호는 건너뛰되 앞 줄과의 이어 붙이기 판단은 유지한다
+            if after_header and BARE_NUMBER.match(raw):
+                continue  # 머리글 바로 옆에 숫자만 있는 줄은 쪽 번호다
             line = raw.strip()
             if not line:
-                prev_raw = None  # 빈 줄은 문단 경계
+                if not after_header:
+                    blank_pending = True  # 다음 줄이 머리글이면 무시하고, 본문이면 문단 경계로 쓴다
                 continue
+            after_header = False
+            if blank_pending:
+                prev_raw = None  # 빈 줄은 문단 경계
+                blank_pending = False
             starts_list = LIST_START.match(line)
             if starts_list and prev_raw is not None and re.match(r'\s*[가-하][.)]', line):
                 # '…시점을 말한' + '다.  단, …'처럼 단어 중간에서 끊긴 문장 끝은 목록 기호('다. 내용')와 모양이 같다.
@@ -279,7 +303,7 @@ def main():
     docs, replaced_containers = get_core_documents()
     print(f"Total documents to process: {len(docs)} (압축파일 {len(replaced_containers)}개는 풀린 문서로 대체)")
     
-    indexed_by_cat = {"supply": [], "sewer": [], "kwcs": [], "guide": []}
+    indexed_by_cat = {"supply": [], "sewer": [], "kwcs": [], "guide": [], "civil": []}
     failures = []
     total_long_chunks = 0
     

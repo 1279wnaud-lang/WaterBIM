@@ -1,14 +1,15 @@
 {
- "documents_in_scope": 794,
- "documents_indexed": 790,
+ "documents_in_scope": 1009,
+ "documents_indexed": 1005,
  "failures": 1,
- "chunks": 45918,
- "chunks_over_10000_chars_before_split": 144,
+ "chunks": 52251,
+ "chunks_over_10000_chars_before_split": 150,
  "by_category": {
   "supply": 76,
   "sewer": 51,
   "kwcs": 189,
-  "guide": 474
+  "guide": 474,
+  "civil": 215
  },
  "containers_replaced_by_extracted_files": [
   "02_기관별_지침/상하수도_실무지침/(붙임 2) 먹는물수질공정시험기준 개정내용_b36a7c7430bc.zip",
@@ -23,11 +24,12 @@
   "02_기관별_지침/상하수도_실무지침/토양오염공정시험기준_일부개정(130912)_6412aaad52ea.zip"
  ],
  "files": {
-  "standards-index-supply.js": 2164940,
-  "standards-index-sewer.js": 1697741,
-  "standards-index-kwcs.js": 6110513,
-  "standards-index-guide-1.js": 15362730,
-  "standards-index-guide-2.js": 15134493,
-  "standards-index-guide-3.js": 15165613
+  "standards-index-supply.js": 2158128,
+  "standards-index-sewer.js": 1694059,
+  "standards-index-kwcs.js": 6107678,
+  "standards-index-guide-1.js": 15353618,
+  "standards-index-guide-2.js": 15081529,
+  "standards-index-guide-3.js": 15122708,
+  "standards-index-civil.js": 7800687
  }
 }

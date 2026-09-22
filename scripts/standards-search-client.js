@@ -153,8 +153,10 @@
         '<p class="std-card-text">' + highlight(ex.text, rx) + '</p>' +
         '<button type="button" class="std-full-toggle" aria-expanded="false">' + (ex.cut ? '조항 전체 보기' : '펼쳐 보기') + '</button>' +
       '</div>' +
-      '<div class="std-card-footer"><span>' + (chunk.page ? esc(String(chunk.page)) + '쪽' : '쪽 미상') + '</span>' +
-        '<span title="' + esc(doc.path || '') + '">' + esc(file) + '</span></div>' +
+      '<div class="std-card-footer">' +
+        '<span>출처 - <span title="' + esc(doc.path || '') + '">' + esc(file) + '</span>' +
+        (chunk.page ? ' · ' + esc(String(chunk.page)) + '쪽' : '') + '</span>' +
+      '</div>' +
     '</article>';
   }
 
@@ -177,7 +179,13 @@
     synonyms = (window.STANDARDS_SYNONYMS && window.STANDARDS_SYNONYMS.synonym_groups) || [];
     const raw = input.value.trim();
     limit = PAGE_SIZE;
-    if (!raw) { results = []; query = null; list.innerHTML = '<p class="empty">검색어를 입력하세요.</p>'; meta.textContent = ''; return; }
+    if (!raw) {
+      results = []; query = null; list.innerHTML = '<p class="empty">검색어를 입력하세요.</p>';
+      // 용어사전 탭과 같은 문구: 검색 전에는 검색 가능한 전체 수를 보여준다.
+      const total = (window.STANDARDS_INDEX || []).reduce((n, d) => n + (d.chunks || []).length, 0);
+      meta.textContent = '총 ' + total.toLocaleString() + '개 조항 검색 가능';
+      return;
+    }
     query = parseQuery(raw);
     results = [];
     for (const doc of window.STANDARDS_INDEX || []) {
@@ -191,7 +199,7 @@
     draw();
     const typed = raw.split(/\s+/);
     const extra = [...new Set(query.groups.flat())].filter((w) => norm(w) !== norm(raw) && !typed.includes(w));
-    meta.textContent = results.length.toLocaleString() + '건의 조항 발견' + (extra.length ? " ('" + extra.join("', '") + "' 포함 검색됨)" : '');
+    meta.textContent = results.length.toLocaleString() + '개 결과' + (extra.length ? " ('" + extra.join("', '") + "' 포함 검색됨)" : '');
   }
 
   input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 250); });

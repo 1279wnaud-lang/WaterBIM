@@ -1,1 +1,1 @@
-window.STANDARDS_MANIFEST = ["standards-index-supply.js", "standards-index-sewer.js", "standards-index-kwcs.js", "standards-index-guide-1.js", "standards-index-guide-2.js", "standards-index-guide-3.js"];
+window.STANDARDS_MANIFEST = ["standards-index-supply.js", "standards-index-sewer.js", "standards-index-kwcs.js", "standards-index-guide-1.js", "standards-index-guide-2.js", "standards-index-guide-3.js", "standards-index-civil.js"];

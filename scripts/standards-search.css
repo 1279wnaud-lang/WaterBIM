@@ -4,6 +4,7 @@
   --std-sewer: #059669;
   --std-kwcs: #D97706;
   --std-guide: #7C3AED;
+  --std-civil: #64748B;
 }
 .std-results {
   display: flex;
@@ -19,7 +20,7 @@
 }
 .std-card-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: flex-start;
   margin-bottom: 12px;
   gap: 12px;
@@ -108,7 +109,7 @@
   font-size: 12px;
   color: var(--muted);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
 }
 .std-card-footer span:last-child {
@@ -140,3 +141,4 @@
 #stdFilters .chip[data-filter="sewer"] .dot { background: var(--std-sewer); }
 #stdFilters .chip[data-filter="kwcs"] .dot { background: var(--std-kwcs); }
 #stdFilters .chip[data-filter="guide"] .dot { background: var(--std-guide); }
+#stdFilters .chip[data-filter="civil"] .dot { background: var(--std-civil); }

@@ -28,7 +28,7 @@ h1 { font-size:29px; font-weight:600; letter-spacing:-1px; margin-bottom:22px; }
 .chip { min-height:35px; padding:8px 13px; background:#ffffffa8; font-size:12px; border-color:transparent; }
 .chip:not(.active) { opacity:1; color:#626370; }
 .chip.active { background:#e5e0f7; border-color:#d2cbea; color:#38314c; }
-#meta,#colorMeta,#dictMeta { margin-top:15px; font-size:13px; }
+#meta,#colorMeta,#dictMeta,#stdMeta { margin-top:15px; font-size:13px; }
 .layout,.layout.split,.dict-list,.color-groups,#mr-app,#mc-app,#pc-app { max-width:none; padding:0 36px 36px; margin:0; }
 .layout.split { grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:20px; }
 .dict-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-items:start; }
