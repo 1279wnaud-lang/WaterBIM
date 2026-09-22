@@ -594,10 +594,27 @@ const navListEl = document.getElementById('navList');
 
 let activeTab = 'home';
 try {
-  const saved = localStorage.getItem('kwater-tool-active-tab');
-  if (saved) activeTab = saved;
+  const hash = location.hash.replace('#', '');
+  if (hash && TABS.some(t => t.id === hash)) {
+      activeTab = hash;
+  } else {
+      const saved = localStorage.getItem('kwater-tool-active-tab');
+      if (saved) activeTab = saved;
+  }
 } catch (e) {}
 if (!TABS.some((t) => t.id === activeTab)) activeTab = TABS[0].id;
+
+window.addEventListener('popstate', (e) => {
+    let hash = location.hash.replace('#', '');
+    if (!hash) {
+       if (e.state && e.state.tab) hash = e.state.tab;
+    }
+    if (hash && TABS.some(t => t.id === hash)) {
+        setActiveTab(hash, false);
+    } else {
+        setActiveTab(TABS[0].id, false);
+    }
+});
 
 function renderNav() {
   navListEl.innerHTML = TABS.map((t) =>
@@ -605,7 +622,7 @@ function renderNav() {
     (t.icon || '') + '<span>' + esc(t.label) + '</span></button>'
   ).join('');
 }
-function setActiveTab(id) {
+function setActiveTab(id, pushHistory = true) {
   activeTab = id;
   try { localStorage.setItem('kwater-tool-active-tab', id); } catch (e) {}
   renderNav();
@@ -614,6 +631,11 @@ function setActiveTab(id) {
   });
   updateTrayTop();
   document.dispatchEvent(new CustomEvent('tool-tab-change',{detail:id}));
+  if (pushHistory) {
+      if (location.hash.replace('#', '') !== id) {
+          history.pushState({tab: id}, '', '#' + id);
+      }
+  }
 }
 navListEl.addEventListener('click', (ev) => {
   const item = ev.target.closest('.nav-item');

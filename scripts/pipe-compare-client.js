@@ -37,7 +37,7 @@
  function renderTable(){
   const mats=data.materials.filter(m=>shown.has(m.id));
   const groups=[...new Set(data.rows.map(r=>r.group))];
-  let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+' style="cursor:pointer;" title="클릭하여 상세 정보 보기" onclick="document.getElementById(\'mc-search-input\').value=\''+m.name+'\'; document.getElementById(\'mc-search-input\').dispatchEvent(new Event(\'input\')); window.scrollTo({top:0, behavior:\'smooth\'});"><div class="mc-th-inner"><div class="mc-th-text">'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</div>'+(m.image?'<div class="mc-th-img"><img src="'+esc(m.image)+'" alt=""></div>':'')+'</div></th>').join('')+'</tr></thead>';
+  let html='<thead><tr><th scope="col" class="mc-row-head">구분</th>'+mats.map(m=>'<th scope="col"'+(m.recommended?' class="mc-th-pick"':'')+' style="cursor:pointer;" title="클릭하여 상세 정보 보기" onclick="document.getElementById(\'mc-search-input\').value=\''+m.name+'\'; document.getElementById(\'mc-search-input\').dispatchEvent(new Event(\'input\')); history.pushState({tab: \'compare\', isDetail: true}, \'\', location.hash); window.scrollTo({top:0, behavior:\'smooth\'});"><div class="mc-th-inner"><div class="mc-th-text">'+esc(m.name)+(m.alias?'<small>'+esc(m.alias)+'</small>':'')+'<span class="mc-std">'+esc(m.standard)+'</span>'+(m.recommended?'<span class="mc-pick-badge">원문 추천</span>':'')+(m.source==='ref'?'<span class="mc-src mc-src-ref">공개 표준</span>':'')+'</div>'+(m.image?'<div class="mc-th-img"><img src="'+esc(m.image)+'" alt=""></div>':'')+'</div></th>').join('')+'</tr></thead>';
   for(const g of groups){
    const rows=data.rows.filter(r=>r.group===g&&mats.some(m=>hasData(m,r)));
    if(!rows.length)continue;
@@ -123,3 +123,16 @@
 
 update();
 })();
+
+  window.addEventListener('popstate', (e) => {
+      const hash = location.hash.replace('#', '');
+      if (hash === 'compare') {
+          if (!e.state || !e.state.isDetail) {
+              const input = document.getElementById('mc-search-input');
+              if (input && input.value.trim() !== '') {
+                  input.value = '';
+                  input.dispatchEvent(new Event('input'));
+              }
+          }
+      }
+  });
