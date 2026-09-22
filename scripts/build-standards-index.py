@@ -112,6 +112,18 @@ def get_all_documents():
         
     return docs, replaced
 
+# 실무지침 폴더의 압축파일 중 설계 업무와 거리가 먼 것(사용자 결정, 2026-09-22).
+# 수질·토양 공정시험기준(ES, 221건)은 실험실 분석법이라 '납·망간' 같은 검색에서 설계 기준을 밀어내고,
+# 상수도공사 표준시방서 옛 개정판(10건)은 상수도 분류의 최신 KCS 57과 겹친다.
+GUIDE_EXCLUDED_ARCHIVES = (
+    "_dfa314c079d3.zip",  # 먹는물수질공정시험기준 개정전문(20131106)
+    "_b36a7c7430bc.zip",  # 먹는물수질공정시험기준 개정내용
+    "_146ecd8e9cee.zip",  # 토양오염공정시험기준(전문)
+    "_6412aaad52ea.zip",  # 토양오염공정시험기준 일부개정(130912)
+    "_da01cc86c93f.zip",  # 상수도공사 표준시방서 개정 전문(옛 판)
+)
+
+
 def get_core_documents():
     """1차 색인 대상. 범위 안의 압축파일은 압축을 푼 문서(04_압축해제)로 대신 색인한다.
     예전에는 10MB가 넘는 파일을 조용히 건너뛰었는데, 그 안에 수도정비기본계획 수립지침 같은
@@ -144,6 +156,8 @@ def get_core_documents():
         if cat is None and path.startswith("04_압축해제/"):
             container = meta.get("container_path")
             cat = containers.get(container)
+            if container and any(h in container for h in GUIDE_EXCLUDED_ARCHIVES):
+                continue
         if cat is None:
             continue
         if path in containers:
@@ -215,6 +229,10 @@ PAGE_NUMBER = re.compile(r'^\s*[-–—]\s*\d{1,4}\s*[-–—]\s*$')
 STD_HEADER = re.compile(r'^\s*(?:(?:KDS|KCS|KWCS)\s\d{2}\s\d{2}\s\d{2}(?:\s\d{2})?\s+[가-힣·ㆍ\s]{2,30}(?:설계기준|공사|시방서|기준)|.{0,60}\b(?:KDS|KCS|KWCS)\s\d{2}\s\d{2}\s\d{2}(?:\s\d{2})?\s*:\s*\d{4})\s*$')
 BARE_NUMBER = re.compile(r'^\s*\d{1,3}\s*$')
 TOC_LEADER = re.compile(r'[·.…‥ㆍ─-]{5,}\s*\d{1,4}\s*$')
+TOC_LEADER_END = re.compile(r'[·.…‥ㆍ]{5,}\s*$')
+TOC_LEADER_ONLY = re.compile(r'^\s*(?:[◦○●□■◇◆-]\s*)?[·.…‥ㆍ]{5,}\s*$')
+BACK_MATTER_START = re.compile(r'^\s*(집\s*필\s*위\s*원|심\s*의\s*위\s*원|자\s*문\s*위\s*원|작\s*성\s*위\s*원|참\s*여\s*위\s*원'
+                               r'|제\s*·\s*개\s*정\s*이\s*력|기\s*준\s*제\s*정\s*및\s*개\s*정\s*연\s*혁)\s*$')
 
 
 VERTICAL_CHAR = re.compile(r'^\s*[가-힣A-Za-z0-9]\s*$')
@@ -239,11 +257,17 @@ def join_vertical(lines):
     return out
 
 
-def reflow(pages, heading_pattern, toc_pattern):
+def reflow(pages, heading_pattern, toc_pattern, doc_code=""):
     """원문 한글 파일의 화면 줄바꿈을 원래 문단으로 되돌린다.
     rhwp 추출 텍스트는 어절 사이에서 줄이 바뀐 곳은 줄 끝에 공백을 남기고, 단어 중간에서 바뀐 곳은
     공백 없이 끝난다(예: '관로가 합류하' + '는 곳'). 이것을 근거로 띄어서 또는 붙여서 잇는다.
     문장 끝·조항 제목·항목 시작·짧은 줄(표 칸)은 잇지 않는다. 쪽이 바뀌는 곳도 이어 붙인다."""
+    # 기준 문서 끝의 집필위원·심의위원 명단과 제·개정 이력, 발행 정보는 본문이 아니다(마지막 조항 본문에 섞여 들어갔다).
+    # 시작 표시 줄부터 문서 끝까지 버리되, 표시가 문서 끝부분(마지막 20% 또는 마지막 3쪽)에 있을 때만 자른다.
+    # '소관부서'는 본문 표의 열 이름으로도 쓰여(KWSP 57 15 05 코드 표준화 표) 시작 표시로 쓰지 않는다.
+    is_code_doc = bool(re.match(r"K(DS|CS|WCS|WDI|WSP|WMI|WPS)\b", doc_code))
+    back_start = min(len(pages) * 0.8, len(pages) - 3)
+    is_back_matter = False
     # 쪽마다 반복되는 머리글·바닥글(예: '관로시설 설계기준 … KDS 61 40 00 : 2025')과 '- 16 -' 같은
     # 쪽 번호 줄은 본문이 아니다. 그대로 두면 쪽 경계에서 끊긴 문장 사이에 끼어든다.
     # 머리글 끝에 쪽 번호가 붙어 쪽마다 글자가 달라지는 경우('… 건설측량 설계기준 2')도 같은 머리글로 보도록 끝 숫자는 떼고 비교한다.
@@ -259,9 +283,29 @@ def reflow(pages, heading_pattern, toc_pattern):
     prev_raw = None
     after_header = False
     blank_pending = False
-    for page_data in pages:
+    for page_idx, page_data in enumerate(pages):
         page_num = page_data.get('page', 0)
-        for raw in join_vertical(page_data.get('text', '').split('\n')):
+        page_lines = join_vertical(page_data.get('text', '').split('\n'))
+        skip = set()
+        for i, raw in enumerate(page_lines):
+            # 쪽 번호가 다음 줄로 넘어간 목차 줄('1. 일반사항·······' ⏎ '2')은 두 줄 다 버린다.
+            # 다음 줄이 숫자뿐일 때만 목차로 본다. 서식의 빈칸('시설명 : ......')과 자리표시('......')는 둔다.
+            # 점선 모양만 본다(줄 끝 '─────'·'-----'는 표 테두리·본문일 수 있다).
+            if TOC_LEADER_END.search(raw) and i + 1 < len(page_lines) and BARE_NUMBER.match(page_lines[i + 1]):
+                skip.update((i, i + 1))
+        for i, raw in enumerate(page_lines):
+            if i in skip:
+                continue
+            # 한 글자씩 띄어 쓴 표 머리 줄('점 검 사 항', '구    분')은 붙인다. 두 글자 이상 어절이 섞이면 그대로 둔다.
+            words = raw.split()
+            if len(words) >= 2 and all(len(w) == 1 and '가' <= w <= '힣' for w in words):
+                raw = raw[:len(raw) - len(raw.lstrip())] + ''.join(words)
+
+            if is_code_doc and not is_back_matter and page_idx >= back_start and BACK_MATTER_START.match(raw):
+                is_back_matter = True
+            if is_back_matter:
+                continue
+
             if toc_pattern.search(raw) or TOC_LEADER.search(raw):
                 continue  # 목차 줄('제목<탭>12', '4.1 총설 ······ 46')은 본문이 아니다
             if PAGE_NUMBER.match(raw) or key(raw) in running or STD_HEADER.match(raw):
@@ -280,6 +324,8 @@ def reflow(pages, heading_pattern, toc_pattern):
                 prev_raw = None  # 빈 줄은 문단 경계
                 blank_pending = False
             starts_list = LIST_START.match(line)
+            if starts_list and re.match(r'^\s*(표|그림)\s*<?\d[\d.A-Za-z-]*>?\s*(을|를|에|에서|의|과|와|은|는|로|으로|이|가|및|참조)', line):
+                starts_list = None
             if starts_list and prev_raw is not None and re.match(r'\s*[가-하][.)]', line):
                 # '…시점을 말한' + '다.  단, …'처럼 단어 중간에서 끊긴 문장 끝은 목록 기호('다. 내용')와 모양이 같다.
                 # 앞 줄이 단어 중간에서 끊겼으면(공백·문장 끝 없이 긴 줄) 목록이 아니라 앞 문장의 끝으로 본다.
@@ -295,6 +341,8 @@ def reflow(pages, heading_pattern, toc_pattern):
                 prev = prev_raw.rstrip()
                 soft_space = prev_raw.endswith(' ') and not SENTENCE_END.search(prev)
                 soft_word = (not prev_raw.endswith(' ')) and len(prev) >= 30 and not SENTENCE_END.search(prev)
+                if re.match(r'^\s*(표|그림)\s*<?\d[\d.A-Za-z-]*>?\s*(을|를|에|에서|의|과|와|은|는|로|으로|이|가|및|참조)', line):
+                    soft_space = True
                 if soft_space or soft_word:
                     p, text = out[-1]
                     out[-1] = (p, text + (' ' if soft_space else '') + line)
@@ -305,7 +353,7 @@ def reflow(pages, heading_pattern, toc_pattern):
     return out
 
 
-def chunk_text(pages, doc_title):
+def chunk_text(pages, doc_title, doc_code=""):
     chunks = []
     current_chunk = None
     path_stack = []
@@ -315,11 +363,27 @@ def chunk_text(pages, doc_title):
     # 예전 규칙은 '600 75 100' 같은 표 줄이나 '2 개 이상' 같은 본문 줄도 조항 제목으로 잘랐다.
     # 단위가 이어지는 줄('25 MPa 이상', '600 mm 이하')은 본문이므로 제외하고, 장 번호(점 없는 번호)는 20 이하만 본다.
     heading_pattern = re.compile(r'^\s*((?:[1-9]|1\d|20)(?:\.\d{1,2}){0,4})\.?\s+(?!(?:MPa|kPa|Pa|mm|cm|km|m|kN|N|kg|ton|t|L|l|%|℃|°)(?![A-Za-z]))([가-힣A-Za-z(「\[].{0,60})$')
+    # 표 칸의 숫자가 조항 번호로 잡히는 경우를 거른다: '5. 이하', '16. kgf/cm2', '2. mg/L', '2. (55.6)', '1.0. kgVS/…'.
+    # 숫자로 시작해도 '3차원 모델링', '1차 처리'처럼 바로 한글이 붙으면 실제 제목이다.
+    def is_valid_heading(m):
+        if not m:
+            return False
+        num, title = m.group(1), m.group(2).strip()
+        if re.match(r'(이하|이상|초과|미만)(?![가-힣])', title):
+            return False
+        if re.match(r'[a-zμ]', title) or re.match(r'\([\d.]+\)', title):
+            return False
+        if re.match(r'\d', title) and not re.match(r'\d+[가-힣]', title):
+            return False
+        if '.0.' in num + '.':
+            return False
+        return True
+
     
     # 화면 줄바꿈을 문단으로 되돌린 줄 단위로 조항을 나눈다.
-    for page_num, line_clean in reflow(pages, heading_pattern, toc_pattern):
+    for page_num, line_clean in reflow(pages, heading_pattern, toc_pattern, doc_code):
         m = heading_pattern.match(line_clean)
-        if m:
+        if is_valid_heading(m):
             num = m.group(1)
             title = m.group(2).strip()
 
@@ -361,6 +425,9 @@ def chunk_text(pages, doc_title):
         # 제목 줄만 있고 본문이 없는 조항(예: '5. 터파기 지보' 다음에 바로 5.1이 오는 경우)은 결과로 보여도
         # 쓸모가 없으므로 뺀다. 제목은 하위 조항의 경로(path_str)에 남아 있어 그 제목으로도 검색된다.
         if len(c['text']) <= 1 and c['clause_title'] != '일반사항':
+            continue
+        body_clean = re.sub(r'\s+', '', ''.join(c['text'][1:]))
+        if body_clean in ['내용없음', '내용없음.', '해당없음', '해당없음.']:
             continue
         joined_text = "\n".join(c['text'])
         if len(joined_text) <= 10000:
@@ -442,14 +509,17 @@ def main():
             print(f"  -> Error: {error}")
             failures.append({"path": path, "reason": error})
         elif pages:
-            chunks, long_chunks = chunk_text(pages, doc['title'])
+            chunks, long_chunks = chunk_text(pages, doc['title'], doc.get('code') or '')
             # 첫 조항 앞 조각은 표지·목차·개정 이력이다(표지의 세로쓰기 글상자가 한 글자씩 줄로 나와 검색 결과를 어지럽힌다).
             # 기준 문서(KDS·KCS·KWCS와 K-water 수집본 KWDI·KWSP·KWMI·KWPS)는 뒤에 조항이 있으면 항상 뺀다. 실무지침은 첫 조항 앞에 고시 연혁·현황표 같은
             # 본문이 오기도 해서, '목차' 줄이 있거나 300자 이하(표지 글자만 있는 경우)일 때만 뺀다.
+            # 번호 없는 머리말('가. 편람 목적 … 한다.')이 목차와 같은 조각에 들어 있으면 문장이 2개 이상이므로 남긴다
+            # (노후상수도 정비사업 업무편람: 편람 목적·적용범위가 여기 있다).
             if len(chunks) > 1 and chunks[0]['clause_title'] == '일반사항':
                 is_code_doc = bool(re.match(r'K(DS|CS|WCS|WDI|WSP|WMI|WPS)\b', doc.get('code') or ''))
                 front = chunks[0]['text']
-                is_cover = len(front) <= 300 or re.search(r'^\s*목\s*차\s*$', front, re.M)
+                sentences = len(re.findall(r'.{20,}(?:[다음함됨임]\.)\s*$', front, re.M))
+                is_cover = len(front) <= 300 or (re.search(r'^\s*목\s*차\s*$', front, re.M) and sentences < 2)
                 if is_code_doc or is_cover:
                     chunks = chunks[1:]
                     total_front_dropped += 1
