@@ -37,7 +37,7 @@
  }
 
  const fields=['id','category','name','spec','traditional','bim','status','note','owner','source'];
- let state={version:2,title:'',date:'',items:[]},filter='',loadFailed=false,graphView=false;
+ let state={version:2,title:'',date:'',items:[]},filter='',graphView=false;
  function validate(data){
   if(!data||![1,2].includes(data.version)||typeof data.title!=='string'||typeof data.date!=='string'||data.title.length>2000||data.date.length>100||!Array.isArray(data.items)||data.items.length>10000)throw Error('지원하지 않는 프로젝트 파일입니다.');
   const ids=new Set();const items=data.items.map(r=>{
@@ -48,10 +48,10 @@
    const extra=effortDefaults();for(const f of effortFields){const v=r[f]??'';if(typeof v!=='string'||v.length>20000||(isNumericField(f)&&v!==''&&(!Number.isFinite(Number(v))||Number(v)<0||Number(v)>1000000)))throw Error('소요인력 입력값을 확인해주세요.');if(f.endsWith('Difficulty')&&!['','상','중','하'].includes(v))throw Error('난이도를 확인해주세요.');if(f.endsWith('Direct')&&!['','○','X','부분'].includes(v))throw Error('직접 수행 여부를 확인해주세요.');if(['startDate','endDate'].includes(f)&&v!==''&&(!/^\d{4}-\d{2}-\d{2}$/.test(v)||!Number.isFinite(Date.parse(v+'T00:00:00Z'))||new Date(v+'T00:00:00Z').toISOString().slice(0,10)!==v))throw Error('일정 날짜를 확인해주세요.');extra[f]=v;}return {...Object.fromEntries(fields.map(f=>[f,r[f]])),...extra};
   });return {version:2,title:data.title,date:data.date,items};
  }
- // 저장된 자료를 불러왔다는 사실을 밝혀두지 않으면 탭을 다시 열었을 때 목록이 기본 제공된 것으로 오해하게 된다.
- try{const raw=localStorage.getItem(KEY);if(raw){const data=JSON.parse(raw);state=validate(data);if(data.version===1)$('save').textContent='이전 판단은 메모에 보존했습니다. 수행방식을 다시 결정해주세요.';else if(state.items.length)$('save').textContent='이 브라우저에 저장된 업무 '+state.items.length+'개를 불러왔습니다.';}}catch(e){loadFailed=true;$('save').textContent='기존 저장자료를 읽지 못했습니다. 프로젝트 파일을 확인해주세요.';}
+ // 업무는 현재 문서에서만 유지하고, 새로 열 때는 빈 프로젝트로 시작합니다.
+ try{localStorage.removeItem(KEY);}catch(e){}
  let revision=0,printCacheKey="";
- function save(){revision++;if(loadFailed){$('save').textContent='기존 저장자료 보호 중 · 프로젝트 파일로 저장해주세요.';return;}try{localStorage.setItem(KEY,JSON.stringify(state));$('save').textContent='자동 저장됨 · '+new Date().toLocaleTimeString('ko-KR');}catch(e){$('save').textContent='자동 저장 실패 · 프로젝트 파일로 저장해주세요.';}}
+ function save(){revision++;$('save').textContent='작성 중 · 보관하려면 프로젝트 파일로 저장해주세요.';}
  function counts(){ $('counts').innerHTML=['전체',...statuses].map(s=>'<button type="button" class="chip'+((filter||'전체')===s?' active':'')+'" data-filter="'+(s==='전체'?'':s)+'" aria-pressed="'+((filter||'전체')===s)+'">'+s+'<strong>'+(s==='전체'?state.items.length:state.items.filter(r=>r.status===s).length)+'</strong></button>').join('');}
  function stages(){const selected=$('stage-filter').value;const values=[...new Set(state.items.map(r=>r.category).filter(Boolean))];$('stage-filter').innerHTML='<option value="">전체 단계</option>'+values.map(v=>'<option>'+escape(v)+'</option>').join('');$('stage-filter').value=values.includes(selected)?selected:'';$('stages').innerHTML=values.map(v=>'<option value="'+escape(v)+'"></option>').join('');}
  function visible(){const stage=$('stage-filter').value;return state.items.filter(r=>(!filter||r.status===filter)&&(!stage||r.category===stage));}
@@ -142,18 +142,23 @@
  $('template-add').addEventListener('click',()=>{const template=WORKFLOW_TEMPLATES[Number($('template').value)];const rows=template.items.filter(r=>!state.items.some(i=>i.source===r.source)).map(r=>({...r,trDifficulty:'',trDirect:'',trPeople:'',trDays:'',trRemarks:'',bimDirect:''}));try{add(rows);$('template-status').textContent=rows.length+'개 업무 추가 · '+(template.items.length-rows.length)+'개 중복 업무 제외';}catch(e){$('template-status').textContent=e.message;}});
  function download(content,type,ext){const u=URL.createObjectURL(new Blob([content],{type})),a=document.createElement('a');a.href=u;a.download=(state.title||'BIM 업무분류').replace(/[\\/:*?"<>|]/g,'_')+'.'+ext;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
  $('export').addEventListener('click',()=>download(JSON.stringify(state,null,2),'application/json','json'));
- $('reset').addEventListener('click',async ()=>{
-  if(!await modal('현재 프로젝트명, 검토일, 업무 '+state.items.length+'개와 작성 내용을 모두 초기화할까요? 필요한 내용은 취소 후 프로젝트 파일로 저장해주세요.',{cancel:true}))return;
+ function resetProject(){
   const empty={version:2,title:'',date:'',items:[]};
-  try{localStorage.setItem(KEY,JSON.stringify(empty));}catch(e){$('save').textContent='초기화 실패 · 브라우저 저장소를 사용할 수 없습니다.';return;}
-  state=empty;loadFailed=false;filter='';
+  state=empty;filter='';
   for(const k of ['title','date','stage-filter','file'])$(k).value='';
   $('add').reset();$('template').selectedIndex=0;$('template-status').textContent='';$('print-scope').value='all';$('print').innerHTML='';
   document.body.classList.remove('mr-printing');render();
+  revision++;printCacheKey='';setView(false);$('graphs').replaceChildren();
+  $('save').textContent='';
+ }
+ window.addEventListener('pageshow',e=>{if(e.persisted)resetProject();});
+ $('reset').addEventListener('click',async ()=>{
+  if(!await modal('현재 프로젝트명, 검토일, 업무 '+state.items.length+'개와 작성 내용을 모두 초기화할까요? 필요한 내용은 취소 후 프로젝트 파일로 저장해주세요.',{cancel:true}))return;
+  resetProject();
   $('save').textContent='현재 프로젝트를 초기화했습니다.';$('title').focus();
  });
  $('import').addEventListener('click',()=>$('file').click());
- $('file').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>20000000)throw Error('20MB 이하의 프로젝트 파일을 선택해주세요.');const next=validate(JSON.parse(await file.text()));if(!await modal('현재 업무 '+state.items.length+'개를 파일의 '+next.items.length+'개로 바꿀까요? 현재 자료가 필요하면 취소 후 프로젝트 파일을 먼저 저장하세요.',{cancel:true}))return;state=next;loadFailed=false;filter='';$('stage-filter').value='';$('title').value=state.title;$('date').value=state.date;save();render();}catch(err){await modal('불러오기 실패: '+err.message);}finally{e.target.value='';}});
+ $('file').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>20000000)throw Error('20MB 이하의 프로젝트 파일을 선택해주세요.');const next=validate(JSON.parse(await file.text()));if(!await modal('현재 업무 '+state.items.length+'개를 파일의 '+next.items.length+'개로 바꿀까요? 현재 자료가 필요하면 취소 후 프로젝트 파일을 먼저 저장하세요.',{cancel:true}))return;state=next;filter='';$('stage-filter').value='';$('title').value=state.title;$('date').value=state.date;save();render();}catch(err){await modal('불러오기 실패: '+err.message);}finally{e.target.value='';}});
  function paragraphs(value){
   const lines=String(value||'—').replace(/\r/g,'').split('\n');const blocks=[];
   for(const raw of lines){const line=raw.trim();if(!line){blocks.push('');continue;}

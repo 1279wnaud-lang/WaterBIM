@@ -1,0 +1,33 @@
+{
+ "documents_in_scope": 794,
+ "documents_indexed": 790,
+ "failures": 1,
+ "chunks": 45918,
+ "chunks_over_10000_chars_before_split": 144,
+ "by_category": {
+  "supply": 76,
+  "sewer": 51,
+  "kwcs": 189,
+  "guide": 474
+ },
+ "containers_replaced_by_extracted_files": [
+  "02_기관별_지침/상하수도_실무지침/(붙임 2) 먹는물수질공정시험기준 개정내용_b36a7c7430bc.zip",
+  "02_기관별_지침/상하수도_실무지침/[붙임1] 수도사업 통합 효과분석을 위한 간이진단도구(tool)_28ba01821f40.zip",
+  "02_기관별_지침/상하수도_실무지침/[붙임] 하수저류시설 설치 및 운영관리 매뉴얼_77f4c2694f46.zip",
+  "02_기관별_지침/상하수도_실무지침/공법선정 가이드라인_(개정_전문_2015.2)_fbbe56d0e53c.zip",
+  "02_기관별_지침/상하수도_실무지침/먹는물수질공정시험기준 개정전문(20131106)_dfa314c079d3.zip",
+  "02_기관별_지침/상하수도_실무지침/상수도공사 표준시방서 개정 전문_da01cc86c93f.zip",
+  "02_기관별_지침/상하수도_실무지침/최종본_5ee22e5cd39d.zip",
+  "02_기관별_지침/상하수도_실무지침/최종본_a1862fedbc50.zip",
+  "02_기관별_지침/상하수도_실무지침/토양오염공정시험기준(전문)_146ecd8e9cee.zip",
+  "02_기관별_지침/상하수도_실무지침/토양오염공정시험기준_일부개정(130912)_6412aaad52ea.zip"
+ ],
+ "files": {
+  "standards-index-supply.js": 2164940,
+  "standards-index-sewer.js": 1697741,
+  "standards-index-kwcs.js": 6110513,
+  "standards-index-guide-1.js": 15362730,
+  "standards-index-guide-2.js": 15134493,
+  "standards-index-guide-3.js": 15165613
+ }
+}

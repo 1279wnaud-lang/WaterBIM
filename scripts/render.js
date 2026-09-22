@@ -394,11 +394,16 @@ function buildPage() {
 
   const SEARCH_ICON = '<svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>';
   const TOGGLE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>';
-  const NAV_SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>';
-  const NAV_PALETTE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c1.7 0 3.1-1.4 3.1-3.1C20.5 6.6 16.7 2 12 2Z"></path><circle cx="7" cy="10" r="1.2"></circle><circle cx="12" cy="7" r="1.2"></circle><circle cx="16.5" cy="10" r="1.2"></circle></svg>';
-  const NAV_PIPE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 13V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5"></path><path d="M2 13h20v5H2z"></path></svg>';
-  const NAV_DICT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"></path></svg>';
+  const NAV_SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6m-13-14-3 3 3 3m4-6 3 3-3 3"/></svg>';
+  const NAV_PALETTE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-3.7 1.5 1.5 0 0 1 1-2.8h3a3 3 0 0 0 3-3A9 9 0 0 0 12 3Z"/><circle cx="7" cy="10" r="1"/><circle cx="11" cy="7" r="1"/><circle cx="16" cy="8" r="1"/></svg>';
+  const NAV_PIPE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 4h8v5h6v8H9a6 6 0 0 1-6-6Z"/><path d="M1 4h12m4 3v12m4-12v12m-4-9h4m-4 6h4"/></svg>';
+  const NAV_DICT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v16M12 5C9 3 5 3 2 4v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 1Z"/><path d="M5 8h4m-4 4h4m6-4h4m-4 4h4"/></svg>';
 
+  const NAV_HOME_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg>';
+  const NAV_COMPARE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18M15 3v18M3 15h18"/></svg>';
+  const NAV_WORKFLOW_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="2" width="8" height="5" rx="1"/><path d="M12 7v5M5 12h14M5 12v5m14-5v5"/><rect x="2" y="17" width="6" height="5" rx="1"/><rect x="16" y="17" width="6" height="5" rx="1"/></svg>';
+  // 설계기준: 기준 문서에 적합 표시. 사전(펼친 책)·코드검색(돋보기)과 구별되게 문서 모양으로 둔다.
+  const NAV_STANDARDS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8Z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg>';
   const bodyHtml = `<div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head"><span class="sidebar-title"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 2.8c3.5 4 5.8 7 5.8 10.1a5.8 5.8 0 0 1-11.6 0c0-3.1 2.3-6.1 5.8-10.1Z"/><path d="M9.4 13.6a2.7 2.7 0 0 0 2.2 2.7" stroke-linecap="round"/></svg></span>WaterBIM</span></div>
@@ -419,19 +424,19 @@ function buildPage() {
           <span class="home-tool-detail">용어 · 약어 · 분야별 검색</span>
           <span class="home-tool-link">용어 찾아보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
-        <button type="button" class="home-tool" data-open-tab="pipes">
-          <span class="home-tool-icon">${NAV_DICT_ICON}</span>
-          <span class="home-tool-title">주철관 · 강관 규격 사전</span>
-          <span class="home-tool-description">닥타일주철관과 강관의 직관 · 이형관 치수를<br>핸드북 원문 도식과 함께 확인하세요.</span>
-          <span class="home-tool-detail">${pipeCatalog.records.length}개 규격 · 직관 · 이형관 · 핸드북 원문 근거</span>
-          <span class="home-tool-link">규격 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
-        </button>
         <button type="button" class="home-tool" data-open-tab="compare">
-          <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
+          <span class="home-tool-icon">${NAV_COMPARE_ICON}</span>
           <span class="home-tool-title">관종 비교</span>
           <span class="home-tool-description">관종별 재질 · 규격 · 물리적 특성 · 내압 ·<br>장단점을 한 표에서 비교하세요.</span>
           <span class="home-tool-detail">${pipeMaterialCount}개 관종 · 상수도/하수도 구분 · 생산 규격 범위</span>
           <span class="home-tool-link">비교표 보기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="home-tool" data-open-tab="pipes">
+          <span class="home-tool-icon">${NAV_PIPE_ICON}</span>
+          <span class="home-tool-title">주철관 · 강관 규격 사전</span>
+          <span class="home-tool-description">닥타일주철관과 강관의 직관 · 이형관 치수를<br>핸드북 원문 도식과 함께 확인하세요.</span>
+          <span class="home-tool-detail">${pipeCatalog.records.length}개 규격 · 직관 · 이형관 · 핸드북 원문 근거</span>
+          <span class="home-tool-link">규격 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
         <button type="button" class="home-tool" data-open-tab="codesearch">
           <span class="home-tool-icon">${NAV_SEARCH_ICON}</span>
@@ -439,6 +444,13 @@ function buildPage() {
           <span class="home-tool-description">시설과 공종에 맞는 WBS 코드를 찾고,<br>필요한 코드를 조합하세요.</span>
           <span class="home-tool-detail">WBS · OBS · 코드 조합</span>
           <span class="home-tool-link">코드 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="home-tool" data-open-tab="standards-search">
+          <span class="home-tool-icon">${NAV_STANDARDS_ICON}</span>
+          <span class="home-tool-title">설계기준 검색</span>
+          <span class="home-tool-description">상하수도 설계기준·시방서·실무지침에서<br>필요한 조항을 원문 그대로 찾으세요.</span>
+          <span class="home-tool-detail">KDS · KCS · KWCS · 실무지침 · 조항 단위</span>
+          <span class="home-tool-link">기준 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
         <button type="button" class="home-tool" data-open-tab="colors">
           <span class="home-tool-icon">${NAV_PALETTE_ICON}</span>
@@ -448,7 +460,7 @@ function buildPage() {
           <span class="home-tool-link">색상 확인 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
         <button type="button" class="home-tool" data-open-tab="modelreview">
-          <span class="home-tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="m8 9 1.5 1.5L12 8m2 2h3m-9 6h9"/></svg></span>
+          <span class="home-tool-icon">${NAV_WORKFLOW_ICON}</span>
           <span class="home-tool-title">업무분류</span>
           <span class="home-tool-description">BIM과 기존 설계방식의 수행 범위를 정리하고<br>프로젝트 검토 결과를 저장하세요.</span>
           <span class="home-tool-detail">업무 목록 · 수행방식 검토 · PDF 출력</span>
@@ -459,7 +471,8 @@ function buildPage() {
     </section>
     ${reviewHtml}
     ${fs.readFileSync(path.join(__dirname, 'pipe-catalog.html'), 'utf8')}
-    ${fs.readFileSync(path.join(__dirname, 'pipe-compare.html'), 'utf8')}
+    ${fs.readFileSync(path.join(__dirname, 'pipe-compare.html'), 'utf8').replaceAll('{{SEARCH_ICON}}', SEARCH_ICON)}
+    ${fs.readFileSync(path.join(__dirname, 'standards-search.html'), 'utf8').replaceAll('{{SEARCH_ICON}}', SEARCH_ICON)}
     <section class="tab-panel" data-tab="codesearch">
       <header>
         <div class="header-top">
@@ -581,39 +594,56 @@ function esc(s) {
 // --- 사이드바 / 탭 셸 (TABS에 항목만 추가하면 사이드바 목록과 탭 전환이
 //     자동으로 늘어나도록 데이터 기반으로 구성) ---
 const TABS = [
-  { id: 'home', label: '홈', icon: '' },
+  { id: 'home', label: '홈', icon: '${NAV_HOME_ICON}' },
   { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
-  { id: 'pipes', label: '주철관·강관', icon: '${NAV_DICT_ICON}' },
-  { id: 'compare', label: '관종', icon: '${NAV_PIPE_ICON}' },
+  { id: 'compare', label: '관종', icon: '${NAV_COMPARE_ICON}' },
+  { id: 'pipes', label: '주철관·강관', icon: '${NAV_PIPE_ICON}' },
   { id: 'codesearch', label: '코드검색', icon: '${NAV_SEARCH_ICON}' },
+  { id: 'standards-search', label: '설계기준', icon: '${NAV_STANDARDS_ICON}' },
   { id: 'colors', label: '색상기준', icon: '${NAV_PALETTE_ICON}' },
-  { id: 'modelreview', label: '업무분류', icon: '${NAV_DICT_ICON}' },
+  { id: 'modelreview', label: '업무분류', icon: '${NAV_WORKFLOW_ICON}' },
 ];
 const sidebarEl = document.getElementById('sidebar');
 const navListEl = document.getElementById('navList');
 
+// 새로고침일 때만 보던 탭을 되살린다. 껐다 켜기·새로 열기·다른 페이지에서 돌아오기는 홈에서 시작한다.
+// sessionStorage는 새로고침에는 남고 창을 닫으면 지워지므로, 주소에 #탭이 없을 때의 보조 수단으로 쓴다.
+const TAB_SESSION_KEY = 'waterbim-active-tab';
+const isKnownTab = (id) => TABS.some((t) => t.id === id);
+function openedByReload() {
+  try {
+    const nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (nav) return nav.type === 'reload';
+    return !!(performance.navigation && performance.navigation.type === 1);
+  } catch (e) { return false; }
+}
+function clearTabFromUrl() {
+  if (!location.hash) return;
+  try { history.replaceState({tab: 'home'}, '', location.pathname + location.search); } catch (e) {}
+}
 let activeTab = 'home';
-try {
-  const hash = location.hash.replace('#', '');
-  if (hash && TABS.some(t => t.id === hash)) {
-      activeTab = hash;
-  } else {
-      const saved = localStorage.getItem('kwater-tool-active-tab');
-      if (saved) activeTab = saved;
-  }
-} catch (e) {}
-if (!TABS.some((t) => t.id === activeTab)) activeTab = TABS[0].id;
+// 예전 버전은 마지막 탭을 localStorage에 남겨 다음 실행 때 되살렸다. 그 값은 더 이상 쓰지 않는다.
+try { localStorage.removeItem('kwater-tool-active-tab'); } catch (e) {}
+if (openedByReload()) {
+  let restored = location.hash.replace('#', '');
+  if (!isKnownTab(restored)) { try { restored = sessionStorage.getItem(TAB_SESSION_KEY) || ''; } catch (e) { restored = ''; } }
+  if (isKnownTab(restored)) activeTab = restored;
+}
+if (activeTab === 'home') clearTabFromUrl();
 
 window.addEventListener('popstate', (e) => {
     let hash = location.hash.replace('#', '');
     if (!hash) {
        if (e.state && e.state.tab) hash = e.state.tab;
     }
-    if (hash && TABS.some(t => t.id === hash)) {
-        setActiveTab(hash, false);
-    } else {
-        setActiveTab(TABS[0].id, false);
-    }
+    setActiveTab(isKnownTab(hash) ? hash : 'home', false);
+});
+// 다른 페이지에 갔다가 뒤로가기로 돌아와 페이지가 bfcache에서 그대로 살아난 경우도 홈에서 시작한다.
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return;
+  setActiveTab('home', false);
+  clearTabFromUrl();
+  window.scrollTo({top: 0});
 });
 
 function renderNav() {
@@ -623,8 +653,9 @@ function renderNav() {
   ).join('');
 }
 function setActiveTab(id, pushHistory = true) {
+  if (!isKnownTab(id)) return;
   activeTab = id;
-  try { localStorage.setItem('kwater-tool-active-tab', id); } catch (e) {}
+  try { sessionStorage.setItem(TAB_SESSION_KEY, id); } catch (e) {}
   renderNav();
   document.querySelectorAll('.tab-panel').forEach((p) => {
     p.style.display = p.getAttribute('data-tab') === id ? '' : 'none';
@@ -656,10 +687,13 @@ document.querySelectorAll('[data-open-tab]').forEach((button) => {
   });
 });
 renderNav();
-setActiveTab(activeTab);
+setActiveTab(activeTab, false);
+// 첫 기록은 새로 쌓지 않고 교체한다. 앱 안에서 뒤로가기를 끝까지 하면 홈으로 돌아온다.
+try { history.replaceState({tab: activeTab}, '', activeTab === 'home' ? location.pathname + location.search : '#' + activeTab); } catch (e) {}
 
 const SIDEBAR_KEY = 'kwater-tool-sidebar-collapsed';
-let sidebarCollapsed = localStorage.getItem(SIDEBAR_KEY) === '1';
+let sidebarCollapsed = false;
+try { sidebarCollapsed = localStorage.getItem(SIDEBAR_KEY) === '1'; } catch (e) {}
 function applySidebarState() {
   sidebarEl.classList.toggle('collapsed', sidebarCollapsed);
 }
@@ -1199,8 +1233,8 @@ document.addEventListener('tool-tab-change',e=>{if(e.detail==='dictionary'&&!dic
     title: '상하수도 BIM 도구',
     description: 'K-water 상하수도 BIM 코드·색상기준·용어사전·업무분류를 한 곳에서 검색·관리합니다.',
     entryCount: entries.length,
-    styleCss: styleCss + fs.readFileSync(path.join(__dirname, "design-preview.css"), "utf8") + fs.readFileSync(path.join(__dirname, 'pipe-catalog.css'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pipe-compare.css'), 'utf8'),
-    bodyHtml: bodyHtml + '<script>const WORKFLOW_TEMPLATES = ' + reviewTemplates.replace(/</g, '\\u003c') + ';\n' + reviewClient + '</script>' + '<script>const PIPE_CATALOG = ' + JSON.stringify(pipeCatalog).replace(/</g, '\\u003c') + ';\nconst PIPE_SOURCE_IMAGES = ' + JSON.stringify(pipeImages) + ';\nconst PIPE_MATERIALS = ' + pipeMaterials.replace(/</g, '\\u003c') + ';\n' + pipeScript + '</script>',
+    styleCss: styleCss + fs.readFileSync(path.join(__dirname, "design-preview.css"), "utf8") + fs.readFileSync(path.join(__dirname, 'pipe-catalog.css'), 'utf8') + fs.readFileSync(path.join(__dirname, 'pipe-compare.css'), 'utf8') + "\n" + fs.readFileSync(path.join(__dirname, 'standards-search.css'), 'utf8'),
+    bodyHtml: bodyHtml + '<script>const WORKFLOW_TEMPLATES = ' + reviewTemplates.replace(/</g, '\\u003c') + ';\n' + reviewClient + '</script>' + '<script>const PIPE_CATALOG = ' + JSON.stringify(pipeCatalog).replace(/</g, '\\u003c') + ';\nconst PIPE_SOURCE_IMAGES = ' + JSON.stringify(pipeImages) + ';\nconst PIPE_MATERIALS = ' + pipeMaterials.replace(/</g, '\\u003c') + ';\n' + pipeScript + '</script>\n<script>' + fs.readFileSync(path.join(__dirname, 'standards-search-client.js'), 'utf8') + '</script>',
   };
 }
 

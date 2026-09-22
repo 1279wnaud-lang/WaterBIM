@@ -1,0 +1,142 @@
+/* 설계기준 검색 탭. 색은 전역 토큰을 쓰고, 분야 구분 점 색만 이 탭의 토큰으로 둔다. */
+.tab-panel[data-tab="standards-search"] {
+  --std-supply: #0284C7;
+  --std-sewer: #059669;
+  --std-kwcs: #D97706;
+  --std-guide: #7C3AED;
+}
+.std-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.std-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.std-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+.std-card-meta {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.std-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--code-bg);
+  color: var(--ink);
+}
+.std-badge.old {
+  background: color-mix(in srgb, var(--amber) 15%, transparent);
+  color: var(--amber);
+}
+.std-badge.draft {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+}
+.std-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 4px 0 0;
+  color: var(--ink);
+}
+.std-card-body {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.std-card-path {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--accent);
+}
+/* 접힌 상태에서는 발췌 앞부분만 보인다. 발췌는 검색어가 있는 줄부터 시작하므로 검색어가 맨 위에 온다. */
+.std-card-text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 12.8em;
+  overflow: hidden;
+}
+.std-card-text.expanded {
+  max-height: none;
+}
+.std-card-text mark {
+  background: var(--mark-bg);
+  color: var(--mark-ink);
+  font-weight: 600;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.std-full-toggle {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+.std-full-toggle:hover {
+  text-decoration: underline;
+}
+.std-full-toggle:focus-visible,
+.std-load-more:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.std-card-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.std-card-footer span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.std-load-more {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--ink);
+  font: inherit;
+}
+.std-load-more:hover {
+  background: var(--bg);
+}
+.std-results .empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 40px;
+}
+#stdFilters .chip[data-filter="all"] .dot { background: var(--accent); }
+#stdFilters .chip[data-filter="supply"] .dot { background: var(--std-supply); }
+#stdFilters .chip[data-filter="sewer"] .dot { background: var(--std-sewer); }
+#stdFilters .chip[data-filter="kwcs"] .dot { background: var(--std-kwcs); }
+#stdFilters .chip[data-filter="guide"] .dot { background: var(--std-guide); }

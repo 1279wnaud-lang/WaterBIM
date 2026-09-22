@@ -9,7 +9,7 @@
   <label>검토일<input id="mr-date" type="date"></label>
   <div class="mr-actions mr-project-actions"><button id="mr-export">프로젝트 파일 저장</button><button id="mr-import">프로젝트 파일 불러오기</button><button id="mr-reset" type="button">초기화</button><input id="mr-file" type="file" accept=".json,application/json" hidden></div>
  </div>
- <p class="mr-hint mr-storage-hint">자동 저장은 이 브라우저에만 적용됩니다 · 다른 PC 작업은 프로젝트 파일로 저장/불러오기하세요 <span id="mr-save" role="status"></span></p>
+ <p class="mr-hint mr-storage-hint">다시 열면 빈 업무 목록으로 시작합니다 · 작성 내용은 프로젝트 파일로 저장/불러오기하세요 <span id="mr-save" role="status"></span></p>
  <div class="mr-view-tabs" role="tablist" aria-label="업무분류 보기"><button id="mr-list-tab" role="tab" aria-selected="true" aria-controls="mr-rows">업무 목록</button><button id="mr-graph-tab" role="tab" aria-selected="false" aria-controls="mr-graphs" tabindex="-1">그래프</button></div>
  <p class="mr-hint">병행 업무는 BIM·기존 방식 각각의 분담 범위를 적어주세요.</p>
  <details class="mr-setup"><summary>설계 업무 목록으로 시작</summary><p class="mr-hint">세부 업무와 두 업무방식을 가져옵니다 (수행방식은 모두 ‘미결정’으로 시작, 이후 자유롭게 수정 가능).</p><div class="mr-actions"><label>업무 목록<select id="mr-template" aria-label="설계 업무 목록"></select></label><button id="mr-template-add">업무 목록 추가</button></div><p id="mr-template-status" class="mr-hint" role="status"></p></details>
