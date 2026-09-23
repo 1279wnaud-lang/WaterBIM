@@ -111,6 +111,11 @@ function buildPage() {
     background: var(--bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  p, .desc, .dict-explain, .std-card-text {
+    text-wrap: pretty;
   }
   ::selection { background: var(--accent); color: var(--accent-ink); }
 
@@ -403,7 +408,8 @@ function buildPage() {
   const NAV_COMPARE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18M15 3v18M3 15h18"/></svg>';
   const NAV_WORKFLOW_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="8" y="2" width="8" height="5" rx="1"/><path d="M12 7v5M5 12h14M5 12v5m14-5v5"/><rect x="2" y="17" width="6" height="5" rx="1"/><rect x="16" y="17" width="6" height="5" rx="1"/></svg>';
   // 설계기준: 기준 문서에 적합 표시. 사전(펼친 책)·코드검색(돋보기)과 구별되게 문서 모양으로 둔다.
-  const NAV_STANDARDS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8Z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg>';
+  const NAV_PUMSEM_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>';
+    const NAV_STANDARDS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8Z"/><path d="M14 3v5h5"/><path d="m9 14 2 2 4-4"/></svg>';
   const bodyHtml = `<div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head"><span class="sidebar-title"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 2.8c3.5 4 5.8 7 5.8 10.1a5.8 5.8 0 0 1-11.6 0c0-3.1 2.3-6.1 5.8-10.1Z"/><path d="M9.4 13.6a2.7 2.7 0 0 0 2.2 2.7" stroke-linecap="round"/></svg></span>WaterBIM</span></div>
@@ -431,6 +437,13 @@ function buildPage() {
           <span class="home-tool-detail">KDS · KCS · KWCS · 실무지침 · 조항 단위</span>
           <span class="home-tool-link">기준 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
         </button>
+          <button type="button" class="home-tool" data-open-tab="pumsem">
+            <span class="home-tool-icon">${NAV_PUMSEM_ICON}</span>
+            <span class="home-tool-title">표준품셈</span>
+            <span class="home-tool-description">건설공사 표준품셈에서<br>단가 산출 기준을 찾아보세요.</span>
+            <span class="home-tool-detail">2026년 표준품셈 · 표(Table) 조회</span>
+            <span class="home-tool-link">품셈 찾기 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+          </button>
         <button type="button" class="home-tool" data-open-tab="compare">
           <span class="home-tool-icon">${NAV_COMPARE_ICON}</span>
           <span class="home-tool-title">관종 비교</span>
@@ -472,8 +485,31 @@ function buildPage() {
     ${reviewHtml}
     ${fs.readFileSync(path.join(__dirname, 'pipe-catalog.html'), 'utf8')}
     ${fs.readFileSync(path.join(__dirname, 'pipe-compare.html'), 'utf8').replaceAll('{{SEARCH_ICON}}', SEARCH_ICON)}
-    ${fs.readFileSync(path.join(__dirname, 'standards-search.html'), 'utf8').replaceAll('{{SEARCH_ICON}}', SEARCH_ICON)}
-    <section class="tab-panel" data-tab="codesearch">
+      ${fs.readFileSync(path.join(__dirname, 'standards-search.html'), 'utf8').replaceAll('{{SEARCH_ICON}}', SEARCH_ICON)}
+    <section class="tab-panel" data-tab="pumsem" style="display:none">
+      <header>
+        <div class="header-top">
+          <h1 class="sr-only">표준품셈 검색</h1>
+        </div>
+      </header>
+      <div class="std-search-header">
+        <div class="std-search-bar">
+          ${SEARCH_ICON}
+          <input type="search" id="pumsemQ" placeholder="항목 이름, 표 내용 등 검색어 입력" aria-label="표준품셈 검색">
+        </div>
+        <div class="std-filters" id="pumsemFilters">
+          <button type="button" class="chip active" aria-pressed="true" data-filter="all">전체 보기</button>
+          <button type="button" class="chip" aria-pressed="false" data-filter="공통">공통부문</button>
+          <button type="button" class="chip" aria-pressed="false" data-filter="토목">토목부문</button>
+          <button type="button" class="chip" aria-pressed="false" data-filter="건축">건축부문</button>
+          <button type="button" class="chip" aria-pressed="false" data-filter="기계설비">기계설비부문</button>
+          <button type="button" class="chip" aria-pressed="false" data-filter="유지관리">유지관리부문</button>
+        </div>
+        <div class="std-meta" id="pumsemMeta" aria-live="polite"></div>
+      </div>
+      <div class="std-results" id="pumsemResults"></div>
+    </section>
+      <section class="tab-panel" data-tab="codesearch">
       <header>
         <div class="header-top">
           <button class="sidebar-toggle" type="button" aria-label="사이드바 토글">${TOGGLE_ICON}</button>
@@ -597,6 +633,7 @@ const TABS = [
   { id: 'home', label: '홈', icon: '${NAV_HOME_ICON}' },
   { id: 'dictionary', label: '용어사전', icon: '${NAV_DICT_ICON}' },
   { id: 'standards-search', label: '설계기준', icon: '${NAV_STANDARDS_ICON}' },
+    { id: 'pumsem', label: '표준품셈', icon: '${NAV_PUMSEM_ICON}' },
   { id: 'compare', label: '관종', icon: '${NAV_COMPARE_ICON}' },
   { id: 'pipes', label: '주철관·강관', icon: '${NAV_PIPE_ICON}' },
   { id: 'codesearch', label: '코드검색', icon: '${NAV_SEARCH_ICON}' },

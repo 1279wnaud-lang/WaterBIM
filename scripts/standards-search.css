@@ -75,7 +75,8 @@
 .std-card-text {
   margin: 0;
   white-space: pre-wrap;
-  word-break: break-all;
+  word-break: keep-all;
+  overflow-wrap: break-word;
   max-height: 12.8em;
   overflow: hidden;
 }
