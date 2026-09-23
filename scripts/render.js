@@ -195,14 +195,14 @@ function buildPage() {
   .chip:not(.active) { opacity: .55; }
   .chip:not(.active) .dot { opacity: .5; }
 
-  #meta, #colorMeta, #dictMeta, #stdMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
+  #meta, #colorMeta, #dictMeta, #stdMeta, #pumsemMeta { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
 
   .layout {
     display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start;
     max-width: 1320px; margin: 0; padding: 16px 22px 60px 66px;
   }
   .layout.split { grid-template-columns: 1fr 1fr; max-width: none; }
-  main#results { min-width: 0; }
+  main#results, .layout > main { min-width: 0; }  /* 표가 넓어도 칸을 밀어내지 않게 한다 */
   .tray { display: none; }
   .layout.split .tray { display: block; }
   @media (max-width: 860px) {
@@ -486,29 +486,7 @@ function buildPage() {
     ${fs.readFileSync(path.join(__dirname, 'pipe-catalog.html'), 'utf8')}
     ${fs.readFileSync(path.join(__dirname, 'pipe-compare.html'), 'utf8').replaceAll('{{SEARCH_ICON}}', SEARCH_ICON)}
       ${fs.readFileSync(path.join(__dirname, 'standards-search.html'), 'utf8').replaceAll('{{SEARCH_ICON}}', SEARCH_ICON)}
-    <section class="tab-panel" data-tab="pumsem" style="display:none">
-      <header>
-        <div class="header-top">
-          <h1 class="sr-only">표준품셈 검색</h1>
-        </div>
-      </header>
-      <div class="std-search-header">
-        <div class="std-search-bar">
-          ${SEARCH_ICON}
-          <input type="search" id="pumsemQ" placeholder="항목 이름, 표 내용 등 검색어 입력" aria-label="표준품셈 검색">
-        </div>
-        <div class="std-filters" id="pumsemFilters">
-          <button type="button" class="chip active" aria-pressed="true" data-filter="all">전체 보기</button>
-          <button type="button" class="chip" aria-pressed="false" data-filter="공통">공통부문</button>
-          <button type="button" class="chip" aria-pressed="false" data-filter="토목">토목부문</button>
-          <button type="button" class="chip" aria-pressed="false" data-filter="건축">건축부문</button>
-          <button type="button" class="chip" aria-pressed="false" data-filter="기계설비">기계설비부문</button>
-          <button type="button" class="chip" aria-pressed="false" data-filter="유지관리">유지관리부문</button>
-        </div>
-        <div class="std-meta" id="pumsemMeta" aria-live="polite"></div>
-      </div>
-      <div class="std-results" id="pumsemResults"></div>
-    </section>
+    ${fs.readFileSync(path.join(__dirname, 'pumsem-search.html'), 'utf8').replaceAll('{{SEARCH_ICON}}', SEARCH_ICON)}
       <section class="tab-panel" data-tab="codesearch">
       <header>
         <div class="header-top">

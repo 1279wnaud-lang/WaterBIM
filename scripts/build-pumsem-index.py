@@ -17,10 +17,31 @@ PDF_PATH = os.path.join(DATA_DIR, r"06.2026년 건설공사 표준품셈\2026년
 OUT_DIR = r"C:\Pruden_KH\WaterBIM\data"
 
 def clean_spaced_text(raw):
-    words = raw.split()
-    if len(words) >= 2 and all(len(w) == 1 and '가' <= w <= '힣' for w in words):
-        return raw[:len(raw) - len(raw.lstrip())] + ''.join(words)
-    return raw
+    raw = re.sub(r'제\s+(\d+)\s+장', r'제\1장', raw)
+    raw = re.sub(r'(\d+)\s*-\s*(\d+)', r'\1-\2', raw)
+    res = []
+    for line in raw.split('\n'):
+        words = line.split()
+        if len(words) >= 2 and all(len(w) == 1 and '가' <= w <= '힣' for w in words):
+            res.append(line[:len(line) - len(line.lstrip())] + ''.join(words))
+        else:
+            # 괄호·한자·영문이 섞인 칸('굴 착 기 + 부 착 용 집 게', '토 적 ( 높 이 , 너 비 )')은
+            # 한 글자 한글 사이의 공백만 없앤다. 다른 글자 앞뒤 공백은 그대로 둔다.
+            if re.search(r'(?:^|\s)[가-힣一-鿿] [가-힣一-鿿](?:\s|$)', line):
+                line = re.sub(r'(?<=[가-힣一-鿿]) (?=[가-힣一-鿿](?![가-힣一-鿿]))', '', line)
+                line = re.sub(r'\(\s+', '(', re.sub(r'\s+([),])', r'\1', line))  # '( 野面石 )' → '(野面石)'
+            res.append(line)
+    return '\n'.join(res)
+
+def _merge_wrapped_lines(cell):
+    out = []
+    for line in cell.split('\n'):
+        if out and out[-1].count('(') > out[-1].count(')'):
+            out[-1] = out[-1] + ' ' + line.strip()
+        else:
+            out.append(line)
+    return '\n'.join(out)
+
 
 def process_table(rows):
     new_rows = []
@@ -31,12 +52,21 @@ def process_table(rows):
         cells = [c if c is not None else '' for c in r]
         cells = [clean_spaced_text(c) for c in cells]
         
+        # 한 항목이 칸 너비에 걸려 두 줄로 접힌 경우('이형철근 (교량 · 지하철및이와유사한' + '복잡한구조물의주철근)')
+        # 괄호가 닫히지 않은 줄은 다음 줄과 합친다. 그래야 칸마다 줄 수가 맞아 행으로 나눌 수 있다.
+        cells = [_merge_wrapped_lines(c) for c in cells]
+
+        # 한 칸에 여러 줄이 겹쳐 들어온 행은 줄 수만큼 행으로 나눈다.
+        # 여러 행에 걸친 칸(시공량 '250')은 1줄로 나오므로 첫 행에만 넣는다.
         line_counts = [len(c.split('\n')) for c in cells if c.strip()]
-        if line_counts and all(cnt == line_counts[0] for cnt in line_counts) and line_counts[0] > 1:
-            cnt = line_counts[0]
-            split_cells = [c.split('\n') if c.strip() else [''] * cnt for c in cells]
+        cnt = max(line_counts) if line_counts else 1
+        if cnt > 1 and all(n in (1, cnt) for n in line_counts):
             for i in range(cnt):
-                new_rows.append([split_cells[j][i] for j in range(len(cells))])
+                row = []
+                for c in cells:
+                    parts = c.split('\n')
+                    row.append(parts[i] if len(parts) == cnt else (c if i == 0 else ''))
+                new_rows.append(row)
         else:
             new_rows.append(cells)
             
@@ -81,18 +111,22 @@ def main():
                 "header_rows": header_rows
             })
             
+        # 쪽 첫머리에 책에 인쇄된 쪽 번호가 있다(PDF 401쪽 = 책 345쪽). 출처 표시에 함께 쓴다.
+        book_page = next((l.strip() for l in page.get_text().split('\n')[:3] if re.fullmatch(r'\d{1,4}', l.strip())), None)
+
         blocks = page.get_text("blocks")
         items = []
         
         for b in blocks:
             x0, y0, x1, y1, text, block_no, block_type = b
             if block_type != 0: continue
+            if y0 > 790: continue
             
             block_rect = pymupdf.Rect(x0, y0, x1, y1)
             in_table = False
             for tab in tabs.tables:
                 tab_rect = pymupdf.Rect(tab.bbox)
-                intersect = block_rect.intersect(tab_rect)
+                intersect = pymupdf.Rect(block_rect).intersect(tab_rect)
                 if intersect.get_area() > block_rect.get_area() * 0.5:
                     in_table = True
                     break
@@ -112,7 +146,16 @@ def main():
         for item in items:
             if item["type"] == "text":
                 for line in item["text"].split('\n'):
-                    lines_stream.append((page_num + 1, line))
+                    sline = line.strip()
+                    if not sline: continue
+                    if re.match(r'^(공통|토목|건축|기계설비|유지관리)부문$', sline.replace(' ', '')): continue
+                    if re.match(r'^\d+$', sline): continue
+                    if sline == '2026': continue
+                    
+                    if lines_stream and lines_stream[-1][1].startswith('제') and re.match(r'^제\s*\d+\s*장$', lines_stream[-1][1].strip()):
+                        lines_stream[-1] = (lines_stream[-1][0], lines_stream[-1][1] + ' ' + line)
+                    else:
+                        lines_stream.append((page_num + 1, line))
             elif item["type"] == "table":
                 lines_stream.append((page_num + 1, f"[[TABLE_{table_counter}]]"))
                 tables_list.append(item["table"])
@@ -120,11 +163,13 @@ def main():
                 
         pages.append({
             "page": page_num + 1,
+            "book_page": book_page,
             "category": category,
             "text": "\n".join(line for _, line in lines_stream)
         })
 
     page_categories = {p['page']: p['category'] for p in pages}
+    page_books = {p['page']: p.get('book_page') for p in pages}
         
     print(f"Total tables: {len(tables_list)}")
     
@@ -133,18 +178,10 @@ def main():
     
     def is_valid_heading(m):
         if not m: return False
-        title = m.group(1).strip()
-        # 1-2 와 같이 숫자만으로 된 제목이 아닌지 확인
-        # if m.group(1) is '제N장 ...' it's valid
-        if title.startswith('제'): return True
-        
-        parts = title.split(maxsplit=1)
-        if len(parts) == 1: return False # no text after number
-        
-        # check if text after number starts with Korean
-        if not re.match(r'^[가-힣]', parts[1]):
-            return False
-            
+        # m.group(1) is the number, m.group(2) is the text
+        if m.group(1).startswith('제'): return True
+        text_part = m.group(2).strip()
+        if not re.match(r'^[가-힣A-Za-z(「\[]', text_part): return False
         return True
         
     toc_pattern = re.compile(r'\t\s*\d+\s*$')
@@ -172,6 +209,9 @@ def main():
         
         # Determine category
         chunk["category"] = page_categories.get(chunk["page"], "공통")
+        # 책에 인쇄된 쪽 번호. 출처에 'PDF 401쪽(책 345쪽)'으로 함께 보여준다.
+        if page_books.get(chunk["page"]):
+            chunk["book_page"] = page_books[chunk["page"]]
         final_chunks.append(chunk)
         
     # Document info

@@ -6,9 +6,6 @@
   --std-guide: #7C3AED;
   --std-civil: #64748B;
   --std-bim: #DB2777;
-  --std-kwdi: #8B5CF6;
-  --std-kwsp: #14B8A6;
-  --std-kwdi: #059669; /* different tone of green? No, wait */
   --std-kwdi: #2563EB;
   --std-kwsp: #D97706;
 }
@@ -18,6 +15,7 @@
   gap: 16px;
 }
 .std-card {
+  min-width: 0;
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -62,6 +60,7 @@
   color: var(--ink);
 }
 .std-card-body {
+  min-width: 0;
   font-size: 14.5px;
   line-height: 1.6;
   color: var(--ink);
@@ -152,3 +151,81 @@
 #stdFilters .chip[data-filter="civil"] .dot { background: var(--std-civil); }
 #stdFilters .chip[data-filter="kwdi"] .dot { background: var(--std-kwdi); }
 #stdFilters .chip[data-filter="kwsp"] .dot { background: var(--std-kwsp); }
+
+.pumsem-blocks { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pumsem-blocks .std-card-text { max-height: none; }
+
+/* 품셈 표. 칸이 많은 표는 카드 안에서만 옆으로 밀린다(쪽 전체는 밀리지 않는다). */
+.std-table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.std-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.std-table th,
+.std-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  text-align: left;
+  vertical-align: top;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.std-table th:last-child,
+.std-table td:last-child { border-right: 0; }
+.std-table tbody tr:last-child td { border-bottom: 0; }
+/* 머리 행: 배경과 굵기로 본문과 구분하고, 옆으로 밀어도 위에 붙어 있게 한다. */
+.std-table thead th {
+  position: sticky;
+  top: 0;
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel));
+  color: var(--ink);
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+/* 첫 열은 항목 이름이라 눈이 따라가기 쉽게 조금 강조한다. */
+.std-table tbody td:first-child { font-weight: 600; color: var(--ink); }
+.std-table tbody tr:nth-child(even) { background: color-mix(in srgb, var(--border) 18%, transparent); }
+.std-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+/* 숫자 칸은 오른쪽에 붙이고 자릿수를 맞춘다. */
+.std-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* 검색어와 맞는 행 */
+.std-table tbody tr.hit,
+.std-table tbody tr.hit:nth-child(even) {
+  background: color-mix(in srgb, var(--mark-bg) 55%, transparent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+@media (max-width: 640px) {
+  .std-table { font-size: 12px; }
+  .std-table th, .std-table td { padding: 6px 8px; }
+}
+/* 행이 많은 표는 접어 두고 버튼으로 편다. */
+.std-table-wrap.folded { position: relative; }
+.std-table-more {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--accent) 6%, var(--panel));
+  color: var(--accent);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.std-table-more:hover { background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
