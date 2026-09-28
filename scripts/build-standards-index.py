@@ -1,3 +1,9 @@
+import json
+import uuid
+from pua_map import replace_pua
+import os
+from hwp_markdown_extract import extract_hwp_markdown
+from pdf_table_extract import inject_pdf_tables_and_figures
 import os
 import sys
 sys.stdout.reconfigure(encoding="utf-8")
@@ -108,7 +114,7 @@ def add_kwsd_standard_drawings(docs):
 
 def get_all_documents():
     docs, replaced = get_core_documents()
-    import json, datetime
+    import json
     cat_path = r'C:\Pruden_KH\.Data\05.K-water_기술기준_2026-09-22\00_목록\catalog.json'
     cat = json.load(open(cat_path, encoding='utf-8'))
     
@@ -284,12 +290,14 @@ def main():
     docs, replaced_containers = get_all_documents()
     add_kwsd_standard_drawings(docs)
 
+
     print(f"Total documents to process: {len(docs)} (압축파일 {len(replaced_containers)}개는 풀린 문서로 대체)")
     
     indexed_by_cat = {"supply": [], "sewer": [], "kwcs": [], "guide": [], "civil": [], "bim": [], "kwdi": [], "kwsp": []}
     failures = []
     total_long_chunks = 0
     total_front_dropped = 0
+    global_pua_counter = {}
     
     for i, doc in enumerate(docs):
         path = doc['path']
@@ -307,21 +315,37 @@ def main():
         ext = os.path.splitext(full_path)[1].lower()
         pages = None
         error = None
+        tables_dict = {}
+        figures_list = {}
+        is_kwsd = doc.get("category") == "kwdi" and "KWSD 57" in (doc.get("absolute_path") or path)
         
         if ext in ['.hwp', '.hwpx']:
-            pages, error = extract_hwp_text(full_path)
+            # Replace extract_hwp_text entirely
+            pages, tables_dict, figures_list, error = extract_hwp_markdown(full_path, RHWP_EXE, is_kwsd)
         elif ext == '.pdf':
             pages, error = extract_pdf_text(full_path)
+            if not error and pages:
+                pages, tables_dict, figures_list, e = inject_pdf_tables_and_figures(full_path, pages, is_kwsd)
+                if e: error = e
         elif ext in ['.xlsx', '.xls']:
             pages, error = extract_excel_text(full_path)
         else:
             error = f"Unsupported extension: {ext}"
-            
         if error:
             print(f"  -> Error: {error}")
             failures.append({"path": path, "reason": error})
         elif pages:
+            # Replace PUA characters
+            for p in pages:
+                p['text'] = replace_pua(p['text'])
+                # Track remaining PUA
+                for char in p['text']:
+                    if '' <= char <= '':
+                        global_pua_counter[char] = global_pua_counter.get(char, 0) + 1
+                        
             chunks, long_chunks = chunk_text(pages, doc['title'], doc.get('code') or '')
+
+
             # 첫 조항 앞 조각은 표지·목차·개정 이력이다(표지의 세로쓰기 글상자가 한 글자씩 줄로 나와 검색 결과를 어지럽힌다).
             # 기준 문서(KDS·KCS·KWCS와 K-water 수집본 KWDI·KWSP·KWMI·KWPS)는 뒤에 조항이 있으면 항상 뺀다. 실무지침은 첫 조항 앞에 고시 연혁·현황표 같은
             # 본문이 오기도 해서, '목차' 줄이 있거나 300자 이하(표지 글자만 있는 경우)일 때만 뺀다.
@@ -339,6 +363,55 @@ def main():
                 print(f"  -> Had {long_chunks} chunks > 10,000 chars (split)")
                 total_long_chunks += long_chunks
                 
+            # Process [[TABLE_idx]] and [[FIGURE_idx]]
+            doc_id = str(uuid.uuid4())[:8]
+            if is_kwsd:
+                doc_id = os.path.splitext(os.path.basename(path))[0]
+                
+
+                
+            for chunk in chunks:
+                blocks = []
+                for part in chunk['text'].split('\n'):
+                    m_tab = re.match(r'^\[\[TABLE_(\d+)\]\]$', part.strip())
+                    m_fig = re.match(r'^\[\[FIGURE_(\d+)\]\]$', part.strip())
+                    if m_tab:
+                        idx = int(m_tab.group(1))
+                        if idx in tables_dict:
+                            tbl = tables_dict[idx]
+                            # 칸마다 장(章) 전체가 들어간 신구대조표 같은 표는 표로 두면 색인이 터진다
+                            # (한 문서가 90MB를 만들었다). 5천 자를 넘으면 지금까지처럼 글로 담는다.
+                            size = sum(len(str(x)) for r in tbl.get('rows', []) for x in r)
+                            if size > 5000:
+                                flat = '\n'.join(' '.join(str(x) for x in r if str(x).strip())
+                                                 for r in tbl.get('rows', []))
+                                if blocks and blocks[-1].get('type') == 'text':
+                                    blocks[-1]['text'] += '\n' + flat
+                                else:
+                                    blocks.append({'type': 'text', 'text': flat})
+                            else:
+                                blocks.append(tbl)
+                    elif m_fig:
+                        pass
+
+
+                    else:
+                        if blocks and blocks[-1].get("type") == "text":
+                            blocks[-1]["text"] += "\n" + part
+                        else:
+                            blocks.append({"type": "text", "text": part})
+                
+                # Cleanup empty text blocks
+                final_blocks = []
+                for b in blocks:
+                    if b.get("type") == "text":
+                        b["text"] = b["text"].strip()
+                        if not b["text"]: continue
+                    final_blocks.append(b)
+                
+                chunk["blocks"] = final_blocks
+                if "text" in chunk: del chunk["text"]
+
             if chunks:
                 doc['chunks'] = chunks
                 if doc['category'] in indexed_by_cat:
@@ -408,14 +481,22 @@ def main():
         json.dump(syn_evidence, f, ensure_ascii=False, indent=1)
     for g in syn_evidence["synonym_groups"] + syn_evidence["review_needed"]:
         print("  동의어 근거:", g["counts"])
+    print("PUA Characters remaining:")
+    for char, count in sorted(global_pua_counter.items(), key=lambda x: x[1], reverse=True)[:20]:
+        print(f"U+{ord(char):04X}: {count}")
+    print("Total PUA chars:", sum(global_pua_counter.values()))
+
 
     # Write manifest
     with open(os.path.join(OUT_DIR, 'standards-manifest.js'), 'w', encoding='utf-8') as f:
         f.write("window.STANDARDS_MANIFEST = " + json.dumps(manifest_files) + ";\n")
-        
     out_failures = os.path.join(OUT_DIR, "indexing_failures.json")
-    with open(out_failures, 'w', encoding='utf-8') as f:
-        json.dump(failures, f, ensure_ascii=False, indent=2)
+    try:
+        with open(out_failures, 'w', encoding='utf-8') as f:
+            json.dump(failures, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print("Could not write failures json:", e)
+
 
     # 빌드 리포트: 같은 입력이면 같은 내용이 나오도록 시각 같은 변동값은 넣지 않는다.
     indexed = [d for items in indexed_by_cat.values() for d in items]

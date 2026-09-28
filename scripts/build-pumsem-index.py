@@ -11,85 +11,21 @@ except ImportError:
     sys.exit(1)
 
 from text_cleanup import chunk_text
+from table_utils import process_table
 
 DATA_DIR = r"C:\Pruden_KH\.Data"
 PDF_PATH = os.path.join(DATA_DIR, r"06.2026년 건설공사 표준품셈\2026년 건설공사 표준품셈.pdf")
 OUT_DIR = r"C:\Pruden_KH\WaterBIM\data"
 
-def clean_spaced_text(raw):
-    raw = re.sub(r'제\s+(\d+)\s+장', r'제\1장', raw)
-    raw = re.sub(r'(\d+)\s*-\s*(\d+)', r'\1-\2', raw)
-    
-    # 표 칸은 너비에 맞춰 글자를 벌려 쓴다('궤 도 공', '야 면 석 ( 野 面 石 )'). 벌어진 자간만 붙인다.
-    # 줄바꿈은 건드리지 않는다(한 칸에 여러 항목이 줄로 겹쳐 있고, 그 줄로 행을 나눈다).
-    # 정상 띄어쓰기도 건드리지 않는다('콘크리트 타설 후 양생'은 그대로 둔다).
-    res = []
-    for line in raw.split('\n'):
-        words = line.split()
-        if len(words) >= 2 and all(len(w) == 1 and '가' <= w <= '힣' for w in words):
-            res.append(line[:len(line) - len(line.lstrip())] + ''.join(words))
-        elif re.search(r'(?:^|\s)[가-힣一-鿿] [가-힣一-鿿](?:\s|$)', line):
-            # 괄호·한자·영문이 섞인 칸은 한 글자짜리 사이의 공백만 없앤다.
-            line = re.sub(r'(?<=[가-힣一-鿿]) (?=[가-힣一-鿿](?![가-힣一-鿿]))', '', line)
-            res.append(re.sub(r'\(\s+', '(', re.sub(r'\s+([),])', r'\1', line)))
-        else:
-            res.append(line)
-    return '\n'.join(res)
 
-def _merge_wrapped_lines(cell):
-    out = []
-    for line in cell.split('\n'):
-        if out and out[-1].count('(') > out[-1].count(')'):
-            out[-1] = out[-1] + ' ' + line.strip()
-        else:
-            out.append(line)
-    return '\n'.join(out)
+
+
 
 
 global_failures = []
 global_missing_pages = []
 
-def process_table(rows):
-    new_rows = []
-    header_rows = 1
-    
-    # Process cells
-    for r in rows:
-        cells = [c if c is not None else '' for c in r]
-        cells = [clean_spaced_text(c) for c in cells]
-        
-        # 한 항목이 칸 너비에 걸려 두 줄로 접힌 경우('이형철근 (교량 · 지하철및이와유사한' + '복잡한구조물의주철근)')
-        # 괄호가 닫히지 않은 줄은 다음 줄과 합친다. 그래야 칸마다 줄 수가 맞아 행으로 나눌 수 있다.
-        cells = [_merge_wrapped_lines(c) for c in cells]
 
-        # 한 칸에 여러 줄이 겹쳐 들어온 행은 줄 수만큼 행으로 나눈다.
-        # 여러 행에 걸친 칸(시공량 '250')은 1줄로 나오므로 첫 행에만 넣는다.
-        line_counts = [len(c.split('\n')) for c in cells if c.strip()]
-        cnt = max(line_counts) if line_counts else 1
-        if cnt > 1:
-            if all(n in (1, cnt) for n in line_counts):
-                for i in range(cnt):
-                    row = []
-                    for c in cells:
-                        parts = c.split('\n')
-                        row.append(parts[i] if len(parts) == cnt else (c if i == 0 else ''))
-                    new_rows.append(row)
-            else:
-                new_rows.append(cells)
-                global_failures.append({
-                    'reason': f'줄 수 불일치(최대 {cnt}줄, 실제 {line_counts})'
-                })
-        else:
-            new_rows.append(cells)
-            
-    # Detect header_rows
-    # We count rows starting from row 1 where the first cell is empty, up to the end
-    # Actually, in split rows, the first column might not be empty if it had same lines?
-    # No, usually merged headers don't have same lines as data rows, so they don't get split.
-    while header_rows < len(new_rows) and not str(new_rows[header_rows][0]).strip():
-        header_rows += 1
-        
-    return new_rows, header_rows
 
 def main():
     print("Opening PDF...")
@@ -146,7 +82,9 @@ def main():
         tables_info = []
         for tab in tabs.tables:
             raw_rows = tab.extract()
-            processed_rows, header_rows = process_table(raw_rows)
+            processed_rows, header_rows, error = process_table(raw_rows)
+            if error:
+                global_failures.append({"reason": error})
             tables_info.append({
                 "bbox": tab.bbox,
                 "rows": processed_rows,

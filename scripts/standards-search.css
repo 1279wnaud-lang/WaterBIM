@@ -241,3 +241,13 @@
   cursor: pointer;
 }
 .std-table-more:hover { background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+/* 원문 그림(표준도 설계설명서 등). 카드 폭에 맞추고 누르면 새 탭에서 크게 본다. */
+.std-figure { margin: 4px 0; }
+.std-figure img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  cursor: zoom-in;
+}

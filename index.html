@@ -559,7 +559,7 @@ h1 { font-size:29px; font-weight:600; letter-spacing:-1px; margin-bottom:22px; }
 .chip { min-height:35px; padding:8px 13px; background:#ffffffa8; font-size:12px; border-color:transparent; }
 .chip:not(.active) { opacity:1; color:#626370; }
 .chip.active { background:#e5e0f7; border-color:#d2cbea; color:#38314c; }
-#meta,#colorMeta,#dictMeta,#stdMeta { margin-top:15px; font-size:13px; }
+#meta,#colorMeta,#dictMeta,#stdMeta,#pumsemMeta { margin-top:15px; font-size:13px; }
 .layout,.layout.split,.dict-list,.color-groups,#mr-app,#mc-app,#pc-app { max-width:none; padding:0 36px 36px; margin:0; }
 .layout.split { grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:20px; }
 .dict-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-items:start; }
@@ -1030,6 +1030,16 @@ button:focus-visible,.nav-item:focus-visible { outline:3px solid #8271b8; outlin
   cursor: pointer;
 }
 .std-table-more:hover { background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+/* 원문 그림(표준도 설계설명서 등). 카드 폭에 맞추고 누르면 새 탭에서 크게 본다. */
+.std-figure { margin: 4px 0; }
+.std-figure img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  cursor: zoom-in;
+}
 </style>
 </head>
 <body>
@@ -7089,14 +7099,9 @@ update();
       list.querySelectorAll('.std-card').forEach((el) => {
         const btn = el.querySelector('.std-full-toggle');
         const item = results[Number(el.dataset.i)];
+        // 더 보여 줄 내용이 없으면 버튼을 숨긴다. 괜히 눌러 보게 된다.
         const body = config.renderBody(item.chunk, rx, false);
-        // For standards, we hide if scrollHeight <= clientHeight. For pumsem, we hide if not cut.
-        if (config.tabId === 'pumsem') {
-          if (!body.cut) btn.hidden = true;
-        } else {
-          const t = el.querySelector('.std-card-text');
-          if (btn && !body.cut && t && t.scrollHeight <= t.clientHeight + 2) btn.hidden = true;
-        }
+        if (btn && !body.cut) btn.hidden = true;
       });
     }
 
@@ -7188,12 +7193,17 @@ update();
       const rx = query ? highlighter(query) : null;
       
       const newBody = config.renderBody(item.chunk, rx, open);
-      const textContainer = el.querySelector('.std-card-text') || el.querySelector('.pumsem-blocks');
-      
-      if (textContainer) {
-        textContainer.outerHTML = newBody.html;
+      // 본문 전체(블록 묶음)를 통째로 바꾼다. 안쪽 문단 하나만 바꾸면 펼쳐지지 않고
+      // 카드 구조가 어그러져 화면이 튄다.
+      const container = el.querySelector('.pumsem-blocks') || el.querySelector('.std-card-text');
+      if (container) {
+        // 펼치고 접을 때 보던 자리를 지킨다.
+        const before = el.getBoundingClientRect().top;
+        container.outerHTML = newBody.html;
+        const after = el.getBoundingClientRect().top;
+        if (after !== before) window.scrollBy(0, after - before);
       }
-      
+
       toggle.setAttribute('aria-expanded', String(open));
       toggle.textContent = open ? '접기' : (newBody.cut ? (config.tabId === 'pumsem' ? '펼쳐 보기' : '조항 전체 보기') : '펼쳐 보기');
     });
@@ -7289,15 +7299,8 @@ update();
     resultsId: 'stdResults',
     globalIndex: 'STANDARDS_INDEX',
     manifest: 'STANDARDS_MANIFEST',
-    getText: (chunk) => chunk.text || '',
-    renderBody: (chunk, rx, open) => {
-      const text = (chunk.text || '').replace(/\n/g, ' ');
-      const ex = open ? { text, cut: false } : excerpt(text, rx);
-      return {
-        html: '<p class="std-card-text ' + (open ? 'expanded' : '') + '">' + highlight(ex.text, rx) + '</p>',
-        cut: ex.cut || text.length > EXCERPT_LEN
-      };
-    }
+    getText: blockText,
+    renderBody: (chunk, rx, open) => renderBlocks(chunk, rx, open)
   });
 
   // Initialize Pumsem Tab
@@ -7309,52 +7312,74 @@ update();
     resultsId: 'pumsemResults',
     globalIndex: 'PUMSEM_INDEX',
     manifest: 'PUMSEM_MANIFEST',
-    getText: (chunk) => {
-      return (chunk.blocks || []).map(b => {
-        if (b.type === 'text') return b.text;
-        const tbl = b.table || b;
-        return tbl.rows ? tbl.rows.flat().join(' ') : '';
-      }).join('\n');
-    },
-    renderBody: (chunk, rx, open) => {
-      let html = '<div class="pumsem-blocks ' + (open ? 'expanded' : '') + '">';
-      let blockCount = 0;
-      let cut = false;
-      const all = chunk.blocks || [];
-      // 접힌 카드는 검색어가 있는 블록부터 보여준다(설계기준 발췌와 같은 규칙).
-      // 표가 여러 개인 항목에서 첫 표만 보이고 정작 찾는 표는 안 보이는 일을 막는다.
-      let from = 0;
-      if (!open && rx) {
-        // 검색어를 가장 많이(서로 다른 낱말 기준) 담은 블록부터 보여준다.
-        // '원형철근 할증률'이면 '할증률'만 있는 머리글이 아니라 원형철근이 있는 표에서 시작한다.
-        const hits = (b) => {
-          const text = b.type === 'text' ? (b.text || '')
-            : ((b.table || b).rows || []).map((r) => r.join(' ')).join(' ');
-          rx.lastIndex = 0;
-          const found = new Set();
-          for (let m; (m = rx.exec(text));) { if (!m[0]) { rx.lastIndex++; continue; } found.add(norm(m[0])); }
-          return found.size;
-        };
-        let best = 0, bestAt = 0;
-        all.forEach((b, i) => { const n = hits(b); if (n > best) { best = n; bestAt = i; } });
-        from = bestAt;
-      }
-      const blocks = all.slice(from);
-      if (from > 0) { html += '<p class="std-card-text">…</p>'; cut = true; }
-      for (const b of blocks) {
-        if (!open && blockCount >= 2) { cut = true; break; }
-        if (b.type === 'text') {
-          html += '<p class="std-card-text">' + highlight(b.text, rx) + '</p>';
-          blockCount++;
-        } else if (b.type === 'table') {
-          html += renderTable(b.table || b, rx);
-          blockCount++;
-        }
-      }
-      html += '</div>';
-      return { html, cut: cut || (!open && all.length > 2) };
-    }
+    getText: blockText,
+    renderBody: (chunk, rx, open) => renderBlocks(chunk, rx, open)
   });
+
+  // 조각 하나의 글자 전부(글 블록 + 표 칸). 점수 매기기와 강조에 쓴다.
+  // 옛 형식(chunk.text)도 함께 받는다.
+  function blockText(chunk) {
+    if (!chunk.blocks) return chunk.text || '';
+    return chunk.blocks.map((b) => {
+      if (b.type === 'text') return b.text || '';
+      if (b.type === 'table') return ((b.table || b).rows || []).map((r) => r.join(' ')).join('\n');
+      return '';
+    }).join('\n');
+  }
+
+  // 카드 본문 그리기. 글 블록·표·그림을 원문 순서대로 보여준다.
+  // 접힌 카드는 검색어를 가장 많이 담은 블록부터 두 덩어리만 보여주고, 긴 글은 검색어 주변만 발췌한다.
+  function renderBlocks(chunk, rx, open) {
+    const all = chunk.blocks || (chunk.text ? [{ type: 'text', text: chunk.text }] : []);
+    let from = 0;
+    if (!open && rx && all.length > 1) {
+      const hits = (b) => {
+        const t = b.type === 'text' ? (b.text || '')
+          : b.type === 'table' ? ((b.table || b).rows || []).map((r) => r.join(' ')).join(' ') : '';
+        rx.lastIndex = 0;
+        const found = new Set();
+        for (let m; (m = rx.exec(t));) { if (!m[0]) { rx.lastIndex++; continue; } found.add(norm(m[0])); }
+        return found.size;
+      };
+      let best = 0;
+      all.forEach((b, i) => { const n = hits(b); if (n > best) { best = n; from = i; } });
+    }
+    let html = '<div class="pumsem-blocks ' + (open ? 'expanded' : '') + '">';
+    let cut = from > 0;
+    if (from > 0) html += '<p class="std-card-text">…</p>';
+    // 접힌 카드에서도 그림은 보여준다(그림이 그 조항의 핵심인 경우가 많다).
+    const firstFigure = all.slice(from).find((b) => b.type === 'figure' && b.src);
+    let figureShown = false;
+    let shown = 0;
+    for (const b of all.slice(from)) {
+      if (!open && shown >= 2) {
+        cut = true;
+        if (firstFigure && !figureShown) {
+          html += '<figure class="std-figure"><img src="' + esc(firstFigure.src) + '" loading="lazy" alt="' +
+            esc('원문 ' + (firstFigure.page || chunk.page || '') + '쪽 그림') + '"></figure>';
+          figureShown = true;
+        }
+        break;
+      }
+      if (b.type === 'text') {
+        const raw = b.text || '';
+        const ex = open ? { text: raw, cut: false } : excerpt(raw, rx);
+        if (ex.cut) cut = true;
+        html += '<p class="std-card-text ' + (open ? 'expanded' : '') + '">' + highlight(ex.text, rx) + '</p>';
+        shown++;
+      } else if (b.type === 'table') {
+        html += renderTable(b.table || b, rx);
+        shown++;
+      } else if (b.type === 'figure' && b.src) {
+        html += '<figure class="std-figure"><img src="' + esc(b.src) + '" loading="lazy" alt="' +
+          esc('원문 ' + (b.page || chunk.page || '') + '쪽 그림') + '"></figure>';
+        figureShown = true;
+        shown++;
+      }
+    }
+    html += '</div>';
+    return { html, cut: cut || (!open && all.length - from > 2) };
+  }
 
   // 품셈 표 그리기. 한 칸에 여러 줄이 겹쳐 들어온 행은 줄 수가 맞으면 행으로 나누고,
   // 빈 행·빈 열은 빼서 표를 좁게 만든다. 숫자 칸은 오른쪽에 붙여 자릿수를 맞춘다.
@@ -7362,13 +7387,8 @@ update();
     let rows = (tbl.rows || []).map((r) => r.map((c) => String(c == null ? '' : c)));
     // 머리 행만 있고 본문이 없는 표(원문에서 표가 쪽 경계로 잘린 경우)는 머리 행을 본문처럼 보여준다.
     const header = Math.min(tbl.header_rows || 0, Math.max(0, rows.length - 1));
-    const body = rows.slice(header).flatMap((row) => {
-      const counts = row.filter((c) => c.trim()).map((c) => c.split('\n').length);
-      const n = counts.length ? Math.max(...counts) : 1;
-      if (n < 2 || !counts.every((x) => x === n)) return [row];
-      return Array.from({ length: n }, (_, i) => row.map((c) => (c.trim() ? c.split('\n')[i] : '')));
-    });
-    rows = rows.slice(0, header).concat(body);
+    // 행 나누기는 색인을 만들 때 끝낸다. 화면에서 또 나누면 칸 너비에 걸려 접힌 줄('총'+'인장응력')까지
+    // 갈라져 어느 항목의 값인지 알 수 없게 된다(2026-09-28 사용자 지적).
     const width = Math.max(0, ...rows.map((r) => r.length));
     const keep = [];
     for (let c = 0; c < width; c++) if (rows.some((r) => (r[c] || '').trim())) keep.push(c);

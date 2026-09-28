@@ -161,13 +161,17 @@ def chunk_text(pages, doc_title, doc_code="", heading_pattern=None, toc_pattern=
             if not m:
                 return False
             num, title = m.group(1), m.group(2).strip()
+            
+            if title.count('(') != title.count(')'):
+                return False
+            if re.search(r'(의|는|은|을|를|에|와|과|로|에서|으로|까지|부터|보다|하게|하여|하고|지만|므로|이다|한다|다\.|다)$', title):
+                return False
+                
             if re.match(r'(이하|이상|초과|미만)(?![가-힣])', title):
                 return False
             if re.match(r'[a-zμ]', title) or re.match(r'\([\d.]+\)', title):
                 return False
             if re.match(r'\d', title) and not re.match(r'\d+[가-힣]', title):
-                return False
-            if '.0.' in num + '.':
                 return False
             return True
         is_valid_heading = default_is_valid_heading

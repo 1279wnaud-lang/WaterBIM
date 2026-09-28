@@ -2,9 +2,9 @@
  "documents_in_scope": 964,
  "documents_indexed": 961,
  "failures": 1,
- "chunks": 54134,
- "chunks_over_10000_chars_before_split": 222,
- "front_matter_chunks_dropped": 846,
+ "chunks": 42799,
+ "chunks_over_10000_chars_before_split": 169,
+ "front_matter_chunks_dropped": 817,
  "by_category": {
   "supply": 76,
   "sewer": 51,
@@ -28,16 +28,16 @@
   "02_기관별_지침/상하수도_실무지침/토양오염공정시험기준_일부개정(130912)_6412aaad52ea.zip"
  ],
  "files": {
-  "standards-index-supply.js": 2113630,
-  "standards-index-sewer.js": 1650463,
-  "standards-index-kwcs.js": 5483153,
-  "standards-index-guide-1.js": 15713939,
-  "standards-index-guide-2.js": 15722416,
-  "standards-index-guide-3.js": 8476887,
-  "standards-index-civil.js": 6590536,
-  "standards-index-bim.js": 411942,
-  "standards-index-kwdi.js": 5206877,
-  "standards-index-kwsp-1.js": 15719113,
-  "standards-index-kwsp-2.js": 471119
+  "standards-index-supply.js": 2184897,
+  "standards-index-sewer.js": 1705853,
+  "standards-index-kwcs.js": 6393213,
+  "standards-index-guide-1.js": 15575256,
+  "standards-index-guide-2.js": 15113083,
+  "standards-index-guide-3.js": 10810925,
+  "standards-index-civil.js": 7573376,
+  "standards-index-bim.js": 477046,
+  "standards-index-kwdi.js": 5633204,
+  "standards-index-kwsp-1.js": 15728646,
+  "standards-index-kwsp-2.js": 1560194
  }
 }
