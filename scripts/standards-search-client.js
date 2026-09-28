@@ -109,7 +109,21 @@
         '</div>' +
         '<div class="std-card-footer">' +
           '<span>출처 - <span title="' + esc(doc.path || '') + '">' + esc(file) + '</span>' +
-          (chunk.page ? ' · ' + esc(String(chunk.page)) + '쪽' + (chunk.printed_page ? '(책 ' + esc(String(chunk.printed_page)) + '쪽)' : '') : '') + '</span>' +
+          (function() {
+            if (!item.mergedChunks || !item.mergedChunks.length) return '';
+            const pages = item.mergedChunks.map(c => c.page ? (c.printed_page ? String(c.page) + '쪽(책 ' + String(c.printed_page) + '쪽)' : String(c.page)) : '').filter(Boolean);
+            if (!pages.length) return '';
+            const uPages = [...new Set(pages)];
+            const hasPrinted = uPages.some(p => p.includes('책'));
+            let displayPages = uPages;
+            let suffix = '';
+            if (uPages.length > 6) {
+              displayPages = uPages.slice(0, 5);
+              suffix = ' 외 ' + (uPages.length - 5) + '곳';
+            }
+            if (hasPrinted) return ' · ' + esc(displayPages.join('·')) + esc(suffix);
+            return ' · ' + esc(displayPages.join('·')) + '쪽' + esc(suffix);
+          })() + '</span>' +
         '</div>' +
       '</article>';
     }
@@ -165,6 +179,30 @@
         });
       }
       results.sort((a, b) => b.score - a.score || String(b.doc.revision_date || '').localeCompare(String(a.doc.revision_date || '')));
+      
+      const grouped = [];
+      for (const item of results) {
+        const textRaw = config.getText(item.chunk);
+        const textNoSpace = textRaw.replace(/\s+/g, '');
+        
+        let merged = false;
+        if (textNoSpace.length >= 60) {
+          for (const g of grouped) {
+            if (g.doc.path === item.doc.path && g._textNoSpace === textNoSpace) {
+              g.mergedChunks.push(item.chunk);
+              merged = true;
+              break;
+            }
+          }
+        }
+        
+        if (!merged) {
+          item.mergedChunks = [item.chunk];
+          item._textNoSpace = textNoSpace;
+          grouped.push(item);
+        }
+      }
+      results = grouped;
       draw();
       const typed = raw.split(/\s+/);
       const extra = [...new Set(query.groups.flat())].filter((w) => norm(w) !== norm(raw) && !typed.includes(w));

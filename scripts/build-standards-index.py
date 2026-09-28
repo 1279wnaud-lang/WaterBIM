@@ -49,6 +49,63 @@ def category_of(path):
 
 
 
+
+def add_kwsd_standard_drawings(docs):
+    import os, hashlib, re
+    base_dir = r'C:\Users\user\Desktop\KWSD 57 00 00 상하수도부문 표준도'
+    if not os.path.exists(base_dir):
+        return
+    seen_hashes = set()
+    
+    kwsd_code_rx = re.compile(r'(KWSD\s+\d{2}\s+\d{2}\s+\d{2})')
+    rev_date_rx = re.compile(r'(20\d{2}년\s+\d{1,2}월\s+\d{1,2}일\s*개정)')
+    
+    for root, _, files in os.walk(base_dir):
+        # Sort files to ensure deterministic behavior
+        for f in sorted(files):
+            ext = os.path.splitext(f)[1].lower()
+            if ext not in ['.pdf', '.hwp']:
+                continue
+                
+            full_path = os.path.join(root, f)
+            with open(full_path, 'rb') as file_obj:
+                content = file_obj.read()
+                file_hash = hashlib.sha256(content).hexdigest()
+            
+            if file_hash in seen_hashes:
+                continue
+            seen_hashes.add(file_hash)
+            
+            code = ''
+            revision_date = ''
+            
+            pages = []
+            if ext == '.pdf':
+                pages, _ = extract_pdf_text(full_path)
+            elif ext == '.hwp':
+                pages, _ = extract_hwp_text(full_path)
+                
+            if pages:
+                for p in pages[:5]:
+                    ptext = p['text']
+                    c_match = kwsd_code_rx.search(ptext)
+                    if c_match and not code:
+                        code = c_match.group(1)
+                    r_match = rev_date_rx.search(ptext)
+                    if r_match and not revision_date:
+                        revision_date = r_match.group(1)
+                        
+            title = re.sub(r'^\d+\.\s*', '', f)
+            docs.append({
+                'path': f,
+                'title': os.path.splitext(title)[0], # ensure no extension in title
+                'code': code,
+                'revision_date': revision_date,
+                'document_role': 'kwdi',
+                'category': 'kwdi',
+                'absolute_path': full_path
+            })
+
 def get_all_documents():
     docs, replaced = get_core_documents()
     import json, datetime
@@ -223,7 +280,10 @@ def extract_excel_text(filepath):
 from text_cleanup import chunk_text
 
 def main():
+    
     docs, replaced_containers = get_all_documents()
+    add_kwsd_standard_drawings(docs)
+
     print(f"Total documents to process: {len(docs)} (압축파일 {len(replaced_containers)}개는 풀린 문서로 대체)")
     
     indexed_by_cat = {"supply": [], "sewer": [], "kwcs": [], "guide": [], "civil": [], "bim": [], "kwdi": [], "kwsp": []}
@@ -233,9 +293,11 @@ def main():
     
     for i, doc in enumerate(docs):
         path = doc['path']
-        full_path = os.path.join(DATA_DIR, path.replace("/", "\\"))
-        if path.startswith("05.K-water"):
-            full_path = os.path.join(r"C:\Pruden_KH\.Data", path.replace("/", "\\"))
+        full_path = doc.get("absolute_path")
+        if not full_path:
+            full_path = os.path.join(DATA_DIR, path.replace("/", "\\"))
+            if path.startswith("05.K-water"):
+                full_path = os.path.join(r"C:\Pruden_KH\.Data", path.replace("/", "\\"))
         print(f"[{i+1}/{len(docs)}] {path}", flush=True)
         
         if not os.path.exists(full_path):

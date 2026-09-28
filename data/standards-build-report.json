@@ -1,10 +1,10 @@
 {
- "documents_in_scope": 956,
- "documents_indexed": 953,
+ "documents_in_scope": 964,
+ "documents_indexed": 961,
  "failures": 1,
- "chunks": 54068,
+ "chunks": 54134,
  "chunks_over_10000_chars_before_split": 222,
- "front_matter_chunks_dropped": 841,
+ "front_matter_chunks_dropped": 846,
  "by_category": {
   "supply": 76,
   "sewer": 51,
@@ -12,7 +12,7 @@
   "guide": 243,
   "civil": 215,
   "bim": 11,
-  "kwdi": 93,
+  "kwdi": 101,
   "kwsp": 68
  },
  "containers_replaced_by_extracted_files": [
@@ -36,7 +36,7 @@
   "standards-index-guide-3.js": 8476887,
   "standards-index-civil.js": 6590536,
   "standards-index-bim.js": 411942,
-  "standards-index-kwdi.js": 5112415,
+  "standards-index-kwdi.js": 5206877,
   "standards-index-kwsp-1.js": 15719113,
   "standards-index-kwsp-2.js": 471119
  }
