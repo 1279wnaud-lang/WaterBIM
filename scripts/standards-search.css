@@ -1,5 +1,6 @@
 /* 설계기준 검색 탭. 색은 전역 토큰을 쓰고, 분야 구분 점 색만 이 탭의 토큰으로 둔다. */
-.tab-panel[data-tab="standards-search"] {
+.tab-panel[data-tab="standards-search"],
+.tab-panel[data-tab="pumsem"] {
   --std-supply: #0284C7;
   --std-sewer: #059669;
   --std-kwcs: #D97706;
@@ -8,6 +9,12 @@
   --std-bim: #DB2777;
   --std-kwdi: #2563EB;
   --std-kwsp: #D97706;
+  /* 표준품셈 부문 */
+  --pum-common: #0EA5E9;
+  --pum-civil: #16A34A;
+  --pum-arch: #D97706;
+  --pum-mech: #7C3AED;
+  --pum-maint: #DB2777;
 }
 .std-results {
   display: flex;
@@ -151,6 +158,11 @@
 #stdFilters .chip[data-filter="civil"] .dot { background: var(--std-civil); }
 #stdFilters .chip[data-filter="kwdi"] .dot { background: var(--std-kwdi); }
 #stdFilters .chip[data-filter="kwsp"] .dot { background: var(--std-kwsp); }
+#pumsemFilters .chip[data-filter="공통"] .dot { background: var(--pum-common); }
+#pumsemFilters .chip[data-filter="토목"] .dot { background: var(--pum-civil); }
+#pumsemFilters .chip[data-filter="건축"] .dot { background: var(--pum-arch); }
+#pumsemFilters .chip[data-filter="기계설비"] .dot { background: var(--pum-mech); }
+#pumsemFilters .chip[data-filter="유지관리"] .dot { background: var(--pum-maint); }
 
 .pumsem-blocks { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .pumsem-blocks .std-card-text { max-height: none; }

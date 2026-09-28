@@ -19,17 +19,20 @@ OUT_DIR = r"C:\Pruden_KH\WaterBIM\data"
 def clean_spaced_text(raw):
     raw = re.sub(r'제\s+(\d+)\s+장', r'제\1장', raw)
     raw = re.sub(r'(\d+)\s*-\s*(\d+)', r'\1-\2', raw)
+    
+    # 표 칸은 너비에 맞춰 글자를 벌려 쓴다('궤 도 공', '야 면 석 ( 野 面 石 )'). 벌어진 자간만 붙인다.
+    # 줄바꿈은 건드리지 않는다(한 칸에 여러 항목이 줄로 겹쳐 있고, 그 줄로 행을 나눈다).
+    # 정상 띄어쓰기도 건드리지 않는다('콘크리트 타설 후 양생'은 그대로 둔다).
     res = []
     for line in raw.split('\n'):
         words = line.split()
         if len(words) >= 2 and all(len(w) == 1 and '가' <= w <= '힣' for w in words):
             res.append(line[:len(line) - len(line.lstrip())] + ''.join(words))
+        elif re.search(r'(?:^|\s)[가-힣一-鿿] [가-힣一-鿿](?:\s|$)', line):
+            # 괄호·한자·영문이 섞인 칸은 한 글자짜리 사이의 공백만 없앤다.
+            line = re.sub(r'(?<=[가-힣一-鿿]) (?=[가-힣一-鿿](?![가-힣一-鿿]))', '', line)
+            res.append(re.sub(r'\(\s+', '(', re.sub(r'\s+([),])', r'\1', line)))
         else:
-            # 괄호·한자·영문이 섞인 칸('굴 착 기 + 부 착 용 집 게', '토 적 ( 높 이 , 너 비 )')은
-            # 한 글자 한글 사이의 공백만 없앤다. 다른 글자 앞뒤 공백은 그대로 둔다.
-            if re.search(r'(?:^|\s)[가-힣一-鿿] [가-힣一-鿿](?:\s|$)', line):
-                line = re.sub(r'(?<=[가-힣一-鿿]) (?=[가-힣一-鿿](?![가-힣一-鿿]))', '', line)
-                line = re.sub(r'\(\s+', '(', re.sub(r'\s+([),])', r'\1', line))  # '( 野面石 )' → '(野面石)'
             res.append(line)
     return '\n'.join(res)
 
@@ -42,6 +45,9 @@ def _merge_wrapped_lines(cell):
             out.append(line)
     return '\n'.join(out)
 
+
+global_failures = []
+global_missing_pages = []
 
 def process_table(rows):
     new_rows = []
@@ -60,13 +66,19 @@ def process_table(rows):
         # 여러 행에 걸친 칸(시공량 '250')은 1줄로 나오므로 첫 행에만 넣는다.
         line_counts = [len(c.split('\n')) for c in cells if c.strip()]
         cnt = max(line_counts) if line_counts else 1
-        if cnt > 1 and all(n in (1, cnt) for n in line_counts):
-            for i in range(cnt):
-                row = []
-                for c in cells:
-                    parts = c.split('\n')
-                    row.append(parts[i] if len(parts) == cnt else (c if i == 0 else ''))
-                new_rows.append(row)
+        if cnt > 1:
+            if all(n in (1, cnt) for n in line_counts):
+                for i in range(cnt):
+                    row = []
+                    for c in cells:
+                        parts = c.split('\n')
+                        row.append(parts[i] if len(parts) == cnt else (c if i == 0 else ''))
+                    new_rows.append(row)
+            else:
+                new_rows.append(cells)
+                global_failures.append({
+                    'reason': f'줄 수 불일치(최대 {cnt}줄, 실제 {line_counts})'
+                })
         else:
             new_rows.append(cells)
             
@@ -83,6 +95,32 @@ def main():
     print("Opening PDF...")
     doc = pymupdf.open(PDF_PATH)
     
+    print("Parsing TOC...")
+    categories_start = {}
+    expecting = None
+    for i in range(2, 51):
+        for b in doc[i].get_text('blocks'):
+            txt = b[4].strip()
+            m = re.fullmatch(r'(공통|토목|건축|기계설비|유지관리)부문', txt)
+            if m:
+                expecting = m.group(1)
+            elif expecting:
+                m2 = re.search(r'제\s*\d+\s*장\n[^\n]+\n(\d+)', txt)
+                if m2:
+                    categories_start[expecting] = int(m2.group(1))
+                    expecting = None
+
+    print(f"Categories Start: {categories_start}")
+    
+    # helper to find category by page
+    def get_category_by_page(p):
+        if not p: return None
+        if p >= categories_start.get('유지관리', 857): return '유지관리'
+        if p >= categories_start.get('기계설비', 645): return '기계설비'
+        if p >= categories_start.get('건축', 569): return '건축'
+        if p >= categories_start.get('토목', 307): return '토목'
+        return '공통'
+
     pages = []
     tables_list = []
     table_counter = 0
@@ -93,12 +131,16 @@ def main():
             
         page = doc[page_num]
         
-        # Determine category from header
-        category = "공통"
-        text = page.get_text("text")
-        m = re.search(r'(공통|토목|건축|기계설비|유지관리)부문', text)
-        if m:
-            category = m.group(1)
+        # Extract printed page from footer
+        printed_page = None
+            
+        for b in page.get_text("blocks"):
+            if b[6] != 0: continue
+            if b[1] > 790:
+                m2 = re.search(r'^\s*(\d+)\s*(?:\n|$)', b[4])
+                if m2:
+                    printed_page = int(m2.group(1))
+                    break
             
         tabs = page.find_tables()
         tables_info = []
@@ -163,13 +205,11 @@ def main():
                 
         pages.append({
             "page": page_num + 1,
-            "book_page": book_page,
-            "category": category,
+            "printed_page": printed_page,
             "text": "\n".join(line for _, line in lines_stream)
         })
 
-    page_categories = {p['page']: p['category'] for p in pages}
-    page_books = {p['page']: p.get('book_page') for p in pages}
+    page_printed = {p['page']: p['printed_page'] for p in pages if p.get('printed_page')}
         
     print(f"Total tables: {len(tables_list)}")
     
@@ -207,11 +247,17 @@ def main():
         chunk["blocks"] = blocks
         del chunk["text"]
         
-        # Determine category
-        chunk["category"] = page_categories.get(chunk["page"], "공통")
-        # 책에 인쇄된 쪽 번호. 출처에 'PDF 401쪽(책 345쪽)'으로 함께 보여준다.
-        if page_books.get(chunk["page"]):
-            chunk["book_page"] = page_books[chunk["page"]]
+        # Determine category and printed page
+        if chunk["page"] in page_printed:
+            chunk["printed_page"] = page_printed[chunk["page"]]
+            chunk["category"] = get_category_by_page(chunk["printed_page"])
+        else:
+            # Fallback to previous chunk's category
+            if len(final_chunks) > 0:
+                chunk["category"] = final_chunks[-1]["category"]
+            else:
+                chunk["category"] = "공통"
+            global_missing_pages.append({"page": chunk["page"], "clause_title": chunk["clause_title"]})
         final_chunks.append(chunk)
         
     # Document info
@@ -237,13 +283,22 @@ def main():
         f.write("window.PUMSEM_MANIFEST = ['pumsem-index.js'];\n")
     
     # Build report
+    chapter_count = sum(1 for c in final_chunks if re.match(r'^제\s*\d+\s*장\.?', c["clause_title"].split()[0]))
+    nm_count = sum(1 for c in final_chunks if re.match(r'^\d{1,2}-\d{1,2}\.?$', c["clause_title"].split()[0]))
+    nmk_count = sum(1 for c in final_chunks if re.match(r'^\d{1,2}-\d{1,2}-\d{1,2}\.?$', c["clause_title"].split()[0]))
+
     report = {
         "total_pages": len(doc),
         "excluded_pages": 56,
         "items_count": len(final_chunks),
+        "chapter_count": chapter_count,
+        "nm_count": nm_count,
+        "nmk_count": nmk_count,
         "tables_count": len(tables_list),
         "cells_count": sum(len(r) for t in tables_list for r in t["rows"]),
-        "failures": []
+        "failures": global_failures,
+        "missing_pages": global_missing_pages,
+        "toc_categories": categories_start
     }
     
     with open(os.path.join(OUT_DIR, "pumsem-build-report.json"), 'w', encoding='utf-8') as f:

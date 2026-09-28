@@ -98,7 +98,7 @@
       return '<article class="std-card" data-i="' + i + '" data-key="' + esc(item.key) + '">' +
         '<div class="std-card-header"><div>' +
           '<div class="std-card-meta">' +
-            (doc.code ? '<span>' + esc(doc.code) + '</span><span aria-hidden="true">|</span>' : '') +
+            (doc.code && doc.code.trim() ? '<span>' + esc(doc.code.trim()) + '</span><span aria-hidden="true">|</span> ' : '') +
             '<span>' + esc(doc.revision_date || doc.edition_date_hint || '날짜 미상') + '</span>' + badges + '</div>' +
           '<div class="std-card-title">' + esc(doc.title || '') + '</div>' +
         '</div></div>' +
@@ -109,9 +109,7 @@
         '</div>' +
         '<div class="std-card-footer">' +
           '<span>출처 - <span title="' + esc(doc.path || '') + '">' + esc(file) + '</span>' +
-          (chunk.page ? ' · ' + esc(String(chunk.page)) + '쪽' : '') +
-          // 품셈은 PDF 쪽과 책에 인쇄된 쪽이 다르다(PDF 401쪽 = 책 345쪽). 둘 다 보여준다.
-          (chunk.book_page ? '(책 ' + esc(String(chunk.book_page)) + '쪽)' : '') + '</span>' +
+          (chunk.page ? ' · ' + esc(String(chunk.page)) + '쪽' + (chunk.printed_page ? '(책 ' + esc(String(chunk.printed_page)) + '쪽)' : '') : '') + '</span>' +
         '</div>' +
       '</article>';
     }
@@ -136,6 +134,12 @@
       });
     }
 
+    // 분야 필터. 설계기준은 문서마다, 표준품셈은 한 문서(PDF 한 권) 안에서 조각마다 분야가 다르다.
+    function inScope(doc, chunk) {
+      if (filter === 'all') return true;
+      return doc.category ? doc.category === filter : chunk.category === filter;
+    }
+
     function search() {
       if (!loaded) { meta.textContent = '색인 데이터를 불러오는 중...'; return; }
       synonyms = (window.STANDARDS_SYNONYMS && window.STANDARDS_SYNONYMS.synonym_groups) || [];
@@ -143,15 +147,19 @@
       limit = PAGE_SIZE;
       if (!raw) {
         results = []; query = null; list.innerHTML = '<p class="empty">검색어를 입력하세요.</p>';
-        const total = (window[config.globalIndex] || []).reduce((n, d) => n + (d.chunks || []).length, 0);
+        // 필터를 누르면 그 분야에서 찾을 수 있는 조항 수를 보여준다.
+        let total = 0;
+        for (const d of window[config.globalIndex] || []) {
+          for (const c of d.chunks || []) if (inScope(d, c)) total++;
+        }
         meta.textContent = '총 ' + total.toLocaleString() + '개 조항 검색 가능';
         return;
       }
       query = parseQuery(raw);
       results = [];
       for (const doc of window[config.globalIndex] || []) {
-        if (filter !== 'all' && doc.category !== filter) continue;
         (doc.chunks || []).forEach((chunk, ci) => {
+          if (!inScope(doc, chunk)) return;
           const s = score(chunk, doc, query);
           if (s > -1) results.push({ chunk, doc, score: s, key: doc.path + '#' + ci });
         });
